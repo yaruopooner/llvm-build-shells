@@ -117,6 +117,19 @@ function appendToEnvPath( $path )
     }
 }
 
+function syncNewDirectory( $targetPath )
+{
+    if ( Test-Path $targetPath )
+    {
+        echo "remove old dir = $targetPath"
+        Remove-Item -path $targetPath -recurse -force
+    }
+    while ( Test-Path $targetPath )
+    {
+        Start-Sleep -m 500
+    }
+    New-Item -name $targetPath -type directory
+}
 
 function importScriptEnvVariables( $script, $scriptArg )
 {
@@ -171,6 +184,11 @@ function setupCommonVariables()
     {
         $LLVMBuildEnv.WorkingDir = $workingDirectory
     }
+
+    if ( $LLVMBuildEnv.BuildDir -eq $null )
+    {
+        $LLVMBuildEnv.BuildDir = "build"
+    }
 }
 
 function executeCommon()
@@ -199,16 +217,7 @@ function executeCheckoutBySVN()
 
     $checkout_root_dir = $LLVMBuildEnv.CheckoutRootDir
 
-    if ( Test-Path $checkout_root_dir )
-    {
-        echo "phase:SVN:remove old dir = $checkout_root_dir"
-        Remove-Item -path $checkout_root_dir -recurse -force
-    }
-    while ( Test-Path $checkout_root_dir )
-    {
-        Start-Sleep -m 500
-    }
-    New-Item -name $checkout_root_dir -type directory
+    syncNewDirectory -targetPath $checkout_root_dir
 
 
     # proxy がある場合は ~/.subversion/servers に host と port を指定
@@ -276,11 +285,6 @@ function setupCMakeVariables()
 
         $LLVMBuildEnv.CMAKE.PlatformDir = $const_vars.PLATFORM[ $platform ].Directory
     }
-
-    if ( $LLVMBuildEnv.BuildDir -eq $null )
-    {
-        $LLVMBuildEnv.BuildDir = "build"
-    }
 }
 
 
@@ -302,16 +306,7 @@ function executeCMake()
     }
     cd $build_dir
 
-    if ( Test-Path $platform_dir )
-    {
-        echo "phase:CMAKE:remove old dir = $platform_dir"
-        Remove-Item -path $platform_dir -recurse -force
-    }
-    while ( Test-Path $platform_dir )
-    {
-        Start-Sleep -m 500
-    }
-    New-Item -name $platform_dir -type directory
+    syncNewDirectory -targetPath $platform_dir
 
     cd $platform_dir
 

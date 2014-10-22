@@ -10,10 +10,12 @@ $gnu32 = "c:/cygwin-x86_64/tmp/GnuWin32"
 
 
 . $builderShell -targets @("SVN") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
-. $builderShell -targets @("CMAKE", "MSBUILD") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
-. $builderShell -targets @("CMAKE", "MSBUILD") -clangVersion 350 -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
-# . $builderShell -targets @("MSBUILD") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
-# . $builderShell -targets @("MSBUILD") -clangVersion 350 -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
+. $builderShell -targets @("CMAKE") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
+. $builderShell -targets @("CMAKE") -clangVersion 350 -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
+. $builderShell -targets @("MSBUILD") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
+. $builderShell -targets @("MSBUILD") -clangVersion 350 -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
+# . $builderShell -targets @("CMAKE", "MSBUILD") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
+# . $builderShell -targets @("CMAKE", "MSBUILD") -clangVersion 350 -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
 
 # echo $hoge
 
