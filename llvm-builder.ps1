@@ -2,18 +2,18 @@ Param( $targets = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 20
 
 # $targets = @("SVN", "CMAKE", "MSBUILD")
 # $targets = @("SVN", "CMAKE")
-$targets = @("CMAKE")
+# $targets = @("SVN")
+# $targets = @("CMAKE")
 
 
-$clangVersion = 350
+# $clangVersion = 350
 # $platform = 32
 
 
 
-# $cmakePath = "c:/cygwin-x86_64/tmp/cmake-2.8.12.2-win32-x86/bin"
-$cmakePath = "c:/cygwin-x86_64/tmp/cmake-3.0.2-win32-x86/bin"
-$pythonPath = "c:/Python27"
-$gnu32Path = "c:/usr_share_tools/GnuWin32/bin"
+# $cmakePath = "c:/cygwin-x86_64/tmp/cmake-3.0.2-win32-x86/bin"
+# $pythonPath = "c:/Python27"
+# $gnu32Path = "c:/cygwin-x86_64/tmp/GnuWin32"
 
 
 $LLVMBuildEnv = @{
