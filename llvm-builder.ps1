@@ -30,7 +30,6 @@ $LLVMBuildEnv = @{
         ExecPath = "";
         PythonPath = "";
         MSVCVersion = "12";
-        # Platform = " Win64";
         Platform = "Win64";
         PlatformDir = "msvc-64";
         BuildDir = "build";
@@ -42,6 +41,24 @@ $LLVMBuildEnv = @{
                 2013 = "12 2013";
                 2012 = "11 2012";
                 2010 = "10 2010";
+            };
+            PLATFORM = @{
+                32 = @{
+                    Name = $null;
+                    Directory = "msvc-32";
+                };
+                64 = @{
+                    Name = "Win64";
+                    Directory = "msvc-64";
+                };
+            };
+        };
+
+        CONST200 = @{
+            MSVC = @{
+                2013 = "12";
+                2012 = "11";
+                2010 = "10";
             };
             PLATFORM = @{
                 32 = @{
@@ -266,7 +283,20 @@ function setupCMakeVariables()
     $LLVMBuildEnv.CMAKE.ExecPath = $cmakePath
     $LLVMBuildEnv.CMAKE.PythonPath = $pythonPath
 
-    $const_vars = $LLVMBuildEnv.CMAKE.CONST
+    $cmd = Join-Path $cmakePath "cmake"
+    $result = & $cmd @("--version")
+    $old = "$result" -match "2`.[0-9]`.[0-9]"
+
+    if ( $old )
+    {
+        echo "cmake version 3.0 under"
+        $const_vars = $LLVMBuildEnv.CMAKE.CONST200
+    }
+    else
+    {
+        echo "cmake version 3.0 upper"
+        $const_vars = $LLVMBuildEnv.CMAKE.CONST
+    }
 
     if ( $msvcVersion -ne $null )
     {
