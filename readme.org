@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2014/11/10.02:28:14
+# last updated : 2014/11/10.02:32:03
 
 
 #+TITLE:     LLVM Build Shell
@@ -53,8 +53,7 @@
    Visual Studio GUIからビルドする場合はシステム環境変数のPATHへ追加しておく必要がある。
    環境変数を汚したくない場合はMSBuildでビルドするのがよい。
    MSBuildの場合は、ビルド実行直前に GnuWin32/bin にパスを通せばよいので、
-   呼び出しbat内でset PATH=c:\GnuWin32\bin;%PATH%
-   などとしておけばよい。
+   呼び出しbat内でset PATH=c:\GnuWin32\bin;%PATH%としておけばよい。
 
 
 
