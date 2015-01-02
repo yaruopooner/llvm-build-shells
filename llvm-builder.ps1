@@ -1,9 +1,9 @@
-Param( $targets = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 2013, $platform = 64, $configuration = "Release", $cmakePath, $pythonPath, $gnu32Path )
+Param( $tasks = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 2013, $target, $platform = 64, $configuration = "Release", $additionalProperties, $cmakePath, $pythonPath, $gnu32Path )
 
-# $targets = @("SVN", "CMAKE", "MSBUILD")
-# $targets = @("SVN", "CMAKE")
-# $targets = @("SVN")
-# $targets = @("CMAKE")
+# $tasks = @("SVN", "CMAKE", "MSBUILD")
+# $tasks = @("SVN", "CMAKE")
+# $tasks = @("SVN")
+# $tasks = @("CMAKE")
 
 
 # $clangVersion = 350
@@ -76,10 +76,12 @@ $LLVMBuildEnv = @{
     BUILD = @{
         Gnu32Path = "";
         MSVCVersion  = "";
+        Target = "";
         Platform = "x64";
         PlatformDir = "msvc-64";
         Configuration = "Release";
         TargetNameSuffix = "-x86_64";
+        AdditionalProperties = "";
         VsCmdPrompt = "";
         VsCmdPromptArg = "amd64";
         CommandLine = "";
@@ -295,7 +297,8 @@ function setupCMakeVariables()
     else
     {
         echo "cmake version 3.0 upper"
-        $const_vars = $LLVMBuildEnv.CMAKE.CONST
+        $const_vars = $LLVMBuildEnv.CMAKE.CONST200
+        # $const_vars = $LLVMBuildEnv.CMAKE.CONST
     }
 
     if ( $msvcVersion -ne $null )
@@ -365,6 +368,11 @@ function setupBuildVariables()
         $LLVMBuildEnv.BUILD.MSVCVersion = $const_vars.MSVC[ $msvcVersion ]
     }
 
+    if ( $target -ne $null )
+    {
+        $LLVMBuildEnv.BUILD.Target = "/t:" + $target
+    }
+    
     if ( $platform -ne $null )
     {
         $LLVMBuildEnv.BUILD.Platform = $const_vars.PLATFORM[ $platform ].Name
@@ -377,6 +385,12 @@ function setupBuildVariables()
     {
         $LLVMBuildEnv.BUILD.Configuration = $configuration
     }
+
+    if ( $additionalProperties -ne $null )
+    {
+        $LLVMBuildEnv.BUILD.AdditionalProperties = ";" + $additionalProperties
+    }
+    
 
     # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCVersion, 'Machine')
     $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCVersion
@@ -398,8 +412,9 @@ function executeBuild()
     cd $LLVMBuildEnv.BUILD.PlatformDir
 
     $cmd = "msbuild"
-    $properties = "/p:Platform=" + $LLVMBuildEnv.BUILD.Platform + ";Configuration=" + $LLVMBuildEnv.BUILD.Configuration
-    $cmd_args = @("LLVM.sln", $properties, "/maxcpucount", "/fileLogger")
+    $target = $LLVMBuildEnv.BUILD.Target
+    $properties = "/p:Platform=" + $LLVMBuildEnv.BUILD.Platform + ";Configuration=" + $LLVMBuildEnv.BUILD.Configuration + $LLVMBuildEnv.BUILD.AdditionalProperties
+    $cmd_args = @("LLVM.sln", $target, $properties, "/maxcpucount", "/fileLogger")
 
     & $cmd $cmd_args
 
@@ -429,9 +444,9 @@ function setupVariables()
 {
     setupCommonVariables
 
-    foreach ( $target in $targets )
+    foreach ( $task in $tasks )
     {
-        $phase = $phase_infos[ $target ]
+        $phase = $phase_infos[ $task ]
         if ( $phase -ne $null )
         {
             & $phase.setup
@@ -444,9 +459,9 @@ function executeTasks()
 {
     executeCommon
 
-    foreach ( $target in $targets )
+    foreach ( $task in $tasks )
     {
-        $phase = $phase_infos[ $target ]
+        $phase = $phase_infos[ $task ]
         if ( $phase -ne $null )
         {
             & $phase.execute
