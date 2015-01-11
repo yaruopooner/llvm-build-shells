@@ -1,8 +1,8 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2014/11/10.02:32:03
+# last updated : 2015/01/11.21:51:17
 
 
-#+TITLE:     LLVM Build Shell
+#+TITLE:     LLVM Build Shell by Power Shell
 #+AUTHOR:    yaruopooner
 #+EMAIL:     [https://github.com/yaruopooner]
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
@@ -11,9 +11,11 @@
 * 使用方法
   llvm-builder.ps1が本体です。
   sample.ps1が呼び出しサンプルです。
+  cygwinやmsysから実行すると実行時パス解釈がおかしくなるためWindowsのcmdから実行推奨。
 
 * セルフビルドに必要なソフトウェア
   以下が必要になります。
+
 ** Visual Studio 2013/2012/2010
    どれでもOK
 
@@ -50,7 +52,7 @@
    grepなどを使用している模様。
 
    PATHに GnuWin32/bin を設定する場合は最後尾にしてパス検索順の最後にする。
-   Visual Studio GUIからビルドする場合はシステム環境変数のPATHへ追加しておく必要がある。
+   Visual Studio IDE上からビルドする場合はシステム環境変数のPATHへ追加しておく必要がある。
    環境変数を汚したくない場合はMSBuildでビルドするのがよい。
    MSBuildの場合は、ビルド実行直前に GnuWin32/bin にパスを通せばよいので、
    呼び出しbat内でset PATH=c:\GnuWin32\bin;%PATH%としておけばよい。
