@@ -1,0 +1,15 @@
+# -*- mode: org ; coding: utf-8-unix -*-
+# last updated : 2015/01/12.04:43:39
+
+
+#+TITLE:     LLVM Build Shell by bash
+#+AUTHOR:    the author (default taken from user-full-name)
+#+EMAIL:     his/her email address (default from user-mail-address)
+#+LANGUAGE:  language for HTML, e.g. `en' (org-export-default-language)
+#+TEXT:      Some descriptive text to be inserted at the beginning.
+#+TEXT:      Several lines may be given.
+#+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
+
+
+
+
