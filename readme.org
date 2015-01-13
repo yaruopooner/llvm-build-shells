@@ -1,0 +1,12 @@
+# -*- mode: org ; coding: utf-8-unix -*-
+# last updated : 2015/01/14.01:47:40
+
+
+#+TITLE:     LLVM Build Shells
+#+AUTHOR:    yaruopooner
+#+EMAIL:     [https://github.com/yaruopooner]
+#+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
+
+
+
+
