@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/01/14.01:47:40
+# last updated : 2015/01/14.12:13:43
 
 
 #+TITLE:     LLVM Build Shells
@@ -7,6 +7,15 @@
 #+EMAIL:     [https://github.com/yaruopooner]
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
+
+* LLVM Builder
+  指定バージョンのLLVMを一括でチェックアウト＆ビルドまで行うシェル
+
+  - ps1
+    PowerShell版
+
+  - sh
+    bash版
 
 
 

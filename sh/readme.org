@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/01/12.04:43:39
+# last updated : 2015/01/14.12:08:44
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -11,5 +11,38 @@
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
 
+* 使用方法
+  このシェルではLinux or cygwinのLLVMがビルド可能です。
+  llvm-builder.shが本体です。
+  sample.shが呼び出しサンプルです。
 
+* セルフビルドに必要なソフトウェア
+  以下が必要になります。
+
+** Subversion
+   http://tortoisesvn.net/
+
+   #+begin_src shell
+   $ sudo apt-get install subversion subversion-tools
+   #+end_src
+
+** cmake
+   http://www.cmake.org/
+
+   #+begin_src shell
+   $ sudo apt-get install cmake
+   #+end_src
+
+   最新版の場合は↑からダウンロード
+   cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストールを行う。
+   #+begin_src shell
+   $ tar -xf cmake-3.1.0.tar.gz
+   $ cd cmake-3.1.0
+   $ ./configure
+   $ make
+   $ make install
+   #+end_src
+
+** python 2.7.x
+   入っているはず
 

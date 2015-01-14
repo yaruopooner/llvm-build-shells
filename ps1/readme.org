@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/01/11.21:51:17
+# last updated : 2015/01/14.12:09:41
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -9,6 +9,7 @@
 
 
 * 使用方法
+  このシェルではWindowsのLLVMがビルド可能です。
   llvm-builder.ps1が本体です。
   sample.ps1が呼び出しサンプルです。
   cygwinやmsysから実行すると実行時パス解釈がおかしくなるためWindowsのcmdから実行推奨。
