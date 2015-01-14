@@ -1,21 +1,22 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/01/14.12:13:43
+# last updated : 2015/01/14.12:17:36
 
 
-#+TITLE:     LLVM Build Shells
+#+TITLE:     LLVM Builder
 #+AUTHOR:    yaruopooner
 #+EMAIL:     [https://github.com/yaruopooner]
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
 
-* LLVM Builder
-  指定バージョンのLLVMを一括でチェックアウト＆ビルドまで行うシェル
 
-  - ps1
-    PowerShell版
+指定バージョンのLLVMを一括でチェックアウト＆ビルドまで行うシェル
 
-  - sh
-    bash版
+
+* ps1
+  PowerShell版
+
+* sh
+  bash版
 
 
 
