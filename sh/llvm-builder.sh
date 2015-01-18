@@ -124,6 +124,44 @@ function executeBuild()
 }
 
 
+function executeRebuild()
+{
+    local CHECKOUTED_DIR=${1}
+    local BUILD_DIR=build
+
+    echo "checkout root dir > ${CHECKOUTED_DIR}"
+
+    if [ ! -d ${CHECKOUTED_DIR} ] ; then
+        echo "not found checkout root dir"
+        return 0
+    fi
+    cd ${CHECKOUTED_DIR}
+
+    if [ ! -d ${BUILD_DIR} ] ; then
+        echo "not found build root dir"
+        return 0
+    fi
+    cd ${BUILD_DIR}
+
+
+    make clean
+
+    local CCACHE_CMD=""
+
+    if [ ${ENABLE_CCACHE} ]; then
+	    CCACHE_CMD="ccache "
+    fi
+
+    CC_CMD="${CCACHE_CMD}gcc"
+    CXX_CMD="${CCACHE_CMD}g++"
+    CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
+
+    make -j4
+
+    return 1
+}
+
+
 function executeCheckoutAndBuild()
 {
     local CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
