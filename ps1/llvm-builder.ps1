@@ -1,9 +1,23 @@
-Param( $tasks = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 2013, $target, $platform = 64, $configuration = "Release", $additionalProperties, $cmakePath, $pythonPath, $gnu32Path )
+Param( $tasks = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 2013, $target, $platform = 64, $configuration = "Release", $additionalProperties, $cmakePath, $pythonPath, $gnu32Path, $patchInfos )
 
-# $tasks = @("SVN", "CMAKE", "MSBUILD")
-# $tasks = @("SVN", "CMAKE")
-# $tasks = @("SVN")
-# $tasks = @("CMAKE")
+# $tasks = @("CHECKOUT", "PATCH", "PROJECT", "BUILD")
+# $tasks = @("CHECKOUT", "PROJECT", "BUILD")
+# $tasks = @("CHECKOUT", "PROJECT")
+# $tasks = @("CHECKOUT")
+# $tasks = @("PROJECT")
+
+# $patchInfos = @( 
+#     @{
+#         # relative path from checkout root dir 
+#         targetLocation = "llvm/";
+#         # patch absolute path
+#         absolutePath = "ac-clang/clang-server/patch/invalid-mmap.svn-patch";
+#     },
+#     @{
+#         targetLocation = "llvm/tools/clang/";
+#         absolutePath = "ac-clang/clang-server/patch/libclang-x86_64.svn-patch";
+#     }
+# )
 
 
 # $clangVersion = 350
@@ -277,6 +291,31 @@ function executeCheckoutBySVN()
 }
 
 
+# patch funcs
+
+function setupPatchVariables()
+{
+}
+
+function executePatchBySVN()
+{
+    $checkout_root_dir = $LLVMBuildEnv.CheckoutRootDir
+    pushd $checkout_root_dir
+
+    $cmd = "svn"
+    
+    foreach ( $info in $patchInfos )
+    {
+        pushd $info.targetLocation
+        $cmd_args = @("patch", $info.absolutePath)
+        & $cmd $cmd_args
+        popd
+    }
+
+    popd
+}
+
+
 
 # cmake funcs
 
@@ -423,15 +462,19 @@ function executeBuild()
 
 
 $phase_infos = @{
-    SVN = @{
+    CHECKOUT = @{
         setup = {setupCheckoutVariables};
         execute = {executeCheckoutBySVN};
     };
-    CMAKE = @{
+    PATCH = @{
+        setup = {setupPatchVariables};
+        execute = {executePatchBySVN};
+    };
+    PROJECT = @{
         setup = {setupCMakeVariables};
         execute = {executeCMake};
     };
-    MSBUILD = @{
+    BUILD = @{
         setup = {setupBuildVariables};
         execute = {executeBuild};
     };
