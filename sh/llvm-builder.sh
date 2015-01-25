@@ -26,6 +26,7 @@ function generateRepositoryRelativePath()
     echo "${REPOSITORY_PATH}"
 }
 
+
 function generateCheckoutRootDirectoryName()
 {
     local MAJOR_VERSION=trunk
@@ -41,15 +42,18 @@ function generateCheckoutRootDirectoryName()
     echo "clang-${MAJOR_VERSION}${MINOR_VERSION}"
 }
 
+
 function executeCheckoutBySVN()
 {
+    echo "----------svn checkout phase----------"
+
     local REPOSITORY_PATH=`generateRepositoryRelativePath ${1} ${2}`
     local CHECKOUT_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
 
     echo "repository partial path=${REPOSITORY_PATH}"
     echo "checkout root directory=${CHECKOUT_DIR}"
 
-    if [ -d ${CHECKOUT_DIR} ] ; then
+    if [ -d ${CHECKOUT_DIR} ]; then
         echo "remove old root directory ${CHECKOUT_DIR}"
         rm -rf ${CHECKOUT_DIR}
     fi
@@ -74,22 +78,25 @@ function executeCheckoutBySVN()
     echo "${CHECKOUT_DIR}"
 }
 
+
 function executePatchBySVN()
 {
     local CHECKOUTED_DIR=${1}
     local PATCH_APPLY_LOCATION=${2}
     local PATCH_PATH=${3}
 
+    echo "----------svn patch phase----------"
     echo "CHECKOUTED_DIR       : ${CHECKOUTED_DIR}"
     echo "PATCH_APPLY_LOCATION : ${PATCH_APPLY_LOCATION}"
     echo "PATCH_PATH           : ${PATCH_PATH}"
+    pwd
 
-    if [ ! -d ${CHECKOUT_DIR} ] ; then
+    if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
         return 0
     fi
 
-    pushd ${CHECKOUT_DIR}
+    pushd ${CHECKOUTED_DIR}
     pushd ${PATCH_APPLY_LOCATION}
 
     svn patch ${PATCH_PATH}
@@ -100,28 +107,30 @@ function executePatchBySVN()
     return 1
 }
 
-function executeBuild()
+
+function executeConfigure()
 {
+    echo "----------configure phase----------"
     local CHECKOUTED_DIR=${1}
     local BUILD_DIR=build
 
     echo "checkout root dir > ${CHECKOUTED_DIR}"
 
-    if [ ! -d ${CHECKOUTED_DIR} ] ; then
+    if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
         return 0
     fi
-    cd ${CHECKOUTED_DIR}
+    pushd ${CHECKOUTED_DIR}
 
-    # if [ ! -d ${BUILD_DIR} ] ; then
+    # if [ ! -d ${BUILD_DIR} ]; then
     #     # rm -rf ${BUILD_DIR}
     #     mkdir ${BUILD_DIR}
     # fi
-    if [ -d ${BUILD_DIR} ] ; then
+    if [ -d ${BUILD_DIR} ]; then
         rm -rf ${BUILD_DIR}
     fi
     mkdir ${BUILD_DIR}
-    cd ${BUILD_DIR}
+    pushd ${BUILD_DIR}
 
 
     local CCACHE_CMD=""
@@ -143,8 +152,27 @@ function executeBuild()
     # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
     # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
 
+    popd
+    popd
+    
+    return 1
+}
+
+
+function executeBuild()
+{
+    echo "----------build phase----------"
+
+    local CHECKOUTED_DIR=${1}
+    local BUILD_DIR=build
+
+    pushd ${CHECKOUTED_DIR}
+    pushd ${BUILD_DIR}
 
     make -j4
+
+    popd
+    popd
 
     return 1
 }
@@ -175,13 +203,13 @@ function executeRebuild()
     
     echo "checkout root dir > ${CHECKOUTED_DIR}"
 
-    if [ ! -d ${CHECKOUTED_DIR} ] ; then
+    if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
         return 0
     fi
     cd ${CHECKOUTED_DIR}
 
-    if [ ! -d ${BUILD_DIR} ] ; then
+    if [ ! -d ${BUILD_DIR} ]; then
         echo "not found build root directory"
         return 0
     fi
@@ -206,8 +234,12 @@ function executeRebuild()
 }
 
 
-function executeCheckoutAndBuild()
+function executeBuilder()
 {
+    local TASK_CHECKOUT=
+    local TASK_PATCH=
+    local TASK_CONFIGURE=
+    local TASK_BUILD=
     local CLANG_VERSION=
     local CLANG_MINOR_VERSION=
     local PATCH_APPLY_LOCATIONS=()
@@ -216,6 +248,22 @@ function executeCheckoutAndBuild()
     for OPT in $@
     do
         case $OPT in
+            '-checkout' )
+                TASK_CHECKOUT=true
+                shift
+                ;;
+            '-patch' )
+                TASK_PATCH=true
+                shift
+                ;;
+            '-configure' )
+                TASK_CONFIGURE=true
+                shift
+                ;;
+            '-build' )
+                TASK_BUILD=true
+                shift
+                ;;
             '-clangVersion' )
                 CLANG_VERSION=${2}
                 shift 2
@@ -238,17 +286,27 @@ function executeCheckoutAndBuild()
 
     local CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
 
-    
-    executeCheckoutBySVN ${CLANG_VERSION} ${CLANG_MINOR_VERSION}
 
-    if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ] ; then
-        for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i))
-        do
-            executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
-        done
+    if [ ${TASK_CHECKOUT} ]; then
+       executeCheckoutBySVN ${CLANG_VERSION} ${CLANG_MINOR_VERSION}
     fi
 
-    executeBuild ${CHECKOUTED_DIR}
+    if [ ${TASK_PATCH} ]; then
+       if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ]; then
+           for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i))
+           do
+               executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
+           done
+       fi
+    fi
+
+    if [ ${TASK_CONFIGURE} ]; then
+       executeConfigure ${CHECKOUTED_DIR}
+    fi
+
+    if [ ${TASK_BUILD} ]; then
+       executeBuild ${CHECKOUTED_DIR}
+    fi
 }
 
 
