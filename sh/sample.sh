@@ -3,5 +3,7 @@
 
 . ./llvm-builder.sh
 
-executeCheckoutAndBuild 350 > llvm-build.log 2>&1
-# executeRebuild 350 > llvm-build.log 2>&1
+# executeRebuild -clangVersion 350 > llvm-build.log 2>&1
+
+executeCheckoutAndBuild -clangVersion 350 > llvm-build.log 2>&1
+# executeCheckoutAndBuild -clangVersion 350 -patchApplyLocation "llvm/" -patchPath "/tmp/ac-clang/clang-server/patch/invalid-mmap.svn-patch"  -patchApplyLocation "llvm/clang/" -patchPath "/tmp/ac-clang/clang-server/patch/libclang-x86_64.svn-patch" > llvm-build.log 2>&1

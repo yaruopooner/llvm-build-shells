@@ -74,6 +74,32 @@ function executeCheckoutBySVN()
     echo "${CHECKOUT_DIR}"
 }
 
+function executePatchBySVN()
+{
+    local CHECKOUTED_DIR=${1}
+    local PATCH_APPLY_LOCATION=${2}
+    local PATCH_PATH=${3}
+
+    echo "CHECKOUTED_DIR       : ${CHECKOUTED_DIR}"
+    echo "PATCH_APPLY_LOCATION : ${PATCH_APPLY_LOCATION}"
+    echo "PATCH_PATH           : ${PATCH_PATH}"
+
+    if [ ! -d ${CHECKOUT_DIR} ] ; then
+        echo "not found checkout root directory"
+        return 0
+    fi
+
+    pushd ${CHECKOUT_DIR}
+    pushd ${PATCH_APPLY_LOCATION}
+
+    svn patch ${PATCH_PATH}
+
+    popd
+    popd
+
+    return 1
+}
+
 function executeBuild()
 {
     local CHECKOUTED_DIR=${1}
@@ -82,7 +108,7 @@ function executeBuild()
     echo "checkout root dir > ${CHECKOUTED_DIR}"
 
     if [ ! -d ${CHECKOUTED_DIR} ] ; then
-        echo "not found checkout root dir"
+        echo "not found checkout root directory"
         return 0
     fi
     cd ${CHECKOUTED_DIR}
@@ -126,19 +152,37 @@ function executeBuild()
 
 function executeRebuild()
 {
-    local CHECKOUTED_DIR=${1}
+    local CLANG_VERSION=
+    local CLANG_MINOR_VERSION=
+
+    for OPT in $@
+    do
+        case $OPT in
+            '-clangVersion' )
+                CLANG_VERSION=${2}
+                shift 2
+                ;;
+            '-clangMinorVersion' )
+                CLANG_MINOR_VERSION=${2}
+                shift 2
+                ;;
+        esac
+    done
+
+    local CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
     local BUILD_DIR=build
 
+    
     echo "checkout root dir > ${CHECKOUTED_DIR}"
 
     if [ ! -d ${CHECKOUTED_DIR} ] ; then
-        echo "not found checkout root dir"
+        echo "not found checkout root directory"
         return 0
     fi
     cd ${CHECKOUTED_DIR}
 
     if [ ! -d ${BUILD_DIR} ] ; then
-        echo "not found build root dir"
+        echo "not found build root directory"
         return 0
     fi
     cd ${BUILD_DIR}
@@ -164,10 +208,48 @@ function executeRebuild()
 
 function executeCheckoutAndBuild()
 {
-    local CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
+    local CLANG_VERSION=
+    local CLANG_MINOR_VERSION=
+    local PATCH_APPLY_LOCATIONS=()
+    local PATCH_PATHS=()
+
+    for OPT in $@
+    do
+        case $OPT in
+            '-clangVersion' )
+                CLANG_VERSION=${2}
+                shift 2
+                ;;
+            '-clangMinorVersion' )
+                CLANG_MINOR_VERSION=${2}
+                shift 2
+                ;;
+            '-patchApplyLocation' )
+                PATCH_APPLY_LOCATIONS+=(${2})
+                shift 2
+                ;;
+            '-patchPath' )
+                PATCH_PATHS+=(${2})
+                shift 2
+                ;;
+        esac
+    done
+
+
+    local CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
+
     
-    executeCheckoutBySVN ${1} ${2}
+    executeCheckoutBySVN ${CLANG_VERSION} ${CLANG_MINOR_VERSION}
+
+    if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ] ; then
+        for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i))
+        do
+            executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
+        done
+    fi
+
     executeBuild ${CHECKOUTED_DIR}
 }
+
 
 
