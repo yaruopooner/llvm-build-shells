@@ -13,17 +13,17 @@ $gnu32 = "c:/cygwin-x86_64/tmp/GnuWin32"
 
 $patchInfos = @( 
     @{
-        targetLocation = "llvm/";
+        applyLocation = "llvm/";
         absolutePath = "c:/cygwin-x86_64/tmp/ac-clang/clang-server/patch/invalid-mmap.svn-patch";
     },
     @{
-        targetLocation = "llvm/tools/clang/";
+        applyLocation = "llvm/tools/clang/";
         absolutePath = "c:/cygwin-x86_64/tmp/ac-clang/clang-server/patch/libclang-x86_64.svn-patch";
     }
 )
 
 
-# . $builderShell -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
+# . $builderShell -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32 -patchInfos $patchInfos
 # . $builderShell -tasks @("CHECKOUT") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
 # . $builderShell -tasks @("PROJECT") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
 # . $builderShell -tasks @("PROJECT") -clangVersion 350 -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32
@@ -42,23 +42,6 @@ $patchInfos = @(
 # . $builderShell -tasks @("BUILD") -clangVersion 350 -platform 64 -configuration "Debug" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32 -target "Clang libraries\libclang"
 # . $builderShell -tasks @("BUILD") -clangVersion 350 -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -gnu32Path $gnu32 -target "Clang executables\clang-format"
 
-
-# $cmake = "c:/cygwin-x86_64/tmp/cmake-3.0.2-win32-x86/bin"
-
-# $exec = Join-Path $cmake "cmake.exe"
-# $result = & $exec --version
-
-# # "$result" -match "2`.[0-9]`.[0-9]"
-# $judge = "$result" -match "3`.[0-9]`.[0-9]"
-
-# if ( $judge )
-# {
-#     echo "true"
-# }
-# else
-# {
-#     echo "false"
-# }
 
 
 [Console]::ReadKey()

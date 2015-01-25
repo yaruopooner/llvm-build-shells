@@ -8,13 +8,13 @@ Param( $tasks = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 2013
 
 # $patchInfos = @( 
 #     @{
-#         # relative path from checkout root dir 
-#         targetLocation = "llvm/";
+#         # apply a patch to relative path from checkout root dir .
+#         applyLocation = "llvm/";
 #         # patch absolute path
 #         absolutePath = "ac-clang/clang-server/patch/invalid-mmap.svn-patch";
 #     },
 #     @{
-#         targetLocation = "llvm/tools/clang/";
+#         applyLocation = "llvm/tools/clang/";
 #         absolutePath = "ac-clang/clang-server/patch/libclang-x86_64.svn-patch";
 #     }
 # )
@@ -43,7 +43,7 @@ $LLVMBuildEnv = @{
     CMAKE = @{
         ExecPath = "";
         PythonPath = "";
-        MSVCVersion = "12";
+        MSVCVersion = "12 2013";
         Platform = "Win64";
         PlatformDir = "msvc-64";
         BuildDir = "build";
@@ -52,6 +52,7 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
+                2015 = "14 2015";
                 2013 = "12 2013";
                 2012 = "11 2012";
                 2010 = "10 2010";
@@ -102,6 +103,7 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
+                2015 = "VS130COMNTOOLS";
                 2013 = "VS120COMNTOOLS";
                 2012 = "VS110COMNTOOLS";
                 2010 = "VS100COMNTOOLS";
@@ -306,7 +308,7 @@ function executePatchBySVN()
     
     foreach ( $info in $patchInfos )
     {
-        pushd $info.targetLocation
+        pushd $info.applyLocation
         $cmd_args = @("patch", $info.absolutePath)
         & $cmd $cmd_args
         popd
@@ -336,8 +338,8 @@ function setupCMakeVariables()
     else
     {
         echo "cmake version 3.0 upper"
-        $const_vars = $LLVMBuildEnv.CMAKE.CONST200
-        # $const_vars = $LLVMBuildEnv.CMAKE.CONST
+        # $const_vars = $LLVMBuildEnv.CMAKE.CONST200
+        $const_vars = $LLVMBuildEnv.CMAKE.CONST
     }
 
     if ( $msvcVersion -ne $null )
