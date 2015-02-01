@@ -1,10 +1,9 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/01/14.12:09:41
+# last updated : 2015/02/01.20:12:43
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
-#+AUTHOR:    yaruopooner
-#+EMAIL:     [https://github.com/yaruopooner]
+#+AUTHOR:    yaruopooner [https://github.com/yaruopooner]
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
 
@@ -58,6 +57,15 @@
    MSBuildの場合は、ビルド実行直前に GnuWin32/bin にパスを通せばよいので、
    呼び出しbat内でset PATH=c:\GnuWin32\bin;%PATH%としておけばよい。
 
+* セルフビルド
+  Power Shell版を使用します。
 
+  llvm-build-shellsでは以下を一括で行います。
+  - LLVMチェックアウト
+  - パッチ適用(optional)
+  - cmakeによるLLVMソリューションファイル生成
+  - Visual Studio(MSBuild)によるビルド
+
+  ビルドするターゲットプラットフォーム(64/32)、コンフィグレーション(release/debug)の指定が可能です。
 
 

@@ -1,13 +1,9 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/01/14.12:16:53
+# last updated : 2015/02/01.20:12:00
 
 
 #+TITLE:     LLVM Build Shell by bash
-#+AUTHOR:    the author (default taken from user-full-name)
-#+EMAIL:     his/her email address (default from user-mail-address)
-#+LANGUAGE:  language for HTML, e.g. `en' (org-export-default-language)
-#+TEXT:      Some descriptive text to be inserted at the beginning.
-#+TEXT:      Several lines may be given.
+#+AUTHOR:    yaruopooner [https://github.com/yaruopooner]
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
 
@@ -46,3 +42,16 @@
 ** python 2.7.x
    入っているはず
 
+* セルフビルド
+  自前でチェックアウトしてcmakeでLLVMソリューションファイルを生成するか、以下のshell scriptを使用してください。
+  https://github.com/yaruopooner/llvm-build-shells
+
+  Bash版を使用します。
+
+  llvm-build-shellsでは以下を一括で行います。
+  - LLVMチェックアウト
+  - パッチ適用(optional)
+  - configureによるLLVM Makefile生成
+  - ビルド
+
+    
