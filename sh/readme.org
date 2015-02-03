@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/01.20:12:00
+# last updated : 2015/02/03.00:53:16
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -23,19 +23,19 @@
    #+end_src
 
 ** cmake
-   http://www.cmake.org/
-
    #+begin_src shell
    $ sudo apt-get install cmake
    #+end_src
 
-   最新版の場合は↑からダウンロード
+   最新版の場合は↓からダウンロード
+
+   http://www.cmake.org/
+
    cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストールを行う。
    #+begin_src shell
    $ tar -xf cmake-3.1.0.tar.gz .
    $ cd cmake-3.1.0
-   $ ./configure
-   $ make
+   $ ./configure && make
    $ make install
    #+end_src
 

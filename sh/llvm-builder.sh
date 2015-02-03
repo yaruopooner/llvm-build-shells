@@ -8,6 +8,30 @@
 # $1 未指定の場合は trunk がバインドされる
 # チェックアウト先に同名ディレクトリがある場合は削除して作成するので注意
 
+function usage()
+{
+    echo "Usage: executeBuilder [OPTIONS]"
+    echo
+    echo "Options:"
+    echo " --checkout"
+    echo "     checkout LLVM by SVN"
+    echo "     validate option > --clangVersion"
+    echo " --patch"
+    echo "     apply patch by SVN"
+    echo "     validate option > --patchApplyLocation, --patchPath"
+    echo " --configure"
+    echo "     generate Makefile"
+    echo " --build"
+    echo "     execute make"
+    echo " --clangVersion [VersionNumber]"
+    echo "     LLVM checkout version"
+    echo " --patchApplyLocation [Path]"
+    echo "     patch apply target directory"
+    echo " --patchPath [Path]"
+    echo "     patch file path"
+    echo " --help"
+}
+
 
 function generateRepositoryRelativePath()
 {
@@ -248,37 +272,41 @@ function executeBuilder()
     for OPT in $@
     do
         case $OPT in
-            '-checkout' )
+            '--checkout' )
                 TASK_CHECKOUT=true
                 shift
                 ;;
-            '-patch' )
+            '--patch' )
                 TASK_PATCH=true
                 shift
                 ;;
-            '-configure' )
+            '--configure' )
                 TASK_CONFIGURE=true
                 shift
                 ;;
-            '-build' )
+            '--build' )
                 TASK_BUILD=true
                 shift
                 ;;
-            '-clangVersion' )
+            '--clangVersion' )
                 CLANG_VERSION=${2}
                 shift 2
                 ;;
-            '-clangMinorVersion' )
+            '--clangMinorVersion' )
                 CLANG_MINOR_VERSION=${2}
                 shift 2
                 ;;
-            '-patchApplyLocation' )
+            '--patchApplyLocation' )
                 PATCH_APPLY_LOCATIONS+=(${2})
                 shift 2
                 ;;
-            '-patchPath' )
+            '--patchPath' )
                 PATCH_PATHS+=(${2})
                 shift 2
+                ;;
+            '--help' )
+                usage
+                exit 1
                 ;;
         esac
     done
