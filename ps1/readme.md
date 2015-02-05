@@ -24,7 +24,7 @@
 このシェルではWindowsのLLVMがビルド可能です。  
 llvm-builder.ps1が本体です。  
 sample.ps1が呼び出しサンプルです。  
-cygwinやmsysから実行すると実行時パス解釈がおかしくなるためWindowsのcmdから実行推奨。  
+cygwinやmsysから実行すると実行時パス解釈がおかしくなるためWindowsのcmdかエクスプローラーから実行推奨。  
 
 # セルフビルドに必要なソフトウェア<a id="sec-2" name="sec-2"></a>
 
