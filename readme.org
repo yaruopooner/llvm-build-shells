@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/01/14.12:17:36
+# last updated : 2015/02/06.02:39:45
 
 
 #+TITLE:     LLVM Builder
@@ -13,10 +13,10 @@
 
 
 * ps1
-  PowerShell版
+  PowerShell version
 
 * sh
-  bash版
+  bash version
 
 
 
