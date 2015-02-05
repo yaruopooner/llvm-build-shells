@@ -14,11 +14,7 @@ $gnu32 = "c:/cygwin-x86_64/tmp/GnuWin32"
 $patchInfos = @( 
     @{
         applyLocation = "llvm/";
-        absolutePath = "c:/cygwin-x86_64/tmp/ac-clang/clang-server/patch/invalid-mmap.svn-patch";
-    },
-    @{
-        applyLocation = "llvm/tools/clang/";
-        absolutePath = "c:/cygwin-x86_64/tmp/ac-clang/clang-server/patch/libclang-x86_64.svn-patch";
+        absolutePath = "c:/cygwin-x86_64/tmp/ac-clang/clang-server/patch/invalidate-mmap.patch";
     }
 )
 

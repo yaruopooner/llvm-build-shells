@@ -11,11 +11,11 @@ Param( $tasks = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 2013
 #         # apply a patch to relative path from checkout root dir .
 #         applyLocation = "llvm/";
 #         # patch absolute path
-#         absolutePath = "ac-clang/clang-server/patch/invalid-mmap.svn-patch";
+#         absolutePath = "ac-clang/clang-server/patch/invalidate-mmap.patch";
 #     },
 #     @{
 #         applyLocation = "llvm/tools/clang/";
-#         absolutePath = "ac-clang/clang-server/patch/libclang-x86_64.svn-patch";
+#         absolutePath = "ac-clang/clang-server/patch/libclang-x86_64.patch";
 #     }
 # )
 
