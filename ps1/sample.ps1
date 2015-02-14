@@ -1,7 +1,3 @@
-# . (@(Split-Path $myInvocation.MyCommand.path) + '\llvm-builder.ps1')
-#$hoge = $myInvocation.MyCommand.path
-#$hoge = Split-Path $hoge -Parent
-#$hoge += '\llvm-builder.ps1'
 $builderShell = Join-Path @(Split-Path $myInvocation.MyCommand.path -Parent) 'llvm-builder.ps1'
 
 # $cmake = "c:/cygwin-x86_64/tmp/cmake-2.8.12.2-win32-x86/bin"
