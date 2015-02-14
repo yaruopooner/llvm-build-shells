@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/03.00:53:16
+# last updated : 2015/02/14.19:46:01
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -43,9 +43,6 @@
    入っているはず
 
 * セルフビルド
-  自前でチェックアウトしてcmakeでLLVMソリューションファイルを生成するか、以下のshell scriptを使用してください。
-  https://github.com/yaruopooner/llvm-build-shells
-
   Bash版を使用します。
 
   llvm-build-shellsでは以下を一括で行います。
