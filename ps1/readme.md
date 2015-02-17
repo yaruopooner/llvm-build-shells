@@ -64,8 +64,7 @@ cmake で LLVMのソリューションファイルを生成する際に必要。
 
 ## GnuWin32<a id="sec-2-5" name="sec-2-5"></a>
 
-<http://gnuwin32.sourceforge.net/>  
-<http://sourceforge.net/projects/getgnuwin32/files/>  
+<http://sourceforge.net/projects/getgnuwin32/>     
 
 カスタムビルドステップで使用される。  
 grepなどを使用している模様。  
