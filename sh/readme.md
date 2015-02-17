@@ -54,9 +54,6 @@ cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストー�
 
 # セルフビルド<a id="sec-3" name="sec-3"></a>
 
-自前でチェックアウトしてcmakeでLLVMソリューションファイルを生成するか、以下のshell scriptを使用してください。  
-<https://github.com/yaruopooner/llvm-build-shells>  
-
 Bash版を使用します。  
 
 llvm-build-shellsでは以下を一括で行います。  
