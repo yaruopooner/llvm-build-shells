@@ -2,8 +2,8 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 使用方法</a></li>
-<li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
+<li><a href="#sec-1">1. Usage</a></li>
+<li><a href="#sec-2">2. Requirements</a>
 <ul>
 <li><a href="#sec-2-1">2.1. Visual Studio 2013/2012/2010</a></li>
 <li><a href="#sec-2-2">2.2. Subversion</a></li>
@@ -12,77 +12,81 @@
 <li><a href="#sec-2-5">2.5. GnuWin32</a></li>
 </ul>
 </li>
-<li><a href="#sec-3">3. セルフビルド</a></li>
+<li><a href="#sec-3">3. Self Build</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Patch</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
 
-# 使用方法<a id="sec-1" name="sec-1"></a>
+# Usage<a id="sec-1" name="sec-1"></a>
 
-このシェルではWindowsのLLVMがビルド可能です。  
-llvm-builder.ps1が本体です。  
-sample.ps1が呼び出しサンプルです。  
-cygwinやmsysから実行すると実行時パス解釈がおかしくなるためWindowsのcmdかエクスプローラーから実行推奨。  
+This shell can build LLVM of Windows.  
+llvm-builder.ps1 is body.  
+sample.ps1 is call sample.  
+Please edit if neccessary, such as patch path.  
+Launch of this shell should not be done the CYGWIN and MSYS.  
+because, shell is wrong the path interpretation.  
+There is a need to launch from the Windows CMD or EXPLORER.  
 
-# セルフビルドに必要なソフトウェア<a id="sec-2" name="sec-2"></a>
+# Requirements<a id="sec-2" name="sec-2"></a>
 
-以下が必要になります。  
+The following is required.  
 
 ## Visual Studio 2013/2012/2010<a id="sec-2-1" name="sec-2-1"></a>
 
-どれでもOK  
+any ok.  
 
 ## Subversion<a id="sec-2-2" name="sec-2-2"></a>
 
 <http://tortoisesvn.net/>  
 
-ソリューションビルド時にsvnコマンドラインが呼び出されるのでTortoiseSVNにパスが通っている必要がある。  
-checkout/updateだけならcygwinのsvnで可能だがお勧めしない。  
-svnを呼び出してリビジョンナンバーなどを埋め込んだヘッダファイルを生成したりするが  
-cygwinのsvnだとパス解釈が正しく実行されない場合がありビルド時に該当ファイルがないといわれてしまうケースがある。  
-なのでcygwinのshellなどから実行しないほうがよい。  
+svn Should not use from CYGWIN or MSYS.  
 
 ## cmake<a id="sec-2-3" name="sec-2-3"></a>
 
 <http://www.cmake.org/>  
 
-Windows ZIPをダウンロードして何処かへ展開。  
-Visual Studio ソリューション＆プロジェクトファイル生成と、カスタムビルドステップ時のスクリプト実行で使用される。  
-Windows Sourceのほうはおすすめしない。  
-自前ビルドしたところ、なぜかジェネレーターにVisual Studio系がなかった。なぜ？  
+You download The Windows ZIP and decompress to somewhere.  
+CMake generate a Visual Studio solution and project file.  
+And it is used in the execution on script of custom build step.  
+You need to set the PATH in sample.ps1.  
 
 ## python 2.7.x<a id="sec-2-4" name="sec-2-4"></a>
 
 <http://www.python.org/>  
 <http://www.python.org/download/>  
 
-Python 2.7.x Windows X86-64 Installer を使用  
-3.x 系は使用しない。  
-cmake で LLVMのソリューションファイルを生成する際に必要。  
+Use Python 2.7.x Windows X86-64 Installer.  
+Should not use 3.x.  
+Required when CMake to generate the project files of LLVM.  
+You need to set the PATH in sample.ps1.  
 
 ## GnuWin32<a id="sec-2-5" name="sec-2-5"></a>
 
 <http://sourceforge.net/projects/getgnuwin32/>     
 
-カスタムビルドステップで使用される。  
-grepなどを使用している模様。  
+It is used in a custom build step.  
+You need to set the PATH in sample.ps1.  
 
-PATHに GnuWin32/bin を設定する場合は最後尾にしてパス検索順の最後にする。  
-Visual Studio IDE上からビルドする場合はシステム環境変数のPATHへ追加しておく必要がある。  
-環境変数を汚したくない場合はMSBuildでビルドするのがよい。  
-MSBuildの場合は、ビルド実行直前に GnuWin32/bin にパスを通せばよいので、  
-呼び出しbat内でset PATH=c:\GnuWin32\bin;%PATH%としておけばよい。  
+# Self Build<a id="sec-3" name="sec-3"></a>
 
-# セルフビルド<a id="sec-3" name="sec-3"></a>
+Use Power Shell version.  
 
-Power Shell版を使用します。  
+llvm-build-shells performs the following step at a time.  
+-   LLVM checkout
+-   apply patch(optional)
+-   project files generation by CMake
+-   build by Visual Studio(MSBuild)
 
-llvm-build-shellsでは以下を一括で行います。  
--   LLVMチェックアウト
--   パッチ適用(optional)
--   cmakeによるLLVMソリューションファイル生成
--   Visual Studio(MSBuild)によるビルド
+The following parameters designatable at llvm-build-shells.  
+-   build target platform(64/32)
+-   build configuration(release/debug)
 
-ビルドするターゲットプラットフォーム(64/32)、コンフィグレーション(release/debug)の指定が可能です。
+## Patch<a id="sec-3-1" name="sec-3-1"></a>
+
+You need to set the PATH of patch in sample.ps1.

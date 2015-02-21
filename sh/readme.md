@@ -2,30 +2,35 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 使用方法</a></li>
-<li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
+<li><a href="#sec-1">1. Usage</a></li>
+<li><a href="#sec-2">2. Requirements</a>
 <ul>
 <li><a href="#sec-2-1">2.1. Subversion</a></li>
-<li><a href="#sec-2-2">2.2. cmake</a></li>
-<li><a href="#sec-2-3">2.3. python 2.7.x</a></li>
+<li><a href="#sec-2-2">2.2. CMake</a></li>
+<li><a href="#sec-2-3">2.3. Python 2.7.x</a></li>
 </ul>
 </li>
-<li><a href="#sec-3">3. セルフビルド</a></li>
+<li><a href="#sec-3">3. Self Build</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Patch</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
 
 
-# 使用方法<a id="sec-1" name="sec-1"></a>
+# Usage<a id="sec-1" name="sec-1"></a>
 
-このシェルではLinux or cygwinのLLVMがビルド可能です。  
-llvm-builder.shが本体です。  
-sample.shが呼び出しサンプルです。  
+This shell can build LLVM of Linux or CYGWIN.  
+llvm-builder.sh is body.  
+sample.sh is call sample.  
+Please edit if necessary, such as patch path.  
 
-# セルフビルドに必要なソフトウェア<a id="sec-2" name="sec-2"></a>
+# Requirements<a id="sec-2" name="sec-2"></a>
 
-以下が必要になります。  
+The following is required.  
 
 ## Subversion<a id="sec-2-1" name="sec-2-1"></a>
 
@@ -33,31 +38,35 @@ sample.shが呼び出しサンプルです。
 
     $ sudo apt-get install subversion subversion-tools
 
-## cmake<a id="sec-2-2" name="sec-2-2"></a>
+## CMake<a id="sec-2-2" name="sec-2-2"></a>
 
     $ sudo apt-get install cmake
 
-最新版の場合は↓からダウンロード  
+Download from below URL in the case of the latest version.  
 
 <http://www.cmake.org/>  
 
-cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストールを行う。  
+cmake-3.1.0.tar.gz download and decompress, do build and install.  
 
     $ tar -xf cmake-3.1.0.tar.gz .
     $ cd cmake-3.1.0
     $ ./configure && make
     $ make install
 
-## python 2.7.x<a id="sec-2-3" name="sec-2-3"></a>
+## Python 2.7.x<a id="sec-2-3" name="sec-2-3"></a>
 
-入っているはず  
+It should have contain it if Linux.  
 
-# セルフビルド<a id="sec-3" name="sec-3"></a>
+# Self Build<a id="sec-3" name="sec-3"></a>
 
-Bash版を使用します。  
+Use Bash version.  
 
-llvm-build-shellsでは以下を一括で行います。  
--   LLVMチェックアウト
--   パッチ適用(optional)
--   configureによるLLVM Makefile生成
--   ビルド
+llvm-build-shells performs the following step at a time.  
+-   LLVM checkout
+-   Apply patch(optional)
+-   Makefile generation by configure
+-   Build
+
+## Patch<a id="sec-3-1" name="sec-3-1"></a>
+
+You need to set the PATH of patch in sample.sh.

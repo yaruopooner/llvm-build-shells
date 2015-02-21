@@ -1,0 +1,57 @@
+# -*- mode: org ; coding: utf-8-unix -*-
+# last updated : 2015/02/22.01:13:55
+
+
+#+TITLE:     LLVM Build Shell by bash
+#+AUTHOR:    yaruopooner [https://github.com/yaruopooner]
+#+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
+
+
+* 使用方法
+  このシェルではLinux or CYGWINのLLVMがビルド可能です。
+  llvm-builder.shが本体です。
+  sample.shが呼び出しサンプルです。
+  patchパスなど必要に応じて編集してください。
+
+* セルフビルドに必要なソフトウェア
+  以下が必要になります。
+
+** Subversion
+   http://tortoisesvn.net/
+
+   #+begin_src shell
+   $ sudo apt-get install subversion subversion-tools
+   #+end_src
+
+** CMake
+   #+begin_src shell
+   $ sudo apt-get install cmake
+   #+end_src
+
+   最新版の場合は↓からダウンロード
+
+   http://www.cmake.org/
+
+   cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストールを行う。
+   #+begin_src shell
+   $ tar -xf cmake-3.1.0.tar.gz .
+   $ cd cmake-3.1.0
+   $ ./configure && make
+   $ make install
+   #+end_src
+
+** Python 2.7.x
+   入っているはず
+
+* セルフビルド
+  Bash版を使用します。
+
+  llvm-build-shellsでは以下を一括で行います。
+  - LLVMチェックアウト
+  - パッチ適用(optional)
+  - configureによるLLVM Makefile生成
+  - ビルド
+
+** パッチ
+   sample.shでパッチのパスを設定する必要があります。
+

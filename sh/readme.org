@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/14.19:46:01
+# last updated : 2015/02/22.01:13:55
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -7,13 +7,14 @@
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
 
-* 使用方法
-  このシェルではLinux or cygwinのLLVMがビルド可能です。
-  llvm-builder.shが本体です。
-  sample.shが呼び出しサンプルです。
+* Usage
+  This shell can build LLVM of Linux or CYGWIN.
+  llvm-builder.sh is body.
+  sample.sh is call sample.
+  Please edit if necessary, such as patch path.
 
-* セルフビルドに必要なソフトウェア
-  以下が必要になります。
+* Requirements
+  The following is required.
 
 ** Subversion
    http://tortoisesvn.net/
@@ -22,16 +23,17 @@
    $ sudo apt-get install subversion subversion-tools
    #+end_src
 
-** cmake
+** CMake
    #+begin_src shell
    $ sudo apt-get install cmake
    #+end_src
 
-   最新版の場合は↓からダウンロード
+   Download from below URL in the case of the latest version.
 
    http://www.cmake.org/
 
-   cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストールを行う。
+   cmake-3.1.0.tar.gz download and decompress, do build and install.
+   
    #+begin_src shell
    $ tar -xf cmake-3.1.0.tar.gz .
    $ cd cmake-3.1.0
@@ -39,16 +41,17 @@
    $ make install
    #+end_src
 
-** python 2.7.x
-   入っているはず
+** Python 2.7.x
+   It should have contain it if Linux.
 
-* セルフビルド
-  Bash版を使用します。
+* Self Build
+  Use Bash version.
 
-  llvm-build-shellsでは以下を一括で行います。
-  - LLVMチェックアウト
-  - パッチ適用(optional)
-  - configureによるLLVM Makefile生成
-  - ビルド
-
+  llvm-build-shells performs the following step at a time.
+  - LLVM checkout
+  - Apply patch(optional)
+  - Makefile generation by configure
+  - Build
     
+** Patch
+   You need to set the PATH of patch in sample.sh.

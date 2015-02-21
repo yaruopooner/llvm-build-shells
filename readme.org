@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/06.02:39:45
+# last updated : 2015/02/21.18:00:58
 
 
 #+TITLE:     LLVM Builder
@@ -8,15 +8,25 @@
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
 
+This script supports the LLVM binary generation.
+The script performs the following steps at a time.
+The script dose not install LLVM.
 
-指定バージョンのLLVMを一括でチェックアウト＆ビルドまで行うシェル
+- LLVM checkout
+- apply patch
+- project generation
+- project build
+
+
+This script was made in reference to the following URL.
+http://llvm.org/docs/GettingStarted.html
 
 
 * ps1
-  PowerShell version
+  [[./ps1/readme.org][PowerShell version]]
 
 * sh
-  bash version
+  [[./sh/readme.org][bash version]]
 
 
 
