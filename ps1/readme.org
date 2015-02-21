@@ -1,0 +1,68 @@
+# -*- mode: org ; coding: utf-8-unix -*-
+# last updated : 2015/02/22.01:12:35
+
+
+#+TITLE:     LLVM Build Shell by Power Shell
+#+AUTHOR:    yaruopooner [https://github.com/yaruopooner]
+#+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
+
+
+* Usage
+  This shell can build LLVM of Windows.
+  llvm-builder.ps1 is body.
+  sample.ps1 is call sample.
+  Please edit if neccessary, such as patch path.
+  Launch of this shell should not be done the CYGWIN and MSYS.
+  because, shell is wrong the path interpretation.
+  There is a need to launch from the Windows CMD or EXPLORER.
+
+* Requirements
+  The following is required. 
+
+** Visual Studio 2013/2012/2010
+   any ok.
+
+** Subversion
+   http://tortoisesvn.net/
+
+   svn Should not use from CYGWIN or MSYS.
+
+** cmake
+   http://www.cmake.org/
+
+   You download The Windows ZIP and decompress to somewhere.
+   CMake generate a Visual Studio solution and project file.
+   And it is used in the execution on script of custom build step.
+   You need to set the PATH in sample.ps1.
+	
+** python 2.7.x
+   http://www.python.org/
+   http://www.python.org/download/
+
+   Use Python 2.7.x Windows X86-64 Installer.
+   Should not use 3.x.
+   Required when CMake to generate the project files of LLVM.
+   You need to set the PATH in sample.ps1.
+
+** GnuWin32
+   http://sourceforge.net/projects/getgnuwin32/   
+
+   It is used in a custom build step.
+   You need to set the PATH in sample.ps1.
+
+* Self Build
+  Use Power Shell version.
+
+  llvm-build-shells performs the following step at a time.
+  - LLVM checkout
+  - apply patch(optional)
+  - project files generation by CMake
+  - build by Visual Studio(MSBuild)
+
+  The following parameters designatable at llvm-build-shells.
+  - build target platform(64/32)
+  - build configuration(release/debug) 
+
+** Patch
+   You need to set the PATH of patch in sample.ps1.
+   

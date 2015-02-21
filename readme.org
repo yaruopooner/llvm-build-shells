@@ -1,0 +1,32 @@
+# -*- mode: org ; coding: utf-8-unix -*-
+# last updated : 2015/02/21.18:00:58
+
+
+#+TITLE:     LLVM Builder
+#+AUTHOR:    yaruopooner
+#+EMAIL:     [https://github.com/yaruopooner]
+#+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
+
+
+This script supports the LLVM binary generation.
+The script performs the following steps at a time.
+The script dose not install LLVM.
+
+- LLVM checkout
+- apply patch
+- project generation
+- project build
+
+
+This script was made in reference to the following URL.
+http://llvm.org/docs/GettingStarted.html
+
+
+* ps1
+  [[./ps1/readme.org][PowerShell version]]
+
+* sh
+  [[./sh/readme.org][bash version]]
+
+
+

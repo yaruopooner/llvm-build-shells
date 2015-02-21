@@ -1,0 +1,57 @@
+# -*- mode: org ; coding: utf-8-unix -*-
+# last updated : 2015/02/22.01:13:55
+
+
+#+TITLE:     LLVM Build Shell by bash
+#+AUTHOR:    yaruopooner [https://github.com/yaruopooner]
+#+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
+
+
+* Usage
+  This shell can build LLVM of Linux or CYGWIN.
+  llvm-builder.sh is body.
+  sample.sh is call sample.
+  Please edit if necessary, such as patch path.
+
+* Requirements
+  The following is required.
+
+** Subversion
+   http://tortoisesvn.net/
+
+   #+begin_src shell
+   $ sudo apt-get install subversion subversion-tools
+   #+end_src
+
+** CMake
+   #+begin_src shell
+   $ sudo apt-get install cmake
+   #+end_src
+
+   Download from below URL in the case of the latest version.
+
+   http://www.cmake.org/
+
+   cmake-3.1.0.tar.gz download and decompress, do build and install.
+   
+   #+begin_src shell
+   $ tar -xf cmake-3.1.0.tar.gz .
+   $ cd cmake-3.1.0
+   $ ./configure && make
+   $ make install
+   #+end_src
+
+** Python 2.7.x
+   It should have contain it if Linux.
+
+* Self Build
+  Use Bash version.
+
+  llvm-build-shells performs the following step at a time.
+  - LLVM checkout
+  - Apply patch(optional)
+  - Makefile generation by configure
+  - Build
+    
+** Patch
+   You need to set the PATH of patch in sample.sh.
