@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/18.01:16:38
+# last updated : 2015/02/21.18:01:22
 
 
 #+TITLE:     LLVM Builder
@@ -17,10 +17,10 @@ http://llvm.org/docs/GettingStarted.html
 
 
 * ps1
-  [[./ps1/readme.org][PowerShell version]]
+  [[./ps1/readme.ja.org][PowerShell version]]
 
 * sh
-  [[./sh/readme.org][bash version]]
+  [[./sh/readme.ja.org][bash version]]
 
 
 

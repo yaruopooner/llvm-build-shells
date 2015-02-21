@@ -10,11 +10,15 @@
 
 
 指定バージョンのLLVMを一括でチェックアウト＆ビルドまで行うシェル  
+LLVMのインストールは行いません。  
+
+以下を参考に作られています  
+<http://llvm.org/docs/GettingStarted.html>  
 
 # ps1<a id="sec-1" name="sec-1"></a>
 
-PowerShell version  
+[PowerShell version](./ps1/readme.ja.md)  
 
 # sh<a id="sec-2" name="sec-2"></a>
 
-bash version
+[bash version](./sh/readme.ja.md)
