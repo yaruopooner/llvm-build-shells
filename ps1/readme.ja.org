@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/22.01:14:49
+# last updated : 2015/02/25.11:19:44
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -55,10 +55,10 @@
   Power Shell版を使用します。
 
   llvm-build-shellsでは以下を一括で行います。
-  - LLVMチェックアウト
-  - パッチ適用(optional)
-  - cmakeによるLLVMソリューションファイル生成
-  - Visual Studio(MSBuild)によるビルド
+  1) LLVMチェックアウト
+  2) パッチ適用(optional)
+  3) cmakeによるLLVMソリューションファイル生成
+  4) Visual Studio(MSBuild)によるビルド
 
   ビルドするターゲットプラットフォーム(64/32)、コンフィグレーション(release/debug)の指定が可能です。
 

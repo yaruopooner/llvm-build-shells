@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/22.01:12:35
+# last updated : 2015/02/25.11:19:26
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -27,7 +27,7 @@
 
    svn Should not use from CYGWIN or MSYS.
 
-** cmake
+** CMake
    http://www.cmake.org/
 
    You download The Windows ZIP and decompress to somewhere.
@@ -35,7 +35,7 @@
    And it is used in the execution on script of custom build step.
    You need to set the PATH in sample.ps1.
 	
-** python 2.7.x
+** Python 2.7.x
    http://www.python.org/
    http://www.python.org/download/
 
@@ -54,10 +54,10 @@
   Use Power Shell version.
 
   llvm-build-shells performs the following step at a time.
-  - LLVM checkout
-  - apply patch(optional)
-  - project files generation by CMake
-  - build by Visual Studio(MSBuild)
+  1) LLVM checkout
+  2) apply patch(optional)
+  3) project files generation by CMake
+  4) build by Visual Studio(MSBuild)
 
   The following parameters designatable at llvm-build-shells.
   - build target platform(64/32)

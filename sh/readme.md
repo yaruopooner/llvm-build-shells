@@ -62,10 +62,10 @@ It should have contain it if Linux.
 Use Bash version.  
 
 llvm-build-shells performs the following step at a time.  
--   LLVM checkout
--   Apply patch(optional)
--   Makefile generation by configure
--   Build
+1.  LLVM checkout
+2.  Apply patch(optional)
+3.  Makefile generation by configure
+4.  Build
 
 ## Patch<a id="sec-3-1" name="sec-3-1"></a>
 

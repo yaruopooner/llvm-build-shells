@@ -7,8 +7,8 @@
 <ul>
 <li><a href="#sec-2-1">2.1. Visual Studio 2013/2012/2010</a></li>
 <li><a href="#sec-2-2">2.2. Subversion</a></li>
-<li><a href="#sec-2-3">2.3. cmake</a></li>
-<li><a href="#sec-2-4">2.4. python 2.7.x</a></li>
+<li><a href="#sec-2-3">2.3. CMake</a></li>
+<li><a href="#sec-2-4">2.4. Python 2.7.x</a></li>
 <li><a href="#sec-2-5">2.5. GnuWin32</a></li>
 </ul>
 </li>
@@ -47,7 +47,7 @@ any ok.
 
 svn Should not use from CYGWIN or MSYS.  
 
-## cmake<a id="sec-2-3" name="sec-2-3"></a>
+## CMake<a id="sec-2-3" name="sec-2-3"></a>
 
 <http://www.cmake.org/>  
 
@@ -56,7 +56,7 @@ CMake generate a Visual Studio solution and project file.
 And it is used in the execution on script of custom build step.  
 You need to set the PATH in sample.ps1.  
 
-## python 2.7.x<a id="sec-2-4" name="sec-2-4"></a>
+## Python 2.7.x<a id="sec-2-4" name="sec-2-4"></a>
 
 <http://www.python.org/>  
 <http://www.python.org/download/>  
@@ -78,10 +78,10 @@ You need to set the PATH in sample.ps1.
 Use Power Shell version.  
 
 llvm-build-shells performs the following step at a time.  
--   LLVM checkout
--   apply patch(optional)
--   project files generation by CMake
--   build by Visual Studio(MSBuild)
+1.  LLVM checkout
+2.  apply patch(optional)
+3.  project files generation by CMake
+4.  build by Visual Studio(MSBuild)
 
 The following parameters designatable at llvm-build-shells.  
 -   build target platform(64/32)
