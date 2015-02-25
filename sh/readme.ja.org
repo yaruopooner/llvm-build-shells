@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/25.11:20:14
+# last updated : 2015/02/25.11:24:25
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -47,10 +47,10 @@
   Bash版を使用します。
 
   llvm-build-shellsでは以下を一括で行います。
-  1) LLVMチェックアウト
-  2) パッチ適用(optional)
-  3) configureによるLLVM Makefile生成
-  4) ビルド
+  - LLVMチェックアウト
+  - パッチ適用(optional)
+  - configureによるLLVM Makefile生成
+  - ビルド
 
 ** パッチ
    sample.shでパッチのパスを設定する必要があります。

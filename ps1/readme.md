@@ -78,10 +78,10 @@ You need to set the PATH in sample.ps1.
 Use Power Shell version.  
 
 llvm-build-shells performs the following step at a time.  
-1.  LLVM checkout
-2.  apply patch(optional)
-3.  project files generation by CMake
-4.  build by Visual Studio(MSBuild)
+-   LLVM checkout
+-   apply patch(optional)
+-   project files generation by CMake
+-   build by Visual Studio(MSBuild)
 
 The following parameters designatable at llvm-build-shells.  
 -   build target platform(64/32)

@@ -79,10 +79,10 @@ sample.ps1でパスを設定する必要があります。
 Power Shell版を使用します。  
 
 llvm-build-shellsでは以下を一括で行います。  
-1.  LLVMチェックアウト
-2.  パッチ適用(optional)
-3.  cmakeによるLLVMソリューションファイル生成
-4.  Visual Studio(MSBuild)によるビルド
+-   LLVMチェックアウト
+-   パッチ適用(optional)
+-   cmakeによるLLVMソリューションファイル生成
+-   Visual Studio(MSBuild)によるビルド
 
 ビルドするターゲットプラットフォーム(64/32)、コンフィグレーション(release/debug)の指定が可能です。  
 

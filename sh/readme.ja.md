@@ -62,10 +62,10 @@ cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストー�
 Bash版を使用します。  
 
 llvm-build-shellsでは以下を一括で行います。  
-1.  LLVMチェックアウト
-2.  パッチ適用(optional)
-3.  configureによるLLVM Makefile生成
-4.  ビルド
+-   LLVMチェックアウト
+-   パッチ適用(optional)
+-   configureによるLLVM Makefile生成
+-   ビルド
 
 ## パッチ<a id="sec-3-1" name="sec-3-1"></a>
 

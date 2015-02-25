@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/25.11:20:37
+# last updated : 2015/02/25.11:24:25
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -48,10 +48,10 @@
   Use Bash version.
 
   llvm-build-shells performs the following step at a time.
-  1) LLVM checkout
-  2) Apply patch(optional)
-  3) Makefile generation by configure
-  4) Build
+  - LLVM checkout
+  - Apply patch(optional)
+  - Makefile generation by configure
+  - Build
     
 ** Patch
    You need to set the PATH of patch in sample.sh.
