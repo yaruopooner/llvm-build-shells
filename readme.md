@@ -9,16 +9,16 @@
 </div>
 
 
-This script supports the LLVM binary generation.  
-The script performs the following steps at a time.  
-The script dose not install LLVM.  
+This script checks out, patches and builds the supplied LLVM version.  
+It does not install LLVM.  
 
+It performs the following steps:
 -   LLVM checkout
 -   apply patch
 -   project generation
 -   project build
 
-This script was made in reference to the following URL.  
+This script was made using this as a guide.  
 <http://llvm.org/docs/GettingStarted.html>  
 
 # ps1<a id="sec-1" name="sec-1"></a>
