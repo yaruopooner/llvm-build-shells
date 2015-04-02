@@ -23,10 +23,10 @@
 
 # Usage<a id="sec-1" name="sec-1"></a>
 
-This shell can build LLVM of Linux or CYGWIN.  
-llvm-builder.sh is body.  
-sample.sh is call sample.  
-Please edit if necessary, such as patch path.  
+This script builds LLVM for Linux or Cygwin.  
+llvm-builder.sh is the script itself.  
+sample.sh is a call sample.  
+Please edit it if necessary, for example the patch path.  
 
 # Requirements<a id="sec-2" name="sec-2"></a>
 
@@ -46,7 +46,7 @@ Download from below URL in the case of the latest version.
 
 <http://www.cmake.org/>  
 
-cmake-3.1.0.tar.gz download and decompress, do build and install.  
+download cmake-3.1.0.tar.gz, decompress, build and install.  
 
     $ tar -xf cmake-3.1.0.tar.gz .
     $ cd cmake-3.1.0
@@ -55,13 +55,13 @@ cmake-3.1.0.tar.gz download and decompress, do build and install.
 
 ## Python 2.7.x<a id="sec-2-3" name="sec-2-3"></a>
 
-It should have contain it if Linux.  
+You should have it if on Linux.  
 
 # Self Build<a id="sec-3" name="sec-3"></a>
 
 Use Bash version.  
 
-llvm-build-shells performs the following step at a time.  
+llvm-build-shells performs the following steps.
 -   LLVM checkout
 -   Apply patch(optional)
 -   Makefile generation by configure
@@ -69,4 +69,4 @@ llvm-build-shells performs the following step at a time.
 
 ## Patch<a id="sec-3-1" name="sec-3-1"></a>
 
-You need to set the PATH of patch in sample.sh.
+You need to set the path of the patch in sample.sh.
