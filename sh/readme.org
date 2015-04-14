@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/25.11:24:25
+# last updated : 2015/04/14.12:22:17
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -28,7 +28,7 @@
    $ sudo apt-get install cmake
    #+end_src
 
-   Download from below URL in the case of the latest version.
+   If you want to use the latest version, please download from the following URL.
 
    http://www.cmake.org/
 

@@ -42,7 +42,7 @@ The following is required.
 
     $ sudo apt-get install cmake
 
-Download from below URL in the case of the latest version.  
+If you want to use the latest version, please download from the following URL.  
 
 <http://www.cmake.org/>  
 
@@ -61,7 +61,7 @@ You should have it if on Linux.
 
 Use Bash version.  
 
-llvm-build-shells performs the following steps.
+llvm-build-shells performs the following steps.  
 -   LLVM checkout
 -   Apply patch(optional)
 -   Makefile generation by configure
