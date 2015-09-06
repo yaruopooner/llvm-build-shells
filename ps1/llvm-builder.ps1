@@ -103,7 +103,7 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
-                2015 = "VS130COMNTOOLS";
+                2015 = "VS140COMNTOOLS";
                 2013 = "VS120COMNTOOLS";
                 2012 = "VS110COMNTOOLS";
                 2010 = "VS100COMNTOOLS";

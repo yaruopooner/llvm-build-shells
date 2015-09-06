@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/02/25.11:24:25
+# last updated : 2015/09/05.04:06:56
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -19,7 +19,7 @@
 * Requirements
   The following is required. 
 
-** Visual Studio 2013/2012/2010
+** Visual Studio 2015/2013/2012/2010
    any ok.
 
 ** Subversion
