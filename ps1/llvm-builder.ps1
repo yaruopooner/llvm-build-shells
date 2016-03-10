@@ -527,5 +527,5 @@ executeTasks
 # echo $env:Path
 
 
-pause
+# pause
 
