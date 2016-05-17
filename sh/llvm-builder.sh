@@ -29,6 +29,10 @@ function usage()
     echo "     patch apply target directory"
     echo " --patchPath [Path]"
     echo "     patch file path"
+    echo " --buildType [Release|Debug]"
+    echo "     build type"
+    echo " --projectBuilder [make|cmake]"
+    echo "     build by make or cmake"
     echo " --help"
 }
 
@@ -136,9 +140,11 @@ function executeConfigure()
 {
     echo "----------configure phase----------"
     local CHECKOUTED_DIR=${1}
+    local BUILD_TYPE=${2}
     local BUILD_DIR=build
 
     echo "checkout root dir > ${CHECKOUTED_DIR}"
+    echo "build type        > ${BUILD_TYPE}"
 
     if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
@@ -168,9 +174,18 @@ function executeConfigure()
 
     # CC と CXX を指定しないと何故かコケる
     # CC=gcc CXX=g++ ../llvm/configure --enable-optimized --disable-docs --prefix=/opt/ll
-    CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
+    # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
     # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=x86,x86_64,cpp
 
+    # release options
+    local OPTIONS="--enable-optimized --enable-assertions=no --enable-targets=host-only"
+
+    if [ ${BUILD_TYPE} == "Debug" ]; then
+        OPTIONS="--disable-optimized --enable-assertions --enable-debug-runtime --enable-debug-symbols"
+    fi
+
+    CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure ${OPTIONS}
+    
     # CC と CXX を指定しないと何故かコケる
     # CC=gcc CXX=g++ ../llvm/configure --enable-optimized --disable-docs --prefix=/opt/ll
     # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
@@ -179,6 +194,41 @@ function executeConfigure()
     popd
     popd
     
+    return 1
+}
+
+
+function executeConfigureByCMake()
+{
+    echo "----------configure by cmake phase----------"
+    local CHECKOUTED_DIR=${1}
+    local BUILD_TYPE=${2}
+    local BUILD_DIR=build
+
+    echo "checkout root dir > ${CHECKOUTED_DIR}"
+    echo "build type        > ${BUILD_TYPE}"
+
+    if [ ! -d ${CHECKOUTED_DIR} ]; then
+        echo "not found checkout root directory"
+        return 0
+    fi
+    pushd ${CHECKOUTED_DIR}
+
+    # if [ ! -d ${BUILD_DIR} ]; then
+    #     # rm -rf ${BUILD_DIR}
+    #     mkdir ${BUILD_DIR}
+    # fi
+    if [ -d ${BUILD_DIR} ]; then
+        rm -rf ${BUILD_DIR}
+    fi
+    mkdir ${BUILD_DIR}
+    pushd ${BUILD_DIR}
+
+    cmake ../llvm -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+
+    popd
+    popd
+
     return 1
 }
 
@@ -194,6 +244,25 @@ function executeBuild()
     pushd ${BUILD_DIR}
 
     make -j4
+
+    popd
+    popd
+
+    return 1
+}
+
+
+function executeBuildByCMake()
+{
+    echo "----------build by cmake phase----------"
+
+    local CHECKOUTED_DIR=${1}
+    local BUILD_DIR=build
+
+    pushd ${CHECKOUTED_DIR}
+    pushd ${BUILD_DIR}
+
+    cmake --build .
 
     popd
     popd
@@ -268,6 +337,8 @@ function executeBuilder()
     local CLANG_MINOR_VERSION=
     local PATCH_APPLY_LOCATIONS=()
     local PATCH_PATHS=()
+    local BUILD_TYPE="Release"
+    local PROJECT_BUILDER="make"
 
     for OPT in $@
     do
@@ -288,6 +359,10 @@ function executeBuilder()
                 TASK_BUILD=true
                 shift
                 ;;
+            '--buildType' )
+                BUILD_TYPE=${2}
+                shift 2
+                ;;
             '--clangVersion' )
                 CLANG_VERSION=${2}
                 shift 2
@@ -302,6 +377,10 @@ function executeBuilder()
                 ;;
             '--patchPath' )
                 PATCH_PATHS+=(${2})
+                shift 2
+                ;;
+            '--projectBuilder' )
+                PROJECT_BUILDER=${2}
                 shift 2
                 ;;
             '--help' )
@@ -329,11 +408,25 @@ function executeBuilder()
     fi
 
     if [ ${TASK_CONFIGURE} ]; then
-       executeConfigure ${CHECKOUTED_DIR}
+        case ${PROJECT_BUILDER} in
+            'make' )
+                executeConfigure ${CHECKOUTED_DIR} ${BUILD_TYPE}
+                ;;
+            'cmake' )
+                executeConfigureByCMake ${CHECKOUTED_DIR} ${BUILD_TYPE}
+                ;;
+        esac
     fi
 
     if [ ${TASK_BUILD} ]; then
-       executeBuild ${CHECKOUTED_DIR}
+        case ${PROJECT_BUILDER} in
+            'make' )
+                executeBuild ${CHECKOUTED_DIR}
+                ;;
+            'cmake' )
+                executeBuildByCMake ${CHECKOUTED_DIR}
+                ;;
+        esac
     fi
 }
 
