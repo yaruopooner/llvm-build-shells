@@ -30,9 +30,9 @@ function usage()
     echo " --patchPath [Path]"
     echo "     patch file path"
     echo " --buildType [Release|Debug]"
-    echo "     build type"
+    echo "     default is Release"
     echo " --projectBuilder [make|cmake]"
-    echo "     build by make or cmake"
+    echo "     default is make"
     echo " --help"
 }
 
@@ -141,7 +141,7 @@ function executeConfigure()
     echo "----------configure phase----------"
     local CHECKOUTED_DIR=${1}
     local BUILD_TYPE=${2}
-    local BUILD_DIR=build
+    local BUILD_DIR="build-${BUILD_TYPE}"
 
     echo "checkout root dir > ${CHECKOUTED_DIR}"
     echo "build type        > ${BUILD_TYPE}"
@@ -181,7 +181,7 @@ function executeConfigure()
     local OPTIONS="--enable-optimized --enable-assertions=no --enable-targets=host-only"
 
     if [ ${BUILD_TYPE} == "Debug" ]; then
-        OPTIONS="--disable-optimized --enable-assertions --enable-debug-runtime --enable-debug-symbols"
+        OPTIONS="--disable-optimized --enable-assertions --enable-debug-runtime --enable-debug-symbols --enable-targets=host-only"
     fi
 
     CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure ${OPTIONS}
@@ -203,7 +203,8 @@ function executeConfigureByCMake()
     echo "----------configure by cmake phase----------"
     local CHECKOUTED_DIR=${1}
     local BUILD_TYPE=${2}
-    local BUILD_DIR=build
+    local BUILD_DIR="build-${BUILD_TYPE}"
+
 
     echo "checkout root dir > ${CHECKOUTED_DIR}"
     echo "build type        > ${BUILD_TYPE}"
@@ -238,7 +239,8 @@ function executeBuild()
     echo "----------build phase----------"
 
     local CHECKOUTED_DIR=${1}
-    local BUILD_DIR=build
+    local BUILD_TYPE=${2}
+    local BUILD_DIR="build-${BUILD_TYPE}"
 
     pushd ${CHECKOUTED_DIR}
     pushd ${BUILD_DIR}
@@ -257,7 +259,8 @@ function executeBuildByCMake()
     echo "----------build by cmake phase----------"
 
     local CHECKOUTED_DIR=${1}
-    local BUILD_DIR=build
+    local BUILD_TYPE=${2}
+    local BUILD_DIR="build-${BUILD_TYPE}"
 
     pushd ${CHECKOUTED_DIR}
     pushd ${BUILD_DIR}
@@ -421,10 +424,10 @@ function executeBuilder()
     if [ ${TASK_BUILD} ]; then
         case ${PROJECT_BUILDER} in
             'make' )
-                executeBuild ${CHECKOUTED_DIR}
+                executeBuild ${CHECKOUTED_DIR} ${BUILD_TYPE}
                 ;;
             'cmake' )
-                executeBuildByCMake ${CHECKOUTED_DIR}
+                executeBuildByCMake ${CHECKOUTED_DIR} ${BUILD_TYPE}
                 ;;
         esac
     fi
