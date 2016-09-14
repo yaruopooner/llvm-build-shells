@@ -154,10 +154,24 @@ function appendToEnvPath( $path )
 
 function syncNewDirectory( $targetPath )
 {
+    # if ( Test-Path $targetPath )
+    # {
+    #     echo "remove old dir = $targetPath"
+    #     Remove-Item -path $targetPath -recurse -force
+    # }
     if ( Test-Path $targetPath )
     {
-        echo "remove old dir = $targetPath"
-        Remove-Item -path $targetPath -recurse -force
+        $renamed_path = $targetPath
+        do
+        {
+            $renamed_path += "_"
+        }
+        while ( Test-Path $renamed_path )
+
+        Rename-Item -path $targetPath -newName $renamed_path -force
+
+        echo "rename & remove old dir = $targetPath > $renamed_path"
+        Remove-Item -path $renamed_path -recurse -force
     }
     while ( Test-Path $targetPath )
     {
