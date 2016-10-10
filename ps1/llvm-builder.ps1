@@ -68,6 +68,24 @@ $LLVMBuildEnv = @{
                 };
             };
         };
+
+        CONST200 = @{
+            MSVC = @{
+                2013 = "12";
+                2012 = "11";
+                2010 = "10";
+            };
+            PLATFORM = @{
+                32 = @{
+                    Name = $null;
+                    Directory = "msvc-32";
+                };
+                64 = @{
+                    Name = "Win64";
+                    Directory = "msvc-64";
+                };
+            };
+        };
     };
 
     BUILD = @{
@@ -113,7 +131,7 @@ $LLVMBuildEnv = @{
 
 function pause()
 {
-    Write-Host 'Press any key'
+    echo 'Press any key'
     [Console]::ReadKey()
 }
 
@@ -138,7 +156,7 @@ function syncNewDirectory( $targetPath )
 {
     # if ( Test-Path $targetPath )
     # {
-    #     Write-Host "remove old dir = $targetPath"
+    #     echo "remove old dir = $targetPath"
     #     Remove-Item -path $targetPath -recurse -force
     # }
     if ( Test-Path $targetPath )
@@ -150,10 +168,9 @@ function syncNewDirectory( $targetPath )
         }
         while ( Test-Path $renamed_path )
 
-        # Rename-Item -path $targetPath -newName $renamed_path -force
-        $hoge = Rename-Item -path $targetPath -newName $renamed_path
+        Rename-Item -path $targetPath -newName $renamed_path -force
 
-        Write-Host "rename & remove old dir = $targetPath > $renamed_path"
+        echo "rename & remove old dir = $targetPath > $renamed_path"
         Remove-Item -path $renamed_path -recurse -force
     }
     while ( Test-Path $targetPath )
@@ -185,11 +202,11 @@ function importScriptEnvVariables( $script, $scriptArg )
 
 function messageHelp()
 {
-    Write-Host '$clangVersion designates llvm version number (e.g 33, 34, 35...)'
-    Write-Host 'When $clangVersion is empty that will assign trunk.'
-    Write-Host '$workingDirectory is working directory.'
-    Write-Host 'When $workingDirectory is empty that will assign /tmp.'
-    Write-Host 'Cautions! When a checkout-path exist a same name directory, it deletes and creates. '
+    echo '$clangVersion designates llvm version number (e.g 33, 34, 35...)'
+    echo 'When $clangVersion is empty that will assign trunk.'
+    echo '$workingDirectory is working directory.'
+    echo 'When $workingDirectory is empty that will assign /tmp.'
+    echo 'Cautions! When a checkout-path exist a same name directory, it deletes and creates. '
 }
 
 
@@ -197,6 +214,7 @@ function messageHelp()
 function setupCommonVariables()
 {
     # common
+
     if ( $clangVersion -ne $null )
     {
         $LLVMBuildEnv.ClangBuildVersion = $clangVersion
@@ -232,18 +250,17 @@ function executeCommon()
 
 function messageCheckoutEnvironment()
 {
-    Write-Host "clang build target  = " + $LLVMBuildEnv.ClangBuildVersion
-    Write-Host "checkout repository = " + $LLVMBuildEnv.CheckoutRepository
-    Write-Host "checkout root directory  = " + $LLVMBuildEnv.CheckoutRootDir
-    Write-Host "working directory   = " + $LLVMBuildEnv.WorkingDir
+    echo "clang build target  = " + $LLVMBuildEnv.ClangBuildVersion
+    echo "checkout repository = " + $LLVMBuildEnv.CheckoutRepository
+    echo "checkout root directory  = " + $LLVMBuildEnv.CheckoutRootDir
+    echo "working directory   = " + $LLVMBuildEnv.WorkingDir
 }
 
-function setupCheckoutVariables( [ref]$result )
+function setupCheckoutVariables()
 {
-    $result.value = $true
 }
 
-function executeCheckoutBySVN( [ref]$result )
+function executeCheckoutBySVN()
 {
     pushd $LLVMBuildEnv.WorkingDir
 
@@ -310,30 +327,27 @@ function executeCheckoutBySVN( [ref]$result )
         pushd $info.location
         $cmd_args = @("co", "--force", $info.repository_url, $info.checkout_dir)
         & $cmd $cmd_args
-        # Write-Host $cmd_args
+        # echo $cmd_args
         popd
     }
 
     popd
-
-    $result.value = $true
 }
 
 
 # patch funcs
 
-function setupPatchVariables( [ref]$result )
+function setupPatchVariables()
 {
-    $result.value = $true
 }
 
-function executePatchBySVN( [ref]$result )
+function executePatchBySVN()
 {
     $checkout_root_dir = $LLVMBuildEnv.CheckoutRootDir
     pushd $checkout_root_dir
 
     $cmd = "svn"
-
+    
     foreach ( $info in $patchInfos )
     {
         pushd $info.applyLocation
@@ -343,41 +357,31 @@ function executePatchBySVN( [ref]$result )
     }
 
     popd
-
-    $result.value = $true
 }
 
 
 
 # cmake funcs
 
-function setupCMakeVariables( [ref]$result )
+function setupCMakeVariables()
 {
     $LLVMBuildEnv.CMAKE.ExecPath = $cmakePath
     $LLVMBuildEnv.CMAKE.PythonPath = $pythonPath
 
     $cmd = Join-Path $cmakePath "cmake"
-    $cmd_result = & $cmd @( "--version" )
-    $regex = [regex]"\d+`.\d+`.\d+"
-    $regex_result = $regex.Matches( $cmd_result )
-    $version = $regex_result.value -split "\."
-    $major = [int]$version[0]
-    $minor = [int]$version[1]
-    $maintenance = [int]$version[2]
+    $result = & $cmd @("--version")
+    $old = "$result" -match "2`.[0-9]`.[0-9]"
 
-    if ( ($major -gt 3) -or ( ($major -eq 3) -and ( ($minor -gt 4) -or ( ($minor -eq 4) -and ($maintenance -ge 3) ) ) ) )
+    if ( $old )
     {
-        Write-Host "cmake version 3.0 upper"
-        $const_vars = $LLVMBuildEnv.CMAKE.CONST
+        echo "cmake version 3.0 under"
+        $const_vars = $LLVMBuildEnv.CMAKE.CONST200
     }
     else
     {
-        Write-Host "current cmake version is $cmd_result"
-        Write-Host "cmake version 3.4.3 under"
-        Write-Host "require version 3.4.3 or higher version"
-        $result.value = $false
-
-        return
+        echo "cmake version 3.0 upper"
+        # $const_vars = $LLVMBuildEnv.CMAKE.CONST200
+        $const_vars = $LLVMBuildEnv.CMAKE.CONST
     }
 
     if ( $msvcVersion -ne $null )
@@ -397,12 +401,10 @@ function setupCMakeVariables( [ref]$result )
 
         $LLVMBuildEnv.CMAKE.PlatformDir = $const_vars.PLATFORM[ $platform ].Directory
     }
-
-    $result.value = $true
 }
 
 
-function executeCMake( [ref]$result )
+function executeCMake()
 {
     prependToEnvPath -path $LLVMBuildEnv.CMAKE.ExecPath
     prependToEnvPath -path $LLVMBuildEnv.CMAKE.PythonPath
@@ -430,8 +432,6 @@ function executeCMake( [ref]$result )
     & $cmd $cmd_args
 
     popd
-
-    $result.value = $true
 }
 
 
@@ -439,7 +439,7 @@ function executeCMake( [ref]$result )
 # build funcs
 
 
-function setupBuildVariables( [ref]$result )
+function setupBuildVariables()
 {
     $LLVMBuildEnv.BUILD.Gnu32Path = $gnu32Path
 
@@ -455,7 +455,7 @@ function setupBuildVariables( [ref]$result )
     {
         $LLVMBuildEnv.BUILD.Target = "/t:" + $target
     }
-
+    
     if ( $platform -ne $null )
     {
         $LLVMBuildEnv.BUILD.Platform = $const_vars.PLATFORM[ $platform ].Name
@@ -473,17 +473,15 @@ function setupBuildVariables( [ref]$result )
     {
         $LLVMBuildEnv.BUILD.AdditionalProperties = ";" + $additionalProperties
     }
-
+    
 
     # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCVersion, 'Machine')
     $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCVersion
     $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var
     $LLVMBuildEnv.BUILD.VsCmdPrompt += "../../VC/vcvarsall.bat"
-
-    $result.value = $true
 }
 
-function executeBuild( [ref]$result )
+function executeBuild()
 {
     prependToEnvPath -path $LLVMBuildEnv.BUILD.Gnu32Path
 
@@ -504,61 +502,33 @@ function executeBuild( [ref]$result )
     & $cmd $cmd_args
 
     popd
-
-    $result.value = $true
 }
 
 
 $phase_infos = @{
     CHECKOUT = @{
-        setup = {
-            param( [ref]$result )
-            setupCheckoutVariables -result $result
-        };
-        execute = {
-            param( [ref]$result )
-            executeCheckoutBySVN -result $result
-        };
+        setup = {setupCheckoutVariables};
+        execute = {executeCheckoutBySVN};
     };
     PATCH = @{
-        setup = {
-            param( [ref]$result )
-            setupPatchVariables -result $result
-        };
-        execute = {
-            param( [ref]$result )
-            executePatchBySVN -result $result
-        };
+        setup = {setupPatchVariables};
+        execute = {executePatchBySVN};
     };
     PROJECT = @{
-        setup = {
-            param( [ref]$result )
-            setupCMakeVariables -result $result
-        };
-        execute = {
-            param( [ref]$result )
-            executeCMake -result $result
-        };
+        setup = {setupCMakeVariables};
+        execute = {executeCMake};
     };
     BUILD = @{
-        setup = {
-            param( [ref]$result )
-            setupBuildVariables -result $result
-        };
-        execute = {
-            param( [ref]$result )
-            executeBuild -result $result
-        };
+        setup = {setupBuildVariables};
+        execute = {executeBuild};
     };
 }
 
 
 
 
-function setupVariables( [ref]$result )
+function setupVariables()
 {
-    $result.value = $true
-
     setupCommonVariables
 
     foreach ( $task in $tasks )
@@ -566,20 +536,14 @@ function setupVariables( [ref]$result )
         $phase = $phase_infos[ $task ]
         if ( $phase -ne $null )
         {
-            & $phase.setup -result $result
-
-            if ( !$result.value )
-            {
-                break;
-            }
+            & $phase.setup
+            # Invoke-Command -scriptblock $phase.setup
         }
     }
 }
 
-function executeTasks( [ref]$result )
+function executeTasks()
 {
-    $result.value = $true
-
     executeCommon
 
     foreach ( $task in $tasks )
@@ -587,40 +551,22 @@ function executeTasks( [ref]$result )
         $phase = $phase_infos[ $task ]
         if ( $phase -ne $null )
         {
-            & $phase.execute -result ($result)
-
-            if ( !$result.value )
-            {
-                break;
-            }
+            & $phase.execute
         }
     }
 }
 
 
 
-$setup_result = $true
-$exec_result = $true
-
-setupVariables -result ([ref]$setup_result)
-# setupCMakeVariables -result ([ref]$setup_result)
-
-if ( $setup_result )
-{
-    executeTasks -result ([ref]$exec_result)
-    Write-Host "setup success"
-}
-else
-{
-    Write-Host "setup failed"
-}
+setupVariables
+executeTasks
 
 
-# Write-Host $LLVMBuildEnv
-# Write-Host $LLVMBuildEnv.SVN
-# Write-Host $LLVMBuildEnv.CMAKE
-# Write-Host $LLVMBuildEnv.BUILD
-# Write-Host $env:Path
+# echo $LLVMBuildEnv
+# echo $LLVMBuildEnv.SVN
+# echo $LLVMBuildEnv.CMAKE
+# echo $LLVMBuildEnv.BUILD
+# echo $env:Path
 
 
 # pause

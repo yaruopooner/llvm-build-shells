@@ -19,12 +19,12 @@ function DownloadFromURI( $uri, [switch]$expand, [switch]$forceExpand, [switch]$
 
     if ( !( Test-Path $downloaded_file ) )
     {
-        Write-Host "#downloading : " + $uri
+        echo "#downloading : " + $uri
         Invoke-WebRequest -Uri $uri -OutFile $downloaded_file
     }
     else
     {
-        Write-Host "#already exist : " + $uri
+        echo "#already exist : " + $uri
     }
     
 
@@ -38,7 +38,7 @@ function DownloadFromURI( $uri, [switch]$expand, [switch]$forceExpand, [switch]$
 
             if ( !( Test-Path -Path $expanded_path -PathType container ) )
             {
-                Write-Host "#expanding : " + $downloaded_file
+                echo "#expanding : " + $downloaded_file
                 Expand-Archive -Path $downloaded_file -DestinationPath "./" -Force
             }
         }
