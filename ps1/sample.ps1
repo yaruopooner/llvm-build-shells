@@ -3,7 +3,8 @@ $builderShell = Join-Path @(Split-Path $myInvocation.MyCommand.path -Parent) 'll
 # $cmake = "c:/cygwin-x86_64/tmp/cmake-2.8.12.2-win32-x86/bin"
 # $cmake = "c:/cygwin-x86_64/tmp/cmake-3.0.2-win32-x86/bin"
 # $cmake = "c:/cygwin-x86_64/tmp/cmake-3.1.3-win32-x86/bin"
-$cmake = "c:/cygwin-x86_64/tmp/cmake-3.3.1-win32-x86/bin"
+# $cmake = "c:/cygwin-x86_64/tmp/cmake-3.3.1-win32-x86/bin"
+$cmake = "c:/cygwin-x86_64/tmp/cmake-3.6.2-win64-x64/bin"
 $python = "c:/Python27"
 $gnu32 = "c:/cygwin-x86_64/tmp/GnuWin32"
 
