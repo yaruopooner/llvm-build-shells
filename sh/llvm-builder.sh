@@ -180,7 +180,7 @@ function executeConfigure()
     # release options
     local OPTIONS="--enable-optimized --enable-assertions=no --enable-targets=host-only"
 
-    if [ ${BUILD_TYPE} == "Debug" ]; then
+    if [ ${BUILD_TYPE} = "Debug" ]; then
         OPTIONS="--disable-optimized --enable-assertions --enable-debug-runtime --enable-debug-symbols --enable-targets=host-only"
     fi
 
