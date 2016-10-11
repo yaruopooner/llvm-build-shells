@@ -5,7 +5,7 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
 {
     if ( $uri.Length -eq 0 )
     {
-        Write-Host "invalid URI"
+        Write-Host "invalid URI=$uri"
     
         return
     }
