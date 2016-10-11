@@ -3,10 +3,10 @@
 
 function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install )
 {
-    write-host "length $uri = " $uri.Length
-    
     if ( $uri.Length -eq 0 )
     {
+        Write-Host "invalid URI"
+    
         return
     }
 

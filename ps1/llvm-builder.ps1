@@ -150,8 +150,8 @@ function syncNewDirectory( $targetPath )
         }
         while ( Test-Path $renamed_path )
 
-        # Rename-Item -path $targetPath -newName $renamed_path -force
-        $hoge = Rename-Item -path $targetPath -newName $renamed_path
+        Rename-Item -path $targetPath -newName $renamed_path -force
+        # Rename-Item -path $targetPath -newName $renamed_path
 
         Write-Host "rename & remove old dir = $targetPath > $renamed_path"
         Remove-Item -path $renamed_path -recurse -force
