@@ -1,9 +1,15 @@
+# -*- mode: shell-script ; coding: utf-8-dos -*-
 
 
-
-
-function DownloadFromURI( $uri, [switch]$expand, [switch]$forceExpand, [switch]$install )
+function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install )
 {
+    write-host "length $uri = " $uri.Length
+    
+    if ( $uri.Length -eq 0 )
+    {
+        return
+    }
+
     # directory check
     $download_directory = "./tools-latest-version/"
 
@@ -54,17 +60,23 @@ function DownloadFromURI( $uri, [switch]$expand, [switch]$forceExpand, [switch]$
 }
 
 
-
 function SetupEnvironment()
 {
-    
-    $uri_cmake = "https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip"
-    $uri_python = "https://www.python.org/ftp/python/2.7.12/python-2.7.12.amd64.msi"
-    $uri_gnu_tools = "http://jaist.dl.sourceforge.net/project/getgnuwin32/getgnuwin32/0.6.30/GetGnuWin32-0.6.3.exe"
+    DownloadFromURI -Uri $URI_CMAKE -Expand
+    DownloadFromURI -Uri $URI_PYTHON -Install
+    DownloadFromURI -Uri $URI_GNU_TOOLS -Install
+}
 
-    DownloadFromURI -Uri $uri_cmake -Expand
-    DownloadFromURI -Uri $uri_python -Install
-    DownloadFromURI -Uri $uri_gnu_tools -Install
+
+# preset vars
+$URI_CMAKE = ""
+$URI_PYTHON = ""
+$URI_GNU_TOOLS = ""
+
+# overwrite vars load
+if ( Test-Path -Path "./tools-installer.options" -PathType leaf )
+{
+    Get-Content "./tools-installer.options" -Raw | Invoke-Expression
 }
 
 
