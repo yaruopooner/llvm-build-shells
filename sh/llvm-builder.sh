@@ -37,6 +37,39 @@ function usage()
 }
 
 
+function get_command_version()
+{
+    local readonly COMMAND="${1}"
+    local readonly RESULT=$( echo `${COMMAND} --version` )
+    local readonly REGEX_PATTERN='^.*([0-9]+\.[0-9]+\.[0-9]+).*$'
+    local readonly VERSION=$( echo "${RESULT}" | sed -E "s/${REGEX_PATTERN}/\1/" )
+
+    echo "${VERSION}"
+}
+
+function is_valid_version()
+{
+    local readonly COMMAND="${1}"
+    local readonly REGEX_PATTERN='^.*([0-9]+)\.([0-9]+)\.([0-9]+).*$'
+    local readonly VERSION=$( get_command_version "${COMMAND}" )
+    local readonly MAJAR=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\1/" )
+    local readonly MINOR=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\2/" )
+    local readonly MAINTENANCE=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\3/" )
+    local readonly REQUIRE_VERSION="${2}"
+    local readonly REQUIRE_MAJAR=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\1/" )
+    local readonly REQUIRE_MINOR=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\2/" )
+    local readonly REQUIRE_MAINTENANCE=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\3/" )
+
+    if $( [ ${MAJAR} -gt ${REQUIRE_MAJAR} ] || $( [ ${MAJAR} -eq ${REQUIRE_MAJAR} ] && $( [ ${MINOR} -gt ${REQUIRE_MINOR} ] || $( [ ${MINOR} -eq ${REQUIRE_MINOR} ] && [ ${MAINTENANCE} -ge ${REQUIRE_MAINTENANCE} ] ) ) ) ); then
+        # valid
+        return 0
+    else
+        # invalid
+        return 1
+    fi
+}
+
+
 function generateRepositoryRelativePath()
 {
     local MAJOR_VERSION=trunk
@@ -48,7 +81,7 @@ function generateRepositoryRelativePath()
         if [ ${2} ]; then
             MINOR_VERSION="dot${2}-"
         fi
-        REPOSITORY_PATH=tags/RELEASE_${MAJOR_VERSION}/${MINOR_VERSION}final
+        REPOSITORY_PATH="tags/RELEASE_${MAJOR_VERSION}/${MINOR_VERSION}final"
     fi
 
     echo "${REPOSITORY_PATH}"
@@ -75,8 +108,8 @@ function executeCheckoutBySVN()
 {
     echo "----------svn checkout phase----------"
 
-    local REPOSITORY_PATH=`generateRepositoryRelativePath ${1} ${2}`
-    local CHECKOUT_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
+    local readonly REPOSITORY_PATH=`generateRepositoryRelativePath ${1} ${2}`
+    local readonly CHECKOUT_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
 
     echo "repository partial path=${REPOSITORY_PATH}"
     echo "checkout root directory=${CHECKOUT_DIR}"
@@ -90,15 +123,35 @@ function executeCheckoutBySVN()
 
     # proxy がある場合は ~/.subversion/servers に host と port を指定
 
+    # LLVM
     svn co http://llvm.org/svn/llvm-project/llvm/${REPOSITORY_PATH} llvm
+    # Clang
     pushd llvm/tools
     svn co http://llvm.org/svn/llvm-project/cfe/${REPOSITORY_PATH} clang
     popd
+    # Clang tools
     pushd llvm/tools/clang/tools
     svn co http://llvm.org/svn/llvm-project/clang-tools-extra/${REPOSITORY_PATH} extra
     popd
+    # Compiler-RT (required to build the sanitizers) [Optional]:
     pushd llvm/projects
     svn co http://llvm.org/svn/llvm-project/compiler-rt/${REPOSITORY_PATH} compiler-rt
+    popd
+    # Libomp (required for OpenMP support) [Optional]
+    pushd llvm/projects
+    svn co http://llvm.org/svn/llvm-project/openmp/${REPOSITORY_PATH} openmp
+    popd
+    # libcxx [Optional]
+    pushd llvm/projects
+    svn co http://llvm.org/svn/llvm-project/libcxx/${REPOSITORY_PATH} libcxx
+    popd
+    # libcxxabi [Optional]
+    pushd llvm/projects
+    svn co http://llvm.org/svn/llvm-project/libcxxabi/${REPOSITORY_PATH} libcxxabi
+    popd
+    # Test Suite Source Code [Optional]
+    pushd llvm/projects
+    svn co http://llvm.org/svn/llvm-project/test-suite/${REPOSITORY_PATH} test-suite
     popd
 
     popd
@@ -109,9 +162,9 @@ function executeCheckoutBySVN()
 
 function executePatchBySVN()
 {
-    local CHECKOUTED_DIR=${1}
-    local PATCH_APPLY_LOCATION=${2}
-    local PATCH_PATH=${3}
+    local readonly CHECKOUTED_DIR=${1}
+    local readonly PATCH_APPLY_LOCATION=${2}
+    local readonly PATCH_PATH=${3}
 
     echo "----------svn patch phase----------"
     echo "CHECKOUTED_DIR       : ${CHECKOUTED_DIR}"
@@ -121,7 +174,7 @@ function executePatchBySVN()
 
     if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
-        return 0
+        return 1
     fi
 
     pushd ${CHECKOUTED_DIR}
@@ -132,23 +185,23 @@ function executePatchBySVN()
     popd
     popd
 
-    return 1
+    return 0
 }
 
 
 function executeConfigure()
 {
     echo "----------configure phase----------"
-    local CHECKOUTED_DIR=${1}
-    local BUILD_TYPE=${2}
-    local BUILD_DIR="build-${BUILD_TYPE}"
+    local readonly CHECKOUTED_DIR="${1}"
+    local readonly BUILD_TYPE="${2}"
+    local readonly BUILD_DIR="build-${BUILD_TYPE}"
 
     echo "checkout root dir > ${CHECKOUTED_DIR}"
     echo "build type        > ${BUILD_TYPE}"
 
     if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
-        return 0
+        return 1
     fi
     pushd ${CHECKOUTED_DIR}
 
@@ -194,24 +247,31 @@ function executeConfigure()
     popd
     popd
     
-    return 1
+    return 0
 }
 
 
 function executeConfigureByCMake()
 {
     echo "----------configure by cmake phase----------"
-    local CHECKOUTED_DIR=${1}
-    local BUILD_TYPE=${2}
-    local BUILD_DIR="build-${BUILD_TYPE}"
-
+    local readonly CHECKOUTED_DIR="${1}"
+    local readonly BUILD_TYPE="${2}"
+    local readonly BUILD_DIR="build-${BUILD_TYPE}"
+    local readonly REQUIRE_VERSION="3.4.3"
+    
+    if ! is_valid_version "cmake" "${REQUIRE_VERSION}"; then
+        echo "cmake not enough version"
+        echo "current cmake version "$( get_command_version "cmake" )
+        echo "require version ${REQUIRE_VERSION} or higher version"
+        return 1
+    fi
 
     echo "checkout root dir > ${CHECKOUTED_DIR}"
     echo "build type        > ${BUILD_TYPE}"
 
     if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
-        return 0
+        return 2
     fi
     pushd ${CHECKOUTED_DIR}
 
@@ -230,7 +290,7 @@ function executeConfigureByCMake()
     popd
     popd
 
-    return 1
+    return 0
 }
 
 
@@ -238,9 +298,9 @@ function executeBuild()
 {
     echo "----------build phase----------"
 
-    local CHECKOUTED_DIR=${1}
-    local BUILD_TYPE=${2}
-    local BUILD_DIR="build-${BUILD_TYPE}"
+    local readonly CHECKOUTED_DIR="${1}"
+    local readonly BUILD_TYPE="${2}"
+    local readonly BUILD_DIR="build-${BUILD_TYPE}"
 
     pushd ${CHECKOUTED_DIR}
     pushd ${BUILD_DIR}
@@ -250,7 +310,7 @@ function executeBuild()
     popd
     popd
 
-    return 1
+    return 0
 }
 
 
@@ -258,9 +318,9 @@ function executeBuildByCMake()
 {
     echo "----------build by cmake phase----------"
 
-    local CHECKOUTED_DIR=${1}
-    local BUILD_TYPE=${2}
-    local BUILD_DIR="build-${BUILD_TYPE}"
+    local readonly CHECKOUTED_DIR="${1}"
+    local readonly BUILD_TYPE="${2}"
+    local readonly BUILD_DIR="build-${BUILD_TYPE}"
 
     pushd ${CHECKOUTED_DIR}
     pushd ${BUILD_DIR}
@@ -270,7 +330,7 @@ function executeBuildByCMake()
     popd
     popd
 
-    return 1
+    return 0
 }
 
 
@@ -293,21 +353,21 @@ function executeRebuild()
         esac
     done
 
-    local CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
-    local BUILD_DIR=build
+    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
+    local readonly BUILD_DIR="build"
 
     
     echo "checkout root dir > ${CHECKOUTED_DIR}"
 
     if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
-        return 0
+        return 1
     fi
     cd ${CHECKOUTED_DIR}
 
     if [ ! -d ${BUILD_DIR} ]; then
         echo "not found build root directory"
-        return 0
+        return 1
     fi
     cd ${BUILD_DIR}
 
@@ -326,7 +386,7 @@ function executeRebuild()
 
     make -j4
 
-    return 1
+    return 0
 }
 
 
@@ -394,18 +454,28 @@ function executeBuilder()
     done
 
 
-    local CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
+    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
 
 
     if [ ${TASK_CHECKOUT} ]; then
        executeCheckoutBySVN ${CLANG_VERSION} ${CLANG_MINOR_VERSION}
-    fi
 
+       if [ $? -ne 0 ]; then
+           echo "abort executeCheckoutBySVN"
+           exit 1
+       fi
+    fi
+    
     if [ ${TASK_PATCH} ]; then
        if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ]; then
            for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i))
            do
                executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
+
+               if [ $? -ne 0 ]; then
+                   echo "abort executePatchBySVN"
+                   exit 1
+               fi
            done
        fi
     fi
@@ -414,9 +484,19 @@ function executeBuilder()
         case ${PROJECT_BUILDER} in
             'make' )
                 executeConfigure ${CHECKOUTED_DIR} ${BUILD_TYPE}
+
+                if [ $? -ne 0 ]; then
+                    echo "abort executeConfigure"
+                    exit 1
+                fi
                 ;;
             'cmake' )
                 executeConfigureByCMake ${CHECKOUTED_DIR} ${BUILD_TYPE}
+
+                if [ $? -ne 0 ]; then
+                    echo "abort executeConfigureByCMake"
+                    exit 1
+                fi
                 ;;
         esac
     fi
@@ -425,9 +505,19 @@ function executeBuilder()
         case ${PROJECT_BUILDER} in
             'make' )
                 executeBuild ${CHECKOUTED_DIR} ${BUILD_TYPE}
+
+                if [ $? -ne 0 ]; then
+                    echo "abort executeBuild"
+                    exit 1
+                fi
                 ;;
             'cmake' )
                 executeBuildByCMake ${CHECKOUTED_DIR} ${BUILD_TYPE}
+
+                if [ $? -ne 0 ]; then
+                    echo "abort executeBuildByCMake"
+                    exit 1
+                fi
                 ;;
         esac
     fi
