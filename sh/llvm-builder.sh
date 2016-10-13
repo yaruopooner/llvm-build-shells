@@ -32,7 +32,7 @@ function usage()
     echo " --buildType [Release|Debug]"
     echo "     default is Release"
     echo " --projectBuilder [make|cmake]"
-    echo "     default is make"
+    echo "     default is cmake"
     echo " --help"
 }
 
@@ -401,7 +401,7 @@ function executeBuilder()
     local PATCH_APPLY_LOCATIONS=()
     local PATCH_PATHS=()
     local BUILD_TYPE="Release"
-    local PROJECT_BUILDER="make"
+    local PROJECT_BUILDER="cmake"
 
     for OPT in $@
     do
