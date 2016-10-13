@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2016/10/13.10:59:43
+# last updated : 2016/10/13.11:46:36
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -19,13 +19,13 @@
 ** Subversion
    http://tortoisesvn.net/
 
-   #+begin_src shell
-   $ sudo apt-get install subversion subversion-tools
+   #+begin_src shell-script
+     $ sudo apt-get install subversion subversion-tools
    #+end_src
 
 ** CMake
-   #+begin_src shell
-   $ sudo apt-get install cmake
+   #+begin_src shell-script
+     $ sudo apt-get install cmake
    #+end_src
 
    If you want to use the latest version, please download from the following URL.
@@ -34,12 +34,12 @@
 
    download latest cmake, decompress, build and install.
    
-   #+begin_src shell
-   $ wget --timestamping https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip
-   $ tar -xvf cmake-3.6.2.tar.gz
-   $ cd cmake-3.6.2
-   $ ./configure && make
-   $ make install
+   #+begin_src shell-script
+     $ wget --timestamping https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip
+     $ tar -xvf cmake-3.6.2.tar.gz
+     $ cd cmake-3.6.2
+     $ ./configure && make
+     $ make install
    #+end_src
 
 ** Python 2.7.x
