@@ -46,10 +46,11 @@ If you want to use the latest version, please download from the following URL.
 
 <http://www.cmake.org/>  
 
-download cmake-3.1.0.tar.gz, decompress, build and install.  
+download latest cmake, decompress, build and install.  
 
-    $ tar -xf cmake-3.1.0.tar.gz .
-    $ cd cmake-3.1.0
+    $ wget --timestamping https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip
+    $ tar -xvf cmake-3.6.2.tar.gz
+    $ cd cmake-3.6.2
     $ ./configure && make
     $ make install
 

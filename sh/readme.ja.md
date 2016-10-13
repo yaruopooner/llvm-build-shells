@@ -46,10 +46,11 @@ patchパスなど必要に応じて編集してください。
 
 <http://www.cmake.org/>  
 
-cmake-3.1.0.tar.gzをダウンロードし解凍、ビルド、インストールを行う。  
+最新版をダウンロードし解凍、ビルド、インストールを行う。  
 
-    $ tar -xf cmake-3.1.0.tar.gz .
-    $ cd cmake-3.1.0
+    $ wget --timestamping https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip
+    $ tar -xvf cmake-3.6.2.tar.gz
+    $ cd cmake-3.6.2
     $ ./configure && make
     $ make install
 

@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/04/14.12:22:17
+# last updated : 2016/10/13.10:59:43
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -32,11 +32,12 @@
 
    http://www.cmake.org/
 
-   download cmake-3.1.0.tar.gz, decompress, build and install.
+   download latest cmake, decompress, build and install.
    
    #+begin_src shell
-   $ tar -xf cmake-3.1.0.tar.gz .
-   $ cd cmake-3.1.0
+   $ wget --timestamping https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip
+   $ tar -xvf cmake-3.6.2.tar.gz
+   $ cd cmake-3.6.2
    $ ./configure && make
    $ make install
    #+end_src
