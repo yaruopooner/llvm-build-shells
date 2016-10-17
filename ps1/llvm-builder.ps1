@@ -45,7 +45,7 @@ $LLVMBuildEnv = @{
         PythonPath = "";
         MSVCVersion = "12 2013";
         Platform = "Win64";
-        PlatformDir = "msvc-64";
+        PlatformDir = "msvc2015-64-Release";
         BuildDir = "build";
         GeneratorName = $null;
         CommandLine = $null;
@@ -60,11 +60,9 @@ $LLVMBuildEnv = @{
             PLATFORM = @{
                 32 = @{
                     Name = $null;
-                    Directory = "msvc-32";
                 };
                 64 = @{
                     Name = "Win64";
-                    Directory = "msvc-64";
                 };
             };
         };
@@ -75,7 +73,7 @@ $LLVMBuildEnv = @{
         MSVCVersion  = "";
         Target = "";
         Platform = "x64";
-        PlatformDir = "msvc-64";
+        PlatformDir = "msvc2015-64-Release";
         Configuration = "Release";
         TargetNameSuffix = "-x86_64";
         AdditionalProperties = "";
@@ -93,13 +91,11 @@ $LLVMBuildEnv = @{
             PLATFORM = @{
                 32 = @{
                     Name = "Win32";
-                    Directory = "msvc-32";
                     TargetNameSuffix = "-x86_32";
                     VsCmdPromptArg = "x86";
                 }
                 64 = @{
                     Name = "x64";
-                    Directory = "msvc-64";
                     TargetNameSuffix = "-x86_64";
                     VsCmdPromptArg = "amd64";
                 };
@@ -177,6 +173,12 @@ function importScriptEnvVariables( $script, $scriptArg )
     }
 
     Remove-Item $temp_file
+}
+
+function getPlatformDirectoryName()
+{
+    # "msvc{0}-{1}-{2}" -f $msvcVersion, $platform, $configuration
+    "msvc${msvcVersion}-${platform}-${configuration}"
 }
 
 
@@ -298,11 +300,11 @@ function executeCheckoutBySVN( [ref]$result )
             checkout_dir = "libcxxabi";
         }
         # Test Suite Source Code [Optional]
-        @{
-            location = Join-Path $checkout_root_dir "llvm/projects";
-            repository_url = "http://llvm.org/svn/llvm-project/test-suite/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "test-suite";
-        }
+        # @{
+        #     location = Join-Path $checkout_root_dir "llvm/projects";
+        #     repository_url = "http://llvm.org/svn/llvm-project/test-suite/" + $LLVMBuildEnv.CheckoutRepository;
+        #     checkout_dir = "test-suite";
+        # }
     )
 
     foreach ( $info in $checkout_infos )
@@ -395,7 +397,7 @@ function setupCMakeVariables( [ref]$result )
             $LLVMBuildEnv.CMAKE.GeneratorName += " " + $platform_option
         }
 
-        $LLVMBuildEnv.CMAKE.PlatformDir = $const_vars.PLATFORM[ $platform ].Directory
+        $LLVMBuildEnv.CMAKE.PlatformDir = getPlatformDirectoryName
     }
 
     $result.value = $true
@@ -459,7 +461,7 @@ function setupBuildVariables( [ref]$result )
     if ( $platform -ne $null )
     {
         $LLVMBuildEnv.BUILD.Platform = $const_vars.PLATFORM[ $platform ].Name
-        $LLVMBuildEnv.BUILD.PlatformDir = $const_vars.PLATFORM[ $platform ].Directory
+        $LLVMBuildEnv.BUILD.PlatformDir = getPlatformDirectoryName
         $LLVMBuildEnv.BUILD.TargetNameSuffix = $const_vars.PLATFORM[ $platform ].TargetNameSuffix
         $LLVMBuildEnv.BUILD.VsCmdPromptArg = $const_vars.PLATFORM[ $platform ].VsCmdPromptArg
     }
@@ -477,7 +479,16 @@ function setupBuildVariables( [ref]$result )
 
     # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCVersion, 'Machine')
     $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCVersion
-    $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var
+    $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var -ErrorAction Ignore
+    # check exit code
+    if ( -not $? )
+    {
+        Write-Host "not detect Microsoft Visual Studio ${msvcVersion}"
+        $result.value = $false
+
+        return
+    }
+
     $LLVMBuildEnv.BUILD.VsCmdPrompt += "../../VC/vcvarsall.bat"
 
     $result.value = $true
@@ -607,12 +618,22 @@ setupVariables -result ([ref]$setup_result)
 
 if ( $setup_result )
 {
+    Write-Host "setup --- success"
+
     executeTasks -result ([ref]$exec_result)
-    Write-Host "setup success"
+
+    if ( $exec_result )
+    {
+        Write-Host "exec --- success"
+    }
+    else
+    {
+        Write-Host "exec --- failed"
+    }
 }
 else
 {
-    Write-Host "setup failed"
+    Write-Host "setup --- failed"
 }
 
 
