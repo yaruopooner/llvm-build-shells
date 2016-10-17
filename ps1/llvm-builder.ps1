@@ -45,7 +45,7 @@ $LLVMBuildEnv = @{
         PythonPath = "";
         MSVCVersion = "12 2013";
         Platform = "Win64";
-        PlatformDir = "msvc2015-64-Release";
+        PlatformDir = "msvc2015-64";
         BuildDir = "build";
         GeneratorName = $null;
         CommandLine = $null;
@@ -73,7 +73,7 @@ $LLVMBuildEnv = @{
         MSVCVersion  = "";
         Target = "";
         Platform = "x64";
-        PlatformDir = "msvc2015-64-Release";
+        PlatformDir = "msvc2015-64";
         Configuration = "Release";
         TargetNameSuffix = "-x86_64";
         AdditionalProperties = "";
@@ -178,7 +178,7 @@ function importScriptEnvVariables( $script, $scriptArg )
 function getPlatformDirectoryName()
 {
     # "msvc{0}-{1}-{2}" -f $msvcVersion, $platform, $configuration
-    "msvc${msvcVersion}-${platform}-${configuration}"
+    "msvc${msvcVersion}-${platform}"
 }
 
 
