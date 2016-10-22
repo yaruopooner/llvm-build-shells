@@ -1,4 +1,21 @@
-Param( $tasks = @(), $clangVersion, $workingDirectory = ".", $msvcVersion = 2013, $target, $platform = 64, $configuration = "Release", $additionalProperties, $cmakePath, $pythonPath, $gnu32Path, $patchInfos )
+# -*- mode: powershell ; coding: utf-8-dos -*-
+
+Param( 
+    [array]$tasks = @(), 
+    [int]$clangVersion, 
+    [string]$workingDirectory = ".", 
+    [int]$msvcVersion = 2013, 
+    [string]$target, 
+    [int]$platform = 64, 
+    [string]$configuration = "Release", 
+    [string]$additionalProperties, 
+    [string]$cmakePath, 
+    [string]$msys2Path, 
+    [string]$pythonPath, 
+    [string]$perlPath, 
+    [string]$gnu32Path, 
+    [array]$patchInfos
+)
 
 # $tasks = @("CHECKOUT", "PATCH", "PROJECT", "BUILD")
 # $tasks = @("CHECKOUT", "PROJECT", "BUILD")
@@ -35,13 +52,14 @@ $LLVMBuildEnv = @{
     CheckoutRepository = "trunk";
     WorkingDir = ".";
     CheckoutRootDir = "";
-    BuildDir = $null;
+    BuildDir = "";
 
     SVN = @{
     };
 
     CMAKE = @{
         ExecPath = "";
+        Msys2Path = "";
         PythonPath = "";
         MSVCVersion = "12 2013";
         Platform = "Win64";
@@ -69,6 +87,7 @@ $LLVMBuildEnv = @{
     };
 
     BUILD = @{
+        Msys2Path = "";
         Gnu32Path = "";
         MSVCVersion  = "";
         Target = "";
@@ -114,23 +133,23 @@ function pause()
 }
 
 
-function prependToEnvPath( $path )
+function prependToEnvPath( [string]$path )
 {
-    if ( $path -ne $null )
+    if ( $path -ne "" )
     {
         $env:PATH = $path + ";" + $env:PATH
     }
 }
 
-function appendToEnvPath( $path )
+function appendToEnvPath( [string]$path )
 {
-    if ( $path -ne $null )
+    if ( $path -ne "" )
     {
         $env:PATH += ";" + $path
     }
 }
 
-function syncNewDirectory( $targetPath )
+function syncNewDirectory( [string]$targetPath )
 {
     # if ( Test-Path $targetPath )
     # {
@@ -159,17 +178,18 @@ function syncNewDirectory( $targetPath )
     New-Item -name $targetPath -type directory
 }
 
-function importScriptEnvVariables( $script, $scriptArg )
+function importScriptEnvVariables( [string]$script, [string]$scriptArg )
 {
     $temp_file = [IO.Path]::GetTempFileName()
 
     cmd /c " `"$script`" $scriptArg && set > `"$temp_file`" "
 
     Get-Content $temp_file | Foreach-Object {
-        if( $_ -match "^(.*?)=(.*)$" )
+        if ( $_ -match "^(.*?)=(.*)$" )
         { 
             Set-Content "env:\$($matches[1])" $matches[2]
-        } 
+            Write-Host "$matches[1] = $matches[2]"
+        }
     }
 
     Remove-Item $temp_file
@@ -187,10 +207,10 @@ function getPlatformDirectoryName()
 
 function messageHelp()
 {
-    Write-Host '$clangVersion designates llvm version number (e.g 33, 34, 35...)'
-    Write-Host 'When $clangVersion is empty that will assign trunk.'
-    Write-Host '$workingDirectory is working directory.'
-    Write-Host 'When $workingDirectory is empty that will assign /tmp.'
+    Write-Host '${clangVersion} designates llvm version number (e.g 33, 34, 35...)'
+    Write-Host 'When ${clangVersion} is empty that will assign trunk.'
+    Write-Host '${workingDirectory} is working directory.'
+    Write-Host 'When ${workingDirectory} is empty that will assign /tmp.'
     Write-Host 'Cautions! When a checkout-path exist a same name directory, it deletes and creates. '
 }
 
@@ -199,10 +219,10 @@ function messageHelp()
 function setupCommonVariables()
 {
     # common
-    if ( $clangVersion -ne $null )
+    if ( $clangVersion -gt 0 )
     {
         $LLVMBuildEnv.ClangBuildVersion = $clangVersion
-        $LLVMBuildEnv.CheckoutRepository = "tags/RELEASE_$clangVersion/final"
+        $LLVMBuildEnv.CheckoutRepository = "tags/RELEASE_${clangVersion}/final"
     }
     else
     {
@@ -213,12 +233,12 @@ function setupCommonVariables()
     $LLVMBuildEnv.CheckoutRootDir = "clang-" + $LLVMBuildEnv.ClangBuildVersion
     $LLVMBuildEnv.WorkingDir = "."
 
-    if ( $workingDirectory -ne $null )
+    if ( $workingDirectory -ne "" )
     {
         $LLVMBuildEnv.WorkingDir = $workingDirectory
     }
 
-    if ( $LLVMBuildEnv.BuildDir -eq $null )
+    if ( $LLVMBuildEnv.BuildDir -eq "" )
     {
         $LLVMBuildEnv.BuildDir = "build"
     }
@@ -356,6 +376,7 @@ function executePatchBySVN( [ref]$result )
 function setupCMakeVariables( [ref]$result )
 {
     $LLVMBuildEnv.CMAKE.ExecPath = $cmakePath
+    $LLVMBuildEnv.CMAKE.Msys2Path = $msys2Path
     $LLVMBuildEnv.CMAKE.PythonPath = $pythonPath
 
     $cmd = Join-Path $cmakePath "cmake"
@@ -382,12 +403,12 @@ function setupCMakeVariables( [ref]$result )
         return
     }
 
-    if ( $msvcVersion -ne $null )
+    if ( $msvcVersion -ne 0 )
     {
         $LLVMBuildEnv.CMAKE.MSVCVersion = $const_vars.MSVC[ $msvcVersion ]
     }
 
-    if ( $platform -ne $null )
+    if ( $platform -ne 0 )
     {
         $LLVMBuildEnv.CMAKE.GeneratorName = "Visual Studio " + $LLVMBuildEnv.CMAKE.MSVCVersion
 
@@ -407,7 +428,17 @@ function setupCMakeVariables( [ref]$result )
 function executeCMake( [ref]$result )
 {
     prependToEnvPath -path $LLVMBuildEnv.CMAKE.ExecPath
-    prependToEnvPath -path $LLVMBuildEnv.CMAKE.PythonPath
+    if ( $LLVMBuildEnv.CMAKE.Msys2Path -ne "" )
+    {
+        # don't use prepend.
+        # because the cmd of 'windows/system32' will not starts, instead the cmd of 'msys2/mingw64' starts.
+        # This is not taken over by the environment variable, 'msbuild' can't be executed.
+        appendToEnvPath -path $LLVMBuildEnv.CMAKE.Msys2Path
+    }
+    if ( $LLVMBuildEnv.CMAKE.PythonPath -ne "" )
+    {
+        prependToEnvPath -path $LLVMBuildEnv.CMAKE.PythonPath
+    }
 
     pushd $LLVMBuildEnv.WorkingDir
     cd $LLVMBuildEnv.CheckoutRootDir
@@ -448,17 +479,17 @@ function setupBuildVariables( [ref]$result )
     # local vars
     $const_vars = $LLVMBuildEnv.BUILD.CONST
 
-    if ( $msvcVersion -ne $null )
+    if ( $msvcVersion -ne 0 )
     {
         $LLVMBuildEnv.BUILD.MSVCVersion = $const_vars.MSVC[ $msvcVersion ]
     }
 
-    if ( $target -ne $null )
+    if ( $target -ne "" )
     {
         $LLVMBuildEnv.BUILD.Target = "/t:" + $target
     }
 
-    if ( $platform -ne $null )
+    if ( $platform -ne 0 )
     {
         $LLVMBuildEnv.BUILD.Platform = $const_vars.PLATFORM[ $platform ].Name
         $LLVMBuildEnv.BUILD.PlatformDir = getPlatformDirectoryName
@@ -466,12 +497,12 @@ function setupBuildVariables( [ref]$result )
         $LLVMBuildEnv.BUILD.VsCmdPromptArg = $const_vars.PLATFORM[ $platform ].VsCmdPromptArg
     }
 
-    if ( $configuration -ne $null )
+    if ( $configuration -ne "" )
     {
         $LLVMBuildEnv.BUILD.Configuration = $configuration
     }
 
-    if ( $additionalProperties -ne $null )
+    if ( $additionalProperties -ne "" )
     {
         $LLVMBuildEnv.BUILD.AdditionalProperties = ";" + $additionalProperties
     }
@@ -496,7 +527,10 @@ function setupBuildVariables( [ref]$result )
 
 function executeBuild( [ref]$result )
 {
-    prependToEnvPath -path $LLVMBuildEnv.BUILD.Gnu32Path
+    if ( $LLVMBuildEnv.BUILD.Gnu32Path -ne "" )
+    {
+        prependToEnvPath -path $LLVMBuildEnv.BUILD.Gnu32Path
+    }
 
     # $script = $LLVMBuildEnv.BUILD.VsCmdPrompt
     # $scriptArg = $LLVMBuildEnv.BUILD.VsCmdPromptArg
@@ -507,6 +541,7 @@ function executeBuild( [ref]$result )
     cd $LLVMBuildEnv.BuildDir
     cd $LLVMBuildEnv.BUILD.PlatformDir
 
+    # return
     $cmd = "msbuild"
     $target = $LLVMBuildEnv.BUILD.Target
     $properties = "/p:Platform=" + $LLVMBuildEnv.BUILD.Platform + ";Configuration=" + $LLVMBuildEnv.BUILD.Configuration + $LLVMBuildEnv.BUILD.AdditionalProperties
