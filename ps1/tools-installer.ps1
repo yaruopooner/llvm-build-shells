@@ -1,4 +1,4 @@
-# -*- mode: shell-script ; coding: utf-8-dos -*-
+# -*- mode: powershell ; coding: utf-8-dos -*-
 
 
 function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install )
@@ -25,12 +25,12 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
 
     if ( !( Test-Path $downloaded_file ) )
     {
-        Write-Host "#downloading : " + $uri
+        Write-Host "#downloading : ${uri}"
         Invoke-WebRequest -Uri $uri -OutFile $downloaded_file
     }
     else
     {
-        Write-Host "#already exist : " + $uri
+        Write-Host "#already exist : ${uri}"
     }
     
 
@@ -38,14 +38,33 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     if ( $expand )
     {
         $extension = [System.IO.Path]::GetExtension( $downloaded_file )
-        if ( ( $extension -eq ".zip" ) -or $forceExpand )
-        {
-            $expanded_path = [System.IO.Path]::GetFileNameWithoutExtension( $downloaded_file )
+        $expanded_path = [System.IO.Path]::GetFileNameWithoutExtension( $downloaded_file )
 
+        if ( $extension -eq ".zip" )
+        {
             if ( !( Test-Path -Path $expanded_path -PathType container ) )
             {
-                Write-Host "#expanding : " + $downloaded_file
+                Write-Host "#expanding : ${downloaded_file}"
                 Expand-Archive -Path $downloaded_file -DestinationPath "./" -Force
+            }
+        }
+        $cmd = "./7za.exe"
+        if ( ( ( $extension -eq ".xz" ) -or ( $extension -eq ".gz" ) ) -and ( Test-Path $cmd ) )
+        {
+            if ( !( Test-Path -Path $expanded_path -PathType any ) )
+            {
+                Write-Host "#expanding : ${downloaded_file}"
+                & $cmd x $downloaded_file -aos
+            }
+
+            $extension2 = [System.IO.Path]::GetExtension( $expanded_path )
+            if ( $extension2 -eq ".tar" )
+            {
+                $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $expanded_path )
+                if ( !( Test-Path -Path $extract_name -PathType any ) )
+                {
+                    & $cmd x $expanded_path -aos
+                }
             }
         }
     }
@@ -60,18 +79,21 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
 }
 
 
-function SetupEnvironment()
+
+function setupEnvironment()
 {
-    DownloadFromURI -Uri $URI_CMAKE -Expand
-    DownloadFromURI -Uri $URI_PYTHON -Install
-    DownloadFromURI -Uri $URI_GNU_TOOLS -Install
+    DownloadFromURI -Uri $URI_7ZIP -Expand
+
+    foreach ( $download in $DOWNLOAD_LIST )
+    {
+        DownloadFromURI -Uri $download.URI $download.OPTIONS
+    }
 }
 
 
 # preset vars
-$URI_CMAKE = ""
-$URI_PYTHON = ""
-$URI_GNU_TOOLS = ""
+$DOWNLOAD_LIST = @()
+$URI_7ZIP = "http://www.7-zip.org/a/7za920.zip"
 
 # overwrite vars load
 if ( Test-Path -Path "./tools-installer.options" -PathType leaf )
@@ -81,6 +103,7 @@ if ( Test-Path -Path "./tools-installer.options" -PathType leaf )
 
 
 setupEnvironment
+
 
 [Console]::ReadKey()
 
