@@ -149,7 +149,7 @@ function appendToEnvPath( [string]$path )
     }
 }
 
-function syncNewDirectory( [string]$targetPath )
+function syncNewDirectory( [string]$targetPath, [ref]$result )
 {
     # if ( Test-Path $targetPath )
     # {
@@ -168,6 +168,17 @@ function syncNewDirectory( [string]$targetPath )
         Rename-Item -path $targetPath -newName $renamed_path -force
         # Rename-Item -path $targetPath -newName $renamed_path
 
+        # check exit code
+        if ( -not $? )
+        {
+            if ( $result )
+            {
+                $result.value = $false
+            }
+            
+            return
+        }
+
         Write-Host "rename & remove old dir = $targetPath > $renamed_path"
         Remove-Item -path $renamed_path -recurse -force
     }
@@ -176,6 +187,11 @@ function syncNewDirectory( [string]$targetPath )
         Start-Sleep -m 500
     }
     New-Item -name $targetPath -type directory
+
+    if ( $result )
+    {
+        $result.value = $true
+    }
 }
 
 function importScriptEnvVariables( [string]$script, [string]$scriptArg )
@@ -271,9 +287,16 @@ function executeCheckoutBySVN( [ref]$result )
 
     $checkout_root_dir = $LLVMBuildEnv.CheckoutRootDir
 
-    syncNewDirectory -targetPath $checkout_root_dir
+    $sync_result = $true
+    syncNewDirectory -targetPath $checkout_root_dir -result ([ref]$sync_result)
+    if ( !$sync_result )
+    {
+        $result.value = $false
 
+        return
+    }
 
+    
     # proxy がある場合は ~/.subversion/servers に host と port を指定
     $cmd = "svn"
     $checkout_infos = @(
@@ -453,7 +476,14 @@ function executeCMake( [ref]$result )
     }
     cd $build_dir
 
-    syncNewDirectory -targetPath $platform_dir
+    $sync_result = $true
+    syncNewDirectory -targetPath $platform_dir -result ([ref]$sync_result)
+    if ( !$sync_result )
+    {
+        $result.value = $false
+
+        return
+    }
 
     cd $platform_dir
 
