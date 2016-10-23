@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/09/05.04:06:56
+# last updated : 2016/10/23.05:42:11
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -19,15 +19,15 @@
 * Requirements
   The following is required. 
 
-** Visual Studio 2015/2013/2012/2010
+** Visual Studio 2015/2013/2012/2010[required]
    any ok.
 
-** Subversion
+** Subversion[required]
    http://tortoisesvn.net/
 
    svn Should not use from CYGWIN or MSYS.
 
-** CMake
+** CMake[required]
    http://www.cmake.org/
 
    You download The Windows ZIP and decompress to somewhere.
@@ -35,7 +35,15 @@
    And it is used in the execution on script of custom build step.
    You need to set the PATH in sample.ps1.
 	
-** Python 2.7.x
+** MSYS2[recommend]
+   http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/
+
+   Python and Perl support.
+   Perl is also required when Win32 build.
+   Easier than individually install Python and Perl.
+
+** Python 2.7.x[unrecommend]
+   
    http://www.python.org/
    http://www.python.org/download/
 
@@ -44,7 +52,7 @@
    Required when CMake to generate the project files of LLVM.
    You need to set the PATH in sample.ps1.
 
-** GnuWin32
+** GnuWin32[unrecommend]
    http://sourceforge.net/projects/getgnuwin32/   
 
    It is used in a custom build step.
