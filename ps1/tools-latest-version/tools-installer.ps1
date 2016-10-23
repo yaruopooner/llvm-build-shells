@@ -27,6 +27,8 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     # archive expand
     if ( $expand )
     {
+        Write-Host "#expand : ${downloaded_file}"
+
         $extension = [System.IO.Path]::GetExtension( $downloaded_file )
         $expanded_path = [System.IO.Path]::GetFileNameWithoutExtension( $downloaded_file )
 
@@ -70,26 +72,12 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
 
 function setupEnvironment()
 {
-    # directory check
-    $download_directory = "./tools-latest-version/"
-
-    if ( !( Test-Path $download_directory ) )
-    {
-        New-Item -Name $download_directory -Type directory
-    }
-
-    pushd $download_directory
-
-
     DownloadFromURI -Uri $URI_7ZIP -Expand
 
     foreach ( $download in $DOWNLOAD_LIST )
     {
         DownloadFromURI -Uri $download.URI $download.OPTIONS
     }
-
-    
-    popd
 }
 
 

@@ -305,45 +305,45 @@ function executeCheckoutBySVN( [ref]$result )
             location = $checkout_root_dir;
             repository_url = "http://llvm.org/svn/llvm-project/llvm/" + $LLVMBuildEnv.CheckoutRepository;
             checkout_dir = "llvm"
-        }, 
+        }
         # Clang
-        @{
+        ,@{
             location = Join-Path $checkout_root_dir "llvm/tools";
             repository_url = "http://llvm.org/svn/llvm-project/cfe/" + $LLVMBuildEnv.CheckoutRepository;
             checkout_dir = "clang";
-        }, 
+        }
         # Clang tools
-        @{
+        ,@{
             location = Join-Path $checkout_root_dir "llvm/tools/clang/tools";
             repository_url = "http://llvm.org/svn/llvm-project/clang-tools-extra/" + $LLVMBuildEnv.CheckoutRepository;
             checkout_dir = "extra";
-        }, 
+        }
         # Compiler-RT (required to build the sanitizers) [Optional]:
-        @{
+        ,@{
             location = Join-Path $checkout_root_dir "llvm/projects";
             repository_url = "http://llvm.org/svn/llvm-project/compiler-rt/" + $LLVMBuildEnv.CheckoutRepository;
             checkout_dir = "compiler-rt";
         }
         # Libomp (required for OpenMP support) [Optional]
-        @{
+        ,@{
             location = Join-Path $checkout_root_dir "llvm/projects";
             repository_url = "http://llvm.org/svn/llvm-project/openmp/" + $LLVMBuildEnv.CheckoutRepository;
             checkout_dir = "openmp";
         }
         # libcxx [Optional]
-        @{
+        ,@{
             location = Join-Path $checkout_root_dir "llvm/projects";
             repository_url = "http://llvm.org/svn/llvm-project/libcxx/" + $LLVMBuildEnv.CheckoutRepository;
             checkout_dir = "libcxx";
         }
         # libcxxabi [Optional]
-        @{
+        ,@{
             location = Join-Path $checkout_root_dir "llvm/projects";
             repository_url = "http://llvm.org/svn/llvm-project/libcxxabi/" + $LLVMBuildEnv.CheckoutRepository;
             checkout_dir = "libcxxabi";
         }
         # Test Suite Source Code [Optional]
-        # @{
+        # ,@{
         #     location = Join-Path $checkout_root_dir "llvm/projects";
         #     repository_url = "http://llvm.org/svn/llvm-project/test-suite/" + $LLVMBuildEnv.CheckoutRepository;
         #     checkout_dir = "test-suite";
