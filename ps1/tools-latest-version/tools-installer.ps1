@@ -10,16 +10,6 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
         return
     }
 
-    # directory check
-    $download_directory = "./tools-latest-version/"
-
-    if ( !( Test-Path $download_directory ) )
-    {
-        New-Item -Name $download_directory -Type directory
-    }
-
-    pushd $download_directory
-
     # download
     $downloaded_file = [System.IO.Path]::GetFileName( $uri )
 
@@ -74,20 +64,32 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     {
         Start-Process -FilePath $downloaded_file
     }
-    
-    popd
 }
 
 
 
 function setupEnvironment()
 {
+    # directory check
+    $download_directory = "./tools-latest-version/"
+
+    if ( !( Test-Path $download_directory ) )
+    {
+        New-Item -Name $download_directory -Type directory
+    }
+
+    pushd $download_directory
+
+
     DownloadFromURI -Uri $URI_7ZIP -Expand
 
     foreach ( $download in $DOWNLOAD_LIST )
     {
         DownloadFromURI -Uri $download.URI $download.OPTIONS
     }
+
+    
+    popd
 }
 
 
