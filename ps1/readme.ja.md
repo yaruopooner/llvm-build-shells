@@ -7,14 +7,20 @@
 <ul>
 <li><a href="#sec-2-1">2.1. Visual Studio 2015/2013/2012/2010</a></li>
 <li><a href="#sec-2-2">2.2. Subversion</a></li>
-<li><a href="#sec-2-3">2.3. CMake</a></li>
-<li><a href="#sec-2-4">2.4. Python 2.7.x</a></li>
-<li><a href="#sec-2-5">2.5. GnuWin32</a></li>
+<li><a href="#sec-2-3">2.3. CMake[必須]</a></li>
+<li><a href="#sec-2-4">2.4. MSYS2[推奨]</a></li>
+<li><a href="#sec-2-5">2.5. Python 2.7.x[非推奨]</a></li>
+<li><a href="#sec-2-6">2.6. GnuWin32[非推奨]</a></li>
 </ul>
 </li>
-<li><a href="#sec-3">3. セルフビルド</a>
+<li><a href="#sec-3">3. 必要なソフトウェアのダウンロードサポート</a>
 <ul>
-<li><a href="#sec-3-1">3.1. パッチ</a></li>
+<li><a href="#sec-3-1">3.1. MSYS2について</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. セルフビルド</a>
+<ul>
+<li><a href="#sec-4-1">4.1. パッチ</a></li>
 </ul>
 </li>
 </ul>
@@ -49,7 +55,7 @@ svnを呼び出してリビジョンナンバーなどを埋め込んだヘッ�
 CYGWINのsvnだとパス解釈が正しく実行されない場合がありビルド時に該当ファイルがないといわれてしまうケースがある。  
 なのでCYGWINのshellなどから実行しないほうがよい。  
 
-## CMake<a id="sec-2-3" name="sec-2-3"></a>
+## CMake[必須]<a id="sec-2-3" name="sec-2-3"></a>
 
 <http://www.cmake.org/>  
 
@@ -57,7 +63,17 @@ Windows ZIPをダウンロードして何処かへ展開。
 Visual Studio ソリューション＆プロジェクトファイル生成と、カスタムビルドステップ時のスクリプト実行で使用される。  
 sample.ps1でパスを設定する必要があります。  
 
-## Python 2.7.x<a id="sec-2-4" name="sec-2-4"></a>
+## MSYS2[推奨]<a id="sec-2-4" name="sec-2-4"></a>
+
+<http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/>  
+
+Python, Perl をサポート。  
+PerlはWin32版ビルドでのみ必要。  
+個別にPythonとPerlをインストールするより楽。  
+ポータブル版を使用するので環境を汚さない。  
+sample.ps1でパスを設定する必要があります。  
+
+## Python 2.7.x[非推奨]<a id="sec-2-5" name="sec-2-5"></a>
 
 <http://www.python.org/>  
 <http://www.python.org/download/>  
@@ -67,14 +83,36 @@ Python 2.7.x Windows X86-64 Installer を使用
 cmake で LLVMのソリューションファイルを生成する際に必要。  
 sample.ps1でパスを設定する必要があります。  
 
-## GnuWin32<a id="sec-2-5" name="sec-2-5"></a>
+## GnuWin32[非推奨]<a id="sec-2-6" name="sec-2-6"></a>
 
 <http://sourceforge.net/projects/getgnuwin32/>     
 
 カスタムビルドステップで使用される。  
 sample.ps1でパスを設定する必要があります。  
 
-# セルフビルド<a id="sec-3" name="sec-3"></a>
+# 必要なソフトウェアのダウンロードサポート<a id="sec-3" name="sec-3"></a>
+
+`./tools-latest-version/tools-installer.ps1`  
+を使用すると、  
+`./tools-latest-version/tools-installer.options` に記述されているソフトウェアが  
+`./tools-latest-version/` にダウンロード＆展開されます。  
+
+`sample.ps1` に記述するツールパスは `./tools-latest-version/` へ展開されたパスを使用する。  
+
+## MSYS2について<a id="sec-3-1" name="sec-3-1"></a>
+
+展開後に自動起動する MinGW64 シェルにおいて  
+
+    $ cd /tmp
+    $ ./setup-msys2.sh
+
+を実行して、MSYS2を最新の状態に更新する。  
+これを行わないとPython2.7xやPerlがインストールされない。  
+
+プロキシ経由している場合は `setup-msys2.sh` 実行前に  
+`setup-msys2.options` を編集してhttp\_proxy等の設定を行う必要がある。  
+
+# セルフビルド<a id="sec-4" name="sec-4"></a>
 
 Power Shell版を使用します。  
 
@@ -86,6 +124,6 @@ llvm-build-shellsでは以下を一括で行います。
 
 ビルドするターゲットプラットフォーム(64/32)、コンフィグレーション(release/debug)の指定が可能です。  
 
-## パッチ<a id="sec-3-1" name="sec-3-1"></a>
+## パッチ<a id="sec-4-1" name="sec-4-1"></a>
 
 sample.ps1でパッチのパスを設定する必要があります。
