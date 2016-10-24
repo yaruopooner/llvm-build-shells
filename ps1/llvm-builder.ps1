@@ -296,7 +296,7 @@ function executeCheckoutBySVN( [ref]$result )
         return
     }
 
-    
+
     # proxy がある場合は ~/.subversion/servers に host と port を指定
     $cmd = "svn"
     $checkout_infos = @(
@@ -485,6 +485,7 @@ function executeCMake( [ref]$result )
         return
     }
 
+    
     cd $platform_dir
 
     $cmd = "cmake"
@@ -679,7 +680,6 @@ $setup_result = $true
 $exec_result = $true
 
 setupVariables -result ([ref]$setup_result)
-# setupCMakeVariables -result ([ref]$setup_result)
 
 if ( $setup_result )
 {
@@ -689,11 +689,11 @@ if ( $setup_result )
 
     if ( $exec_result )
     {
-        Write-Host "exec --- success"
+        Write-Host "execute --- success"
     }
     else
     {
-        Write-Host "exec --- failed"
+        Write-Host "execute --- failed"
     }
 }
 else
