@@ -1,7 +1,7 @@
 # -*- mode: powershell ; coding: utf-8-dos -*-
 
 
-function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install )
+function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask )
 {
     if ( $uri.Length -eq 0 )
     {
@@ -66,6 +66,12 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     {
         Start-Process -FilePath $downloaded_file
     }
+
+    # afterTask execute 
+    if ( $afterTask )
+    {
+        & $afterTask
+    }
 }
 
 
@@ -76,19 +82,27 @@ function setupEnvironment()
 
     foreach ( $download in $DOWNLOAD_LIST )
     {
-        DownloadFromURI -Uri $download.URI $download.OPTIONS
+        DownloadFromURI @download
     }
 }
+
 
 
 # preset vars
 $DOWNLOAD_LIST = @()
 $URI_7ZIP = "http://www.7-zip.org/a/7za920.zip"
 
-# overwrite vars load
-if ( Test-Path -Path "./tools-installer.options" -PathType leaf )
+$installer_option_file = "./tools-installer.options"
+
+if ( !(Test-Path -Path $installer_option_file -PathType leaf) )
 {
-    Get-Content "./tools-installer.options" -Raw | Invoke-Expression
+    Copy-Item -Path "${installer_option_file}.sample" -Destination $installer_option_file
+}
+
+# overwrite vars load
+if ( Test-Path -Path $installer_option_file -PathType leaf )
+{
+    Get-Content $installer_option_file -Raw | Invoke-Expression
 }
 
 

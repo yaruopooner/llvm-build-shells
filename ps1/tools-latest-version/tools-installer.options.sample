@@ -1,24 +1,29 @@
-# -*- mode: shell-script ; coding: utf-8-dos -*-
+# -*- mode: powershell ; coding: utf-8-dos -*-
 
 $DOWNLOAD_LIST = @(
-    # CMAKE
-    @{
-        URI = "https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip";
-        OPTIONS = "-Expand";
+    @{ # CMAKE
+        uri = "https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip";
+        expand = $true;
     }
-    # MSYS2
-    ,@{
-        URI = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20160921.tar.xz";
-        OPTIONS = "-Expand";
+    ,@{ # MSYS2
+        uri = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20160921.tar.xz";
+        expand = $true;
+        afterTask = {
+            Copy-Item -Path "./setup-msys2.sh" -Destination "./msys64/tmp/setup-msys2.sh"
+            if ( !(Test-Path -Path "./msys64/tmp/setup-msys2.options" -PathType leaf) )
+            {
+                Copy-Item -Path "./setup-msys2.options.sample" -Destination "./msys64/tmp/setup-msys2.options"
+            }
+            $cmd = "./msys64/mingw64.exe"
+            & $cmd
+        };
     }
-    # Python
-    # ,@{
-    #     URI = "https://www.python.org/ftp/python/2.7.12/python-2.7.12.amd64.msi";
-    #     OPTIONS = "-Install";
+    # ,@{ # Python
+    #     uri = "https://www.python.org/ftp/python/2.7.12/python-2.7.12.amd64.msi";
+    #     install = $true;
     # }
-    # GnuWin32
-    # ,@{
-    #     URI = "http://jaist.dl.sourceforge.net/project/getgnuwin32/getgnuwin32/0.6.30/GetGnuWin32-0.6.3.exe";
-    #     OPTIONS = "-Install";
+    # ,@{ # GnuWin32
+    #     uri = "http://jaist.dl.sourceforge.net/project/getgnuwin32/getgnuwin32/0.6.30/GetGnuWin32-0.6.3.exe";
+    #     install = $true;
     # }
 )
