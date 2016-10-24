@@ -93,10 +93,21 @@ $DOWNLOAD_LIST = @()
 $URI_7ZIP = "http://www.7-zip.org/a/7za920.zip"
 
 $installer_option_file = "./tools-installer.options"
+$installer_option_src_file = "${installer_option_file}.sample"
 
-if ( !(Test-Path -Path $installer_option_file -PathType leaf) )
+if ( Test-Path -Path $installer_option_file -PathType leaf )
 {
-    Copy-Item -Path "${installer_option_file}.sample" -Destination $installer_option_file
+    $src_time = ( Get-ItemProperty -Path $installer_option_src_file ).LastWriteTime.Ticks
+    $dest_time = ( Get-ItemProperty -Path $installer_option_file ).LastWriteTime.Ticks
+
+    if ( $src_time -gt $dest_time )
+    {
+        Copy-Item -Path $installer_option_src_file -Destination $installer_option_file -Force
+    }
+}
+else
+{
+    Copy-Item -Path $installer_option_src_file -Destination $installer_option_file
 }
 
 # overwrite vars load
