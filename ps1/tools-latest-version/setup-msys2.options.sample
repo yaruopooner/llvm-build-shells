@@ -1,5 +1,10 @@
 # -*- mode: shell-script ; coding: utf-8-unix -*-
 #! /bin/sh
 
+
+# export http_proxy="http://url:port"
+# export https_proxy="https://url:port"
+
+
 ADDITIONAL_PACKAGE_LIST=(
 )
