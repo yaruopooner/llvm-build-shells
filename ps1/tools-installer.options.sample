@@ -1,6 +1,0 @@
-# -*- mode: shell-script ; coding: utf-8-dos -*-
-
-$URI_CMAKE = "https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip"
-$URI_PYTHON = "https://www.python.org/ftp/python/2.7.12/python-2.7.12.amd64.msi"
-$URI_GNU_TOOLS = "http://jaist.dl.sourceforge.net/project/getgnuwin32/getgnuwin32/0.6.30/GetGnuWin32-0.6.3.exe"
-

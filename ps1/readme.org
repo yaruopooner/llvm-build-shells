@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2015/09/05.04:06:56
+# last updated : 2016/10/24.16:24:35
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -19,15 +19,15 @@
 * Requirements
   The following is required. 
 
-** Visual Studio 2015/2013/2012/2010
+** Visual Studio 2015/2013/2012/2010[required]
    any ok.
 
-** Subversion
+** Subversion[required]
    http://tortoisesvn.net/
 
    svn Should not use from CYGWIN or MSYS.
 
-** CMake
+** CMake[required]
    http://www.cmake.org/
 
    You download The Windows ZIP and decompress to somewhere.
@@ -35,7 +35,17 @@
    And it is used in the execution on script of custom build step.
    You need to set the PATH in sample.ps1.
 	
-** Python 2.7.x
+** MSYS2[recommend]
+   http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/
+
+   Python and Perl support.
+   Perl is also required when Win32 build.
+   Easier than individually install Python and Perl.
+   Does not pollute the environment because it uses the portable version.
+   You need to set the PATH in sample.ps1.
+
+** Python 2.7.x[unrecommend]
+   
    http://www.python.org/
    http://www.python.org/download/
 
@@ -44,11 +54,30 @@
    Required when CMake to generate the project files of LLVM.
    You need to set the PATH in sample.ps1.
 
-** GnuWin32
+** GnuWin32[unrecommend]
    http://sourceforge.net/projects/getgnuwin32/   
 
    It is used in a custom build step.
    You need to set the PATH in sample.ps1.
+
+* Required software download support
+  =./tools-latest-version/tools-installer.ps1=
+  When you use this script, 
+  Described software in =./tools-latest-version/tools-installer.options= will be downloaded and archive-expand to =./tools-latest-version/= 
+
+  TOOL-PATH for described to a =sample.ps1= , use the =./tools-latest-version/= that has been archive-expand.
+
+** about MSYS2
+   MinGW64 shell is auto launch after archive-expand.
+   #+begin_src shell-script
+     $ cd /tmp
+     $ ./setup-msys2.sh
+   #+end_src
+   When you do this, MSYS2 update latest environment.
+   If don't do this, Python2.7x and Perl not install.
+
+   If you use proxy, before =setup-msys2.sh= execution
+   it is necessary to set such http_proxy by editing the =setup-msys2.options= .
 
 * Self Build
   Use Power Shell version.
