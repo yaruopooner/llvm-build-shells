@@ -29,8 +29,8 @@ Param(
 #         applyLocation = "llvm/";
 #         # patch absolute path
 #         absolutePath = "ac-clang/clang-server/patch/invalidate-mmap.patch";
-#     },
-#     @{
+#     }
+#     ,@{
 #         applyLocation = "llvm/tools/clang/";
 #         absolutePath = "ac-clang/clang-server/patch/libclang-x86_64.patch";
 #     }
@@ -46,6 +46,8 @@ Param(
 # $pythonPath = "c:/Python27"
 # $gnu32Path = "c:/cygwin-x86_64/tmp/GnuWin32"
 
+$scriptPath = Split-Path $myInvocation.MyCommand.path -Parent
+$projectPath = Split-Path $scriptPath -Parent
 
 $LLVMBuildEnv = @{
     ClangBuildVersion = "trunk";
