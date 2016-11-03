@@ -29,21 +29,21 @@ $patchInfos = @(
 # executeBuilder -tasks @("PROJECT", "BUILD") -clangVersion 390 -msvcVersion 2013 -platform 32 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -patchInfos $patches -target "Clang libraries\libclang;Clang executables\clang-format"
 
 
-# executeBuilder -tasks @("CHECKOUT", "PATCH") -clangVersion 390 -patchInfos $patchInfos
-executeBuilder -tasks @("PATCH") -clangVersion 390 -patchInfos $patchInfos
+executeBuilder -tasks @("CHECKOUT", "PATCH") -clangVersion 390 -patchInfos $patchInfos
+# executeBuilder -tasks @("PATCH") -clangVersion 390 -patchInfos $patchInfos
 executeBuilder -tasks @("PROJECT") -clangVersion 390 -msvcVersion 2013 -platform 64 -cmakePath $cmake -msys2Path $msys2
-# executeBuilder -tasks @("PROJECT") -clangVersion 390 -msvcVersion 2013 -platform 32 -cmakePath $cmake -msys2Path $msys2
-# executeBuilder -tasks @("BUILD") -clangVersion 390 -msvcVersion 2013 -platform 64 -configuration "Release" -target "Clang libraries\libclang"
-# executeBuilder -tasks @("BUILD") -clangVersion 390 -msvcVersion 2013 -platform 32 -configuration "Release" -target "Clang libraries\libclang"
+executeBuilder -tasks @("PROJECT") -clangVersion 390 -msvcVersion 2013 -platform 32 -cmakePath $cmake -msys2Path $msys2
+executeBuilder -tasks @("BUILD") -clangVersion 390 -msvcVersion 2013 -platform 64 -configuration "Release" -target "Clang libraries\libclang"
+executeBuilder -tasks @("BUILD") -clangVersion 390 -msvcVersion 2013 -platform 32 -configuration "Release" -target "Clang libraries\libclang"
 # executeBuilder -tasks @("BUILD") -clangVersion 390 -msvcVersion 2013 -platform 64 -configuration "Debug" -target "Clang libraries\libclang"
 # executeBuilder -tasks @("BUILD") -clangVersion 390 -msvcVersion 2013 -platform 64 -configuration "RelWithDebInfo" -target "Clang libraries\libclang"
 
-# executeBuilder -tasks @("CHECKOUT", "PATCH") -clangVersion 380 -patchInfos $patchInfos
-executeBuilder -tasks @("PATCH") -clangVersion 380 -patchInfos $patchInfos
-# executeBuilder -tasks @("PROJECT") -clangVersion 380 -msvcVersion 2013 -platform 64 -cmakePath $cmake -msys2Path $msys2
-# executeBuilder -tasks @("PROJECT") -clangVersion 380 -msvcVersion 2013 -platform 32 -cmakePath $cmake -msys2Path $msys2
-# executeBuilder -tasks @("BUILD") -clangVersion 380 -msvcVersion 2013 -platform 64 -configuration "Release" -target "Clang libraries\libclang"
-# executeBuilder -tasks @("BUILD") -clangVersion 380 -msvcVersion 2013 -platform 32 -configuration "Release" -target "Clang libraries\libclang"
+executeBuilder -tasks @("CHECKOUT", "PATCH") -clangVersion 380 -patchInfos $patchInfos
+# executeBuilder -tasks @("PATCH") -clangVersion 380 -patchInfos $patchInfos
+executeBuilder -tasks @("PROJECT") -clangVersion 380 -msvcVersion 2013 -platform 64 -cmakePath $cmake -msys2Path $msys2
+executeBuilder -tasks @("PROJECT") -clangVersion 380 -msvcVersion 2013 -platform 32 -cmakePath $cmake -msys2Path $msys2
+executeBuilder -tasks @("BUILD") -clangVersion 380 -msvcVersion 2013 -platform 64 -configuration "Release" -target "Clang libraries\libclang"
+executeBuilder -tasks @("BUILD") -clangVersion 380 -msvcVersion 2013 -platform 32 -configuration "Release" -target "Clang libraries\libclang"
 # executeBuilder -tasks @("BUILD") -clangVersion 380 -msvcVersion 2013 -platform 64 -configuration "Debug" -target "Clang libraries\libclang"
 # executeBuilder -tasks @("BUILD") -clangVersion 380 -msvcVersion 2013 -platform 64 -configuration "RelWithDebInfo" -target "Clang libraries\libclang"
 
