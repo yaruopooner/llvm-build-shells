@@ -160,6 +160,7 @@ function syncNewDirectory( [string]$targetPath, [ref]$result )
         {
             if ( $result )
             {
+                Write-Host "failed rename"
                 $result.value = $false
             }
             
@@ -480,6 +481,14 @@ function executeCMake( [ref]$result )
 
     & $cmd $cmd_args
 
+    if ( -not $? )
+    {
+        Write-Host "failed cmake"
+        $result.value = $false
+
+        return
+    }
+
     popd
 
     $result.value = $true
@@ -566,6 +575,14 @@ function executeBuild( [ref]$result )
     $cmd_args = @("LLVM.sln", $target, $properties, "/maxcpucount", "/fileLogger")
 
     & $cmd $cmd_args
+
+    if ( -not $? )
+    {
+        Write-Host "failed msbuild"
+        $result.value = $false
+
+        return
+    }
 
     popd
 
