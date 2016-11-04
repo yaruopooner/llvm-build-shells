@@ -10,30 +10,34 @@
 
 function usage()
 {
-    echo "Usage: executeBuilder [OPTIONS]"
+    echo 'Usage: executeBuilder [OPTIONS]'
     echo
-    echo "Options:"
-    echo " --checkout"
-    echo "     checkout LLVM by SVN"
-    echo "     validate option > --clangVersion"
-    echo " --patch"
-    echo "     apply patch by SVN"
-    echo "     validate option > --patchApplyLocation, --patchPath"
-    echo " --configure"
-    echo "     generate Makefile"
-    echo " --build"
-    echo "     execute make"
-    echo " --clangVersion [VersionNumber]"
-    echo "     LLVM checkout version"
-    echo " --patchApplyLocation [Path]"
-    echo "     patch apply target directory"
-    echo " --patchPath [Path]"
-    echo "     patch file path"
-    echo " --buildType [Release|Debug]"
-    echo "     default is Release"
-    echo " --projectBuilder [make|cmake]"
-    echo "     default is cmake"
-    echo " --help"
+    echo 'Options:'
+    echo ' --checkout'
+    echo '     checkout LLVM by SVN'
+    echo '     validate option > --clangVersion'
+    echo ' --patch'
+    echo '     apply patch by SVN'
+    echo '     validate option > --patchApplyLocation, --patchPath, --patchInfo'
+    echo ' --configure'
+    echo '     generate Makefile'
+    echo ' --build'
+    echo '     execute make'
+    echo ' --clangVersion [VersionNumber]'
+    echo '     LLVM checkout version'
+    echo '     default is trunk'
+    echo ' --patchApplyLocation "PATH"'
+    echo '     patch apply target relative directory from checkout directory'
+    echo '     example : llvm/, llvm/tools/clang/'
+    echo ' --patchPath "PATH"'
+    echo '     patch file path'
+    echo ' --patchInfo "APPLY_LOCATION;PATH"'
+    echo '     patch apply target directory and patch file path'
+    echo ' --buildType [Release|Debug]'
+    echo '     default is Release'
+    echo ' --projectBuilder [make|cmake]'
+    echo '     default is cmake'
+    echo ' --help'
 }
 
 
@@ -400,6 +404,7 @@ function executeBuilder()
     local CLANG_MINOR_VERSION=
     local PATCH_APPLY_LOCATIONS=()
     local PATCH_PATHS=()
+    local PATCH_INFOS=()
     local BUILD_TYPE="Release"
     local PROJECT_BUILDER="cmake"
 
@@ -442,6 +447,10 @@ function executeBuilder()
                 PATCH_PATHS+=(${2})
                 shift 2
                 ;;
+            '--patchInfo' )
+                PATCH_INFOS+=(${2})
+                shift 2
+                ;;
             '--projectBuilder' )
                 PROJECT_BUILDER=${2}
                 shift 2
@@ -478,6 +487,23 @@ function executeBuilder()
                fi
            done
        fi
+
+       local readonly EXTRACT_PATTERN='\([^;]\+\);\(.*\)'
+       for ((i = 0; i < ${#PATCH_INFOS[@]}; ++i))
+       do
+           local PATCH_INFO=${PATCH_INFOS[$i]}
+           local PATCH_APPLY_LOCATION=$( echo "${PATCH_INFO}" | sed -e "s/${EXTRACT_PATTERN}/\1/" )
+           local PATCH_PATH=$( echo "${PATCH_INFO}" | sed -e "s/${EXTRACT_PATTERN}/\2/" )
+
+           if $( [ -n ${PATCH_APPLY_LOCATION} ] && [ -n ${PATCH_PATH} ] ); then
+               executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATION} ${PATCH_PATH}
+
+               if [ $? -ne 0 ]; then
+                   echo "abort executePatchBySVN"
+                   exit 1
+               fi
+           fi
+       done
     fi
 
     if [ ${TASK_CONFIGURE} ]; then
