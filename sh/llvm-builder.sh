@@ -46,7 +46,7 @@ function get_command_version()
     local readonly COMMAND="${1}"
     local readonly RESULT=$( echo `${COMMAND} --version` )
     local readonly REGEX_PATTERN='^.*([0-9]+\.[0-9]+\.[0-9]+).*$'
-    local readonly VERSION=$( echo "${RESULT}" | sed -E "s/${REGEX_PATTERN}/\1/" )
+    local readonly VERSION=$( echo "${RESULT}" | sed -r "s/${REGEX_PATTERN}/\1/" )
 
     echo "${VERSION}"
 }
@@ -56,13 +56,13 @@ function is_valid_version()
     local readonly COMMAND="${1}"
     local readonly REGEX_PATTERN='^.*([0-9]+)\.([0-9]+)\.([0-9]+).*$'
     local readonly VERSION=$( get_command_version "${COMMAND}" )
-    local readonly MAJAR=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\1/" )
-    local readonly MINOR=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\2/" )
-    local readonly MAINTENANCE=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\3/" )
+    local readonly MAJAR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
+    local readonly MINOR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
+    local readonly MAINTENANCE=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
     local readonly REQUIRE_VERSION="${2}"
-    local readonly REQUIRE_MAJAR=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\1/" )
-    local readonly REQUIRE_MINOR=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\2/" )
-    local readonly REQUIRE_MAINTENANCE=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\3/" )
+    local readonly REQUIRE_MAJAR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
+    local readonly REQUIRE_MINOR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
+    local readonly REQUIRE_MAINTENANCE=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
 
     if $( [ ${MAJAR} -gt ${REQUIRE_MAJAR} ] || $( [ ${MAJAR} -eq ${REQUIRE_MAJAR} ] && $( [ ${MINOR} -gt ${REQUIRE_MINOR} ] || $( [ ${MINOR} -eq ${REQUIRE_MINOR} ] && [ ${MAINTENANCE} -ge ${REQUIRE_MAINTENANCE} ] ) ) ) ); then
         # valid
@@ -488,12 +488,12 @@ function executeBuilder()
            done
        fi
 
-       local readonly EXTRACT_PATTERN='\([^;]\+\);\(.*\)'
+       local readonly EXTRACT_PATTERN='([^;]+);(.*)'
        for ((i = 0; i < ${#PATCH_INFOS[@]}; ++i))
        do
            local PATCH_INFO=${PATCH_INFOS[$i]}
-           local PATCH_APPLY_LOCATION=$( echo "${PATCH_INFO}" | sed -e "s/${EXTRACT_PATTERN}/\1/" )
-           local PATCH_PATH=$( echo "${PATCH_INFO}" | sed -e "s/${EXTRACT_PATTERN}/\2/" )
+           local PATCH_APPLY_LOCATION=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\1/" )
+           local PATCH_PATH=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\2/" )
 
            if $( [ -n ${PATCH_APPLY_LOCATION} ] && [ -n ${PATCH_PATH} ] ); then
                executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATION} ${PATCH_PATH}
