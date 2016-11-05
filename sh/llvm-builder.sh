@@ -26,7 +26,7 @@ function usage()
     echo ' --clangVersion [VersionNumber]'
     echo '     LLVM checkout version'
     echo '     default is trunk'
-    echo ' --patchApplyLocation "PATH"'
+    echo ' --patchApplyLocation "APPLY_LOCATION"'
     echo '     patch apply target relative directory from checkout directory'
     echo '     example : llvm/, llvm/tools/clang/'
     echo ' --patchPath "PATH"'
