@@ -342,6 +342,7 @@ function executeRebuild()
 {
     local CLANG_VERSION=
     local CLANG_MINOR_VERSION=
+    local OPT
 
     for OPT in $@
     do
@@ -477,8 +478,8 @@ function executeBuilder()
     
     if [ ${TASK_PATCH} ]; then
        if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ]; then
-           for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i))
-           do
+           local i
+           for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i)); do
                executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
 
                if [ $? -ne 0 ]; then
@@ -489,9 +490,8 @@ function executeBuilder()
        fi
 
        local readonly EXTRACT_PATTERN='([^;]+);(.*)'
-       for ((i = 0; i < ${#PATCH_INFOS[@]}; ++i))
-       do
-           local PATCH_INFO=${PATCH_INFOS[$i]}
+       local PATCH_INFO
+       for PATCH_INFO in "${PATCH_INFOS[@]}"; do
            local PATCH_APPLY_LOCATION=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\1/" )
            local PATCH_PATH=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\2/" )
 
