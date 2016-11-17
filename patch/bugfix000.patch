@@ -1,0 +1,24 @@
+Index: lib/Lex/HeaderSearch.cpp
+===================================================================
+--- lib/Lex/HeaderSearch.cpp	(revision 285680)
++++ lib/Lex/HeaderSearch.cpp	(working copy)
+@@ -961,6 +961,9 @@
+     HFI->Resolved = true;
+     auto ExternalHFI = ExternalSource->GetHeaderFileInfo(FE);
+ 
++    if (FE->getUID() >= FileInfo.size())
++        FileInfo.resize(FE->getUID() + 1);
++
+     HFI = &FileInfo[FE->getUID()];
+     if (ExternalHFI.External)
+       mergeHeaderFileInfo(*HFI, ExternalHFI);
+@@ -993,6 +996,9 @@
+       HFI->Resolved = true;
+       auto ExternalHFI = ExternalSource->GetHeaderFileInfo(FE);
+ 
++      if (FE->getUID() >= FileInfo.size())
++          FileInfo.resize(FE->getUID() + 1);
++
+       HFI = &FileInfo[FE->getUID()];
+       if (ExternalHFI.External)
+         mergeHeaderFileInfo(*HFI, ExternalHFI);

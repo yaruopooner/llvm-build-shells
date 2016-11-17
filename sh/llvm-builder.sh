@@ -10,30 +10,34 @@
 
 function usage()
 {
-    echo "Usage: executeBuilder [OPTIONS]"
+    echo 'Usage: executeBuilder [OPTIONS]'
     echo
-    echo "Options:"
-    echo " --checkout"
-    echo "     checkout LLVM by SVN"
-    echo "     validate option > --clangVersion"
-    echo " --patch"
-    echo "     apply patch by SVN"
-    echo "     validate option > --patchApplyLocation, --patchPath"
-    echo " --configure"
-    echo "     generate Makefile"
-    echo " --build"
-    echo "     execute make"
-    echo " --clangVersion [VersionNumber]"
-    echo "     LLVM checkout version"
-    echo " --patchApplyLocation [Path]"
-    echo "     patch apply target directory"
-    echo " --patchPath [Path]"
-    echo "     patch file path"
-    echo " --buildType [Release|Debug]"
-    echo "     default is Release"
-    echo " --projectBuilder [make|cmake]"
-    echo "     default is cmake"
-    echo " --help"
+    echo 'Options:'
+    echo ' --checkout'
+    echo '     checkout LLVM by SVN'
+    echo '     validate option > --clangVersion'
+    echo ' --patch'
+    echo '     apply patch by SVN'
+    echo '     validate option > --patchApplyLocation, --patchPath, --patchInfo'
+    echo ' --configure'
+    echo '     generate Makefile'
+    echo ' --build'
+    echo '     execute make'
+    echo ' --clangVersion [VersionNumber]'
+    echo '     LLVM checkout version'
+    echo '     default is trunk'
+    echo ' --patchApplyLocation "APPLY_LOCATION"'
+    echo '     patch apply target relative directory from checkout directory'
+    echo '     example : llvm/, llvm/tools/clang/'
+    echo ' --patchPath "PATH"'
+    echo '     patch file path'
+    echo ' --patchInfo "APPLY_LOCATION;PATH"'
+    echo '     patch apply target directory and patch file path'
+    echo ' --buildType [Release|Debug]'
+    echo '     default is Release'
+    echo ' --projectBuilder [make|cmake]'
+    echo '     default is cmake'
+    echo ' --help'
 }
 
 
@@ -42,7 +46,7 @@ function get_command_version()
     local readonly COMMAND="${1}"
     local readonly RESULT=$( echo `${COMMAND} --version` )
     local readonly REGEX_PATTERN='^.*([0-9]+\.[0-9]+\.[0-9]+).*$'
-    local readonly VERSION=$( echo "${RESULT}" | sed -E "s/${REGEX_PATTERN}/\1/" )
+    local readonly VERSION=$( echo "${RESULT}" | sed -r "s/${REGEX_PATTERN}/\1/" )
 
     echo "${VERSION}"
 }
@@ -52,13 +56,13 @@ function is_valid_version()
     local readonly COMMAND="${1}"
     local readonly REGEX_PATTERN='^.*([0-9]+)\.([0-9]+)\.([0-9]+).*$'
     local readonly VERSION=$( get_command_version "${COMMAND}" )
-    local readonly MAJAR=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\1/" )
-    local readonly MINOR=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\2/" )
-    local readonly MAINTENANCE=$( echo "${VERSION}" | sed -E "s/${REGEX_PATTERN}/\3/" )
+    local readonly MAJAR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
+    local readonly MINOR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
+    local readonly MAINTENANCE=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
     local readonly REQUIRE_VERSION="${2}"
-    local readonly REQUIRE_MAJAR=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\1/" )
-    local readonly REQUIRE_MINOR=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\2/" )
-    local readonly REQUIRE_MAINTENANCE=$( echo "${REQUIRE_VERSION}" | sed -E "s/${REGEX_PATTERN}/\3/" )
+    local readonly REQUIRE_MAJAR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
+    local readonly REQUIRE_MINOR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
+    local readonly REQUIRE_MAINTENANCE=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
 
     if $( [ ${MAJAR} -gt ${REQUIRE_MAJAR} ] || $( [ ${MAJAR} -eq ${REQUIRE_MAJAR} ] && $( [ ${MINOR} -gt ${REQUIRE_MINOR} ] || $( [ ${MINOR} -eq ${REQUIRE_MINOR} ] && [ ${MAINTENANCE} -ge ${REQUIRE_MAINTENANCE} ] ) ) ) ); then
         # valid
@@ -338,6 +342,7 @@ function executeRebuild()
 {
     local CLANG_VERSION=
     local CLANG_MINOR_VERSION=
+    local OPT
 
     for OPT in $@
     do
@@ -400,6 +405,7 @@ function executeBuilder()
     local CLANG_MINOR_VERSION=
     local PATCH_APPLY_LOCATIONS=()
     local PATCH_PATHS=()
+    local PATCH_INFOS=()
     local BUILD_TYPE="Release"
     local PROJECT_BUILDER="cmake"
 
@@ -442,6 +448,10 @@ function executeBuilder()
                 PATCH_PATHS+=(${2})
                 shift 2
                 ;;
+            '--patchInfo' )
+                PATCH_INFOS+=(${2})
+                shift 2
+                ;;
             '--projectBuilder' )
                 PROJECT_BUILDER=${2}
                 shift 2
@@ -468,8 +478,8 @@ function executeBuilder()
     
     if [ ${TASK_PATCH} ]; then
        if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ]; then
-           for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i))
-           do
+           local i
+           for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i)); do
                executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
 
                if [ $? -ne 0 ]; then
@@ -478,6 +488,22 @@ function executeBuilder()
                fi
            done
        fi
+
+       local readonly EXTRACT_PATTERN='([^;]+);(.*)'
+       local PATCH_INFO
+       for PATCH_INFO in "${PATCH_INFOS[@]}"; do
+           local PATCH_APPLY_LOCATION=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\1/" )
+           local PATCH_PATH=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\2/" )
+
+           if $( [ -n ${PATCH_APPLY_LOCATION} ] && [ -n ${PATCH_PATH} ] ); then
+               executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATION} ${PATCH_PATH}
+
+               if [ $? -ne 0 ]; then
+                   echo "abort executePatchBySVN"
+                   exit 1
+               fi
+           fi
+       done
     fi
 
     if [ ${TASK_CONFIGURE} ]; then
