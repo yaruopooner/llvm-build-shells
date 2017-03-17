@@ -57,6 +57,7 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
+                2017 = "15 2017";
                 2015 = "14 2015";
                 2013 = "12 2013";
                 2012 = "11 2012";
@@ -76,7 +77,10 @@ $LLVMBuildEnv = @{
     BUILD = @{
         Msys2Path = "";
         Gnu32Path = "";
-        MSVCVersion = "";
+        # MSVCVersion = "";
+        VcRegEntryKeyName = ""
+        VcEnvVarName = "";
+        VcVarsBatPath = "";
         Target = "";
         Platform = "x64";
         PlatformDir = "msvc2015-64";
@@ -89,17 +93,57 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
-                2015 = "VS140COMNTOOLS";
-                2013 = "VS120COMNTOOLS";
-                2012 = "VS110COMNTOOLS";
-                2010 = "VS100COMNTOOLS";
+                # 2017 = "VS150COMNTOOLS";
+                # 2015 = "VS140COMNTOOLS";
+                # 2013 = "VS120COMNTOOLS";
+                # 2012 = "VS110COMNTOOLS";
+                # 2010 = "VS100COMNTOOLS";
+                2017 = @{
+                    RegEntryKeyName = "15.0";
+                    EnvVarName = "VS150COMNTOOLS";
+                    VarsBatPath = "VC\Auxiliary\Build\vcvarsall.bat";
+                };
+                2015 = @{
+                    RegEntryKeyName = "14.0";
+                    EnvVarName = "VS140COMNTOOLS";
+                    VarsBatPath = "VC\vcvarsall.bat";
+                };
+                2013 = @{
+                    RegEntryKeyName = "13.0";
+                    EnvVarName = "VS120COMNTOOLS";
+                    VarsBatPath = "VC\vcvarsall.bat";
+                };
+                2012 = @{
+                    RegEntryKeyName = "12.0";
+                    EnvVarName = "VS110COMNTOOLS";
+                    VarsBatPath = "VC\vcvarsall.bat";
+                };
+                2010 = @{
+                    RegEntryKeyName = "10.0";
+                    EnvVarName = "VS100COMNTOOLS";
+                    VarsBatPath = "VC\vcvarsall.bat";
+                };
             };
+            REGISTRY_QUERY = @(
+                # 64 = @{
+                @{
+                    SubKey = "{0}\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7";
+                    RootKeys = @("HKLM", "HKCU");
+                },
+                # 32 = @{
+                @{
+                    SubKey = "{0}\SOFTWARE\Microsoft\VisualStudio\SxS\VS7";
+                    RootKeys = @("HKLM", "HKCU");
+                }
+            );
+            # REGISTRY_PRODUCT_DETAILS = @{
+            # };
             PLATFORM = @{
                 32 = @{
                     Name = "Win32";
                     TargetNameSuffix = "-x86_32";
                     VsCmdPromptArg = "x86";
-                }
+                };
                 64 = @{
                     Name = "x64";
                     TargetNameSuffix = "-x86_64";
@@ -498,6 +542,63 @@ function executeCMake( [ref]$result )
 
 # build funcs
 
+function getVsCmdPromptFromEnvVars( [ref]$result )
+{
+    $env_var = "env:" + $LLVMBuildEnv.BUILD.VcEnvVarName
+    $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var -ErrorAction Ignore
+
+    $result.value = $true
+}
+
+function getVsCmdPromptFromRegistry( [ref]$result )
+{
+    $cmd = "reg"
+    $regex = [regex] "^\s+(\S+)\s+REG_SZ\s+(.+)$"
+
+    foreach ( $query_detail in $LLVMBuildEnv.BUILD.CONST.REGISTRY_QUERY )
+    {
+        foreach ( $root_key in $query_detail.RootKeys )
+        {
+            $cmd_args = @( "query", ( $query_detail.SubKey -f $root_key ) )
+            $query_result = & $cmd $cmd_args
+
+            if ( -not $? )
+            {
+                continue
+            }
+
+            $entries = $query_result.Split("`n", [System.StringSplitOptions]::RemoveEmptyEntries)
+
+            # Write-Host ( "keys = {0}" -f ( $query_detail.SubKey -f $root_key ) )
+
+            foreach ( $entry in $entries )
+            {
+                # Write-Host "entry = $entry"
+
+                $regex_result = $regex.Matches( $entry )
+
+                if ( $regex_result.Groups.Length -ne 3 )
+                {
+                    continue
+                }
+
+                # Write-Host ( "result = {0} : {1}" -f $regex_result.Groups[1], $regex_result.Groups[2] )
+
+                # if ( $regex_result.Groups[1] -eq $LLVMBuildEnv.BUILD.VcRegEntryKeyName )
+                if ( $LLVMBuildEnv.BUILD.VcRegEntryKeyName.Equals( $regex_result.Groups[1].value ) )
+                {
+                    $LLVMBuildEnv.BUILD.VsCmdPrompt = $regex_result.Groups[2].value
+
+                    $result.value = $true
+
+                    return
+                }
+            }
+        }
+    }
+
+    $result.value = $false
+}
 
 function setupBuildVariables( [ref]$result )
 {
@@ -508,7 +609,10 @@ function setupBuildVariables( [ref]$result )
 
     if ( $LLVMBuildInput.msvcVersion -ne 0 )
     {
-        $LLVMBuildEnv.BUILD.MSVCVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ]
+        $LLVMBuildEnv.BUILD.VcRegEntryKeyName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].RegEntryKeyName
+        # $LLVMBuildEnv.BUILD.MSVCVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ]
+        $LLVMBuildEnv.BUILD.VcEnvVarName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].EnvVarName
+        $LLVMBuildEnv.BUILD.VcVarsBatPath = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].VarsBatPath
     }
 
     if ( $LLVMBuildInput.target -ne "" )
@@ -536,10 +640,16 @@ function setupBuildVariables( [ref]$result )
 
 
     # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCVersion, 'Machine')
-    $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCVersion
-    $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var -ErrorAction Ignore
+    # $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCVersion
+    # $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var -ErrorAction Ignore
+
+    $exit_result = $false
+
+    # getVsCmdPromptFromEnvVars -result ([ref]$exit_result)
+    getVsCmdPromptFromRegistry -result ([ref]$exit_result)
     # check exit code
-    if ( -not $? )
+    # if ( -not $? )
+    if ( -not $exit_result )
     {
         Write-Host ( "not detect Microsoft Visual Studio {0}" -f $LLVMBuildInput.msvcVersion )
         $result.value = $false
@@ -547,7 +657,10 @@ function setupBuildVariables( [ref]$result )
         return
     }
 
-    $LLVMBuildEnv.BUILD.VsCmdPrompt += "../../VC/vcvarsall.bat"
+    # $LLVMBuildEnv.BUILD.VsCmdPrompt += "../../VC/vcvarsall.bat"
+    $LLVMBuildEnv.BUILD.VsCmdPrompt += $LLVMBuildEnv.BUILD.VcVarsBatPath
+
+    # Write-Host $LLVMBuildEnv.BUILD.VsCmdPrompt
 
     $result.value = $true
 }
@@ -580,6 +693,8 @@ function executeBuild( [ref]$result )
     {
         Write-Host "failed msbuild"
         $result.value = $false
+
+        popd
 
         return
     }
@@ -719,6 +834,8 @@ function executeBuilder
     $exec_result = $true
 
     setupVariables -result ([ref]$setup_result)
+
+    # return
 
     if ( $setup_result )
     {
