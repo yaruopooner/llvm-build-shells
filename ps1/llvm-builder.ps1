@@ -345,11 +345,11 @@ function executeCheckoutBySVN( [ref]$result )
             checkout_dir = "clang";
         }
         # Clang tools
-        # ,@{
-        #     location = Join-Path $checkout_root_dir "llvm/tools/clang/tools";
-        #     repository_url = "http://llvm.org/svn/llvm-project/clang-tools-extra/" + $LLVMBuildEnv.CheckoutRepository;
-        #     checkout_dir = "extra";
-        # }
+        ,@{
+            location = Join-Path $checkout_root_dir "llvm/tools/clang/tools";
+            repository_url = "http://llvm.org/svn/llvm-project/clang-tools-extra/" + $LLVMBuildEnv.CheckoutRepository;
+            checkout_dir = "extra";
+        }
         # LLD linker [Optional]:
         ,@{
             location = Join-Path $checkout_root_dir "llvm/tools";
@@ -387,11 +387,11 @@ function executeCheckoutBySVN( [ref]$result )
             checkout_dir = "libcxxabi";
         }
         # Test Suite Source Code [Optional]:
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/projects";
-            repository_url = "http://llvm.org/svn/llvm-project/test-suite/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "test-suite";
-        }
+        # ,@{
+        #     location = Join-Path $checkout_root_dir "llvm/projects";
+        #     repository_url = "http://llvm.org/svn/llvm-project/test-suite/" + $LLVMBuildEnv.CheckoutRepository;
+        #     checkout_dir = "test-suite";
+        # }
     )
 
     foreach ( $info in $checkout_infos )
