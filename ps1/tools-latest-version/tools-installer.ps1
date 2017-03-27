@@ -80,7 +80,7 @@ function setupEnvironment()
 {
     DownloadFromURI -Uri $URI_7ZIP -Expand
 
-    foreach ( $download in $DOWNLOAD_LIST )
+    foreach ( $download in $global:DOWNLOAD_LIST )
     {
         DownloadFromURI @download
     }
