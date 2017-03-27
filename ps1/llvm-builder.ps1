@@ -24,6 +24,10 @@
 # $platform = 32
 
 
+$SvnCheckoutInfos = @()
+$LLVMSvnOptionFile = "./llvm-svn.options"
+$LLVMSvnOptionSrcFile = "${LLVMSvnOptionFile}.sample"
+
 
 # $cmakePath = "c:/cygwin-x86_64/tmp/cmake-3.0.2-win32-x86/bin"
 # $pythonPath = "c:/Python27"
@@ -182,38 +186,39 @@ function appendToEnvPath( [string]$path )
 
 function syncNewDirectory( [string]$targetPath, [ref]$result )
 {
-    # if ( Test-Path $targetPath )
-    # {
-    #     Write-Host "remove old dir = $targetPath"
-    #     Remove-Item -path $targetPath -recurse -force
-    # }
     if ( Test-Path $targetPath )
     {
-        $renamed_path = $targetPath
-        do
-        {
-            $renamed_path += "_"
-        }
-        while ( Test-Path $renamed_path )
-
-        Rename-Item -path $targetPath -newName $renamed_path -force
-        # Rename-Item -path $targetPath -newName $renamed_path
-
-        # check exit code
-        if ( -not $? )
-        {
-            if ( $result )
-            {
-                Write-Host "failed rename"
-                $result.value = $false
-            }
-            
-            return
-        }
-
-        Write-Host "rename & remove old dir = $targetPath > $renamed_path"
-        Remove-Item -path $renamed_path -recurse -force
+        Write-Host "remove old dir = $targetPath"
+        # Remove-Item -path $targetPath -recurse -force
+        cmd.exe /c "rmdir /S /Q $targetPath"
     }
+    # if ( Test-Path $targetPath )
+    # {
+    #     $renamed_path = $targetPath
+    #     do
+    #     {
+    #         $renamed_path += "_"
+    #     }
+    #     while ( Test-Path $renamed_path )
+
+    #     Rename-Item -path $targetPath -newName $renamed_path -force
+    #     # Rename-Item -path $targetPath -newName $renamed_path
+
+    #     # check exit code
+    #     if ( -not $? )
+    #     {
+    #         if ( $result )
+    #         {
+    #             Write-Host "failed rename"
+    #             $result.value = $false
+    #         }
+            
+    #         return
+    #     }
+
+    #     Write-Host "rename & remove old dir = $targetPath > $renamed_path"
+    #     Remove-Item -path $renamed_path -recurse -force
+    # }
     while ( Test-Path $targetPath )
     {
         Start-Sleep -m 500
@@ -249,6 +254,15 @@ function getPlatformDirectoryName()
     # "msvc${msvcVersion}-${platform}"
 }
 
+
+function Clone-Object( $DeepCopyObject )
+{
+    $memStream = New-Object IO.MemoryStream
+    $formatter = New-Object Runtime.Serialization.Formatters.Binary.BinaryFormatter
+    $formatter.Serialize($memStream, $DeepCopyObject)
+    $memStream.Position = 0
+    $formatter.Deserialize($memStream)
+}
 
 
 # common funcs
@@ -310,6 +324,29 @@ function messageCheckoutEnvironment()
 
 function setupCheckoutVariables( [ref]$result )
 {
+    # setup svn repository URI
+    if ( Test-Path -Path $LLVMSvnOptionFile -PathType leaf )
+    {
+        $src_time = ( Get-ItemProperty -Path $LLVMSvnOptionSrcFile ).LastWriteTime.Ticks
+        $dest_time = ( Get-ItemProperty -Path $LLVMSvnOptionFile ).LastWriteTime.Ticks
+     
+        if ( $src_time -gt $dest_time )
+        {
+            Copy-Item -Path $LLVMSvnOptionSrcFile -Destination $LLVMSvnOptionFile -Force
+        }
+    }
+    else
+    {
+        Copy-Item -Path $LLVMSvnOptionSrcFile -Destination $LLVMSvnOptionFile
+    }
+     
+    # overwrite svn vars load
+    # load to $global:SvnCheckoutInfos
+    if ( Test-Path -Path $LLVMSvnOptionFile -PathType leaf )
+    {
+        Get-Content $LLVMSvnOptionFile -Raw | Invoke-Expression
+    }
+
     $result.value = $true
 }
 
@@ -331,68 +368,34 @@ function executeCheckoutBySVN( [ref]$result )
 
     # proxy がある場合は ~/.subversion/servers に host と port を指定
     $cmd = "svn"
-    $checkout_infos = @(
-        # LLVM
-        @{
-            location = $checkout_root_dir;
-            repository_url = "http://llvm.org/svn/llvm-project/llvm/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "llvm"
-        }
-        # Clang
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/tools";
-            repository_url = "http://llvm.org/svn/llvm-project/cfe/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "clang";
-        }
-        # Clang tools
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/tools/clang/tools";
-            repository_url = "http://llvm.org/svn/llvm-project/clang-tools-extra/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "extra";
-        }
-        # LLD linker [Optional]:
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/tools";
-            repository_url = "http://llvm.org/svn/llvm-project/lld/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "lld";
-        }
-        # Polly Loop Optimizer [Optional]:
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/tools";
-            repository_url = "http://llvm.org/svn/llvm-project/polly/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "polly";
-        }
-        # Compiler-RT (required to build the sanitizers) [Optional]:
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/projects";
-            repository_url = "http://llvm.org/svn/llvm-project/compiler-rt/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "compiler-rt";
-        }
-        # Libomp (required for OpenMP support) [Optional]:
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/projects";
-            repository_url = "http://llvm.org/svn/llvm-project/openmp/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "openmp";
-        }
-        # libcxx [Optional]:
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/projects";
-            repository_url = "http://llvm.org/svn/llvm-project/libcxx/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "libcxx";
-        }
-        # libcxxabi [Optional]:
-        ,@{
-            location = Join-Path $checkout_root_dir "llvm/projects";
-            repository_url = "http://llvm.org/svn/llvm-project/libcxxabi/" + $LLVMBuildEnv.CheckoutRepository;
-            checkout_dir = "libcxxabi";
-        }
-        # Test Suite Source Code [Optional]:
-        # ,@{
-        #     location = Join-Path $checkout_root_dir "llvm/projects";
-        #     repository_url = "http://llvm.org/svn/llvm-project/test-suite/" + $LLVMBuildEnv.CheckoutRepository;
-        #     checkout_dir = "test-suite";
-        # }
-    )
+    $checkout_infos = Clone-Object -DeepCopyObject $global:SvnCheckoutInfos
+
+    # normalized PATH and URI
+
+    # normalize format
+    # $checkout_infos = @(
+    #     # LLVM
+    #     @{
+    #         location = $checkout_root_dir;
+    #         repository_url = "http://llvm.org/svn/llvm-project/llvm/" + $LLVMBuildEnv.CheckoutRepository;
+    #         checkout_dir = "llvm"
+    #     }
+    #     # Clang
+    #     ,@{
+    #         location = Join-Path $checkout_root_dir "llvm/tools";
+    #         repository_url = "http://llvm.org/svn/llvm-project/cfe/" + $LLVMBuildEnv.CheckoutRepository;
+    #         checkout_dir = "clang";
+    #     }
+    # )
+
+    foreach ( $info in $checkout_infos )
+    {
+        $info.location = Join-Path $checkout_root_dir $info.location
+        $info.repository_url += $LLVMBuildEnv.CheckoutRepository
+
+        # Write-Host $info.location
+        # Write-Host $info.repository_url
+    }
 
     foreach ( $info in $checkout_infos )
     {
