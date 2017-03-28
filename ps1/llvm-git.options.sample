@@ -1,0 +1,67 @@
+# -*- mode: powershell ; coding: utf-8-dos -*-
+
+
+# llvm 4.00
+$global:GitCheckoutInfos = @(
+    # LLVM
+    @{
+        location = "";
+        repository_url = "http://llvm.org/git/llvm.git"
+        checkout_dir = "llvm"
+    }
+    # Clang
+    ,@{
+        location = "llvm/tools";
+        repository_url = "http://llvm.org/git/clang.git"
+        checkout_dir = "clang";
+    }
+    # Clang tools [Optional]:
+    ,@{
+        location = "llvm/tools/clang/tools";
+        repository_url = "http://llvm.org/git/clang-tools-extra.git"
+        checkout_dir = "extra";
+    }
+    # LLD linker [Optional]:
+    ,@{
+        location = "llvm/tools";
+        repository_url = "http://llvm.org/git/lld.git"
+        checkout_dir = "lld";
+    }
+    # Polly Loop Optimizer [Optional]:
+    # ,@{
+    #     location = "llvm/tools";
+    #     repository_url = "http://llvm.org/git/polly.git"
+    #     checkout_dir = "polly";
+    # }
+    # Compiler-RT (required to build the sanitizers) [Optional]:
+    ,@{
+        location = "llvm/projects";
+        repository_url = "http://llvm.org/git/compiler-rt.git"
+        checkout_dir = "compiler-rt";
+    }
+    # Libomp (required for OpenMP support) [Optional]:
+    # ,@{
+    #     location = "llvm/projects";
+    #     repository_url = "http://llvm.org/git/openmp.git"
+    #     checkout_dir = "openmp";
+    # }
+    # libcxx [Optional]:
+    ,@{
+        location = "llvm/projects";
+        repository_url = "http://llvm.org/git/libcxx.git"
+        checkout_dir = "libcxx";
+    }
+    # libcxxabi [Optional]:
+    ,@{
+        location = "llvm/projects";
+        repository_url = "http://llvm.org/git/libcxxabi.git"
+        checkout_dir = "libcxxabi";
+    }
+    # Test Suite Source Code [Optional]:
+    # ,@{
+    #     location = "llvm/projects";
+    #     repository_url = "http://llvm.org/git/test-suite.git"
+    #     checkout_dir = "test-suite";
+    # }
+)
+

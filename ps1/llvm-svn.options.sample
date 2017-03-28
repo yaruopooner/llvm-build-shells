@@ -1,0 +1,65 @@
+# -*- mode: powershell ; coding: utf-8-dos -*-
+# llvm 4.00
+$global:SvnCheckoutInfos = @(
+    # LLVM
+    @{
+        location = "";
+        repository_url = "http://llvm.org/svn/llvm-project/llvm/"
+        checkout_dir = "llvm"
+    }
+    # Clang
+    ,@{
+        location = "llvm/tools";
+        repository_url = "http://llvm.org/svn/llvm-project/cfe/"
+        checkout_dir = "clang";
+    }
+    # Clang tools [Optional]:
+    ,@{
+        location = "llvm/tools/clang/tools";
+        repository_url = "http://llvm.org/svn/llvm-project/clang-tools-extra/"
+        checkout_dir = "extra";
+    }
+    # LLD linker [Optional]:
+    ,@{
+        location = "llvm/tools";
+        repository_url = "http://llvm.org/svn/llvm-project/lld/"
+        checkout_dir = "lld";
+    }
+    # Polly Loop Optimizer [Optional]:
+    # ,@{
+    #     location = "llvm/tools";
+    #     repository_url = "http://llvm.org/svn/llvm-project/polly/"
+    #     checkout_dir = "polly";
+    # }
+    # Compiler-RT (required to build the sanitizers) [Optional]:
+    ,@{
+        location = "llvm/projects";
+        repository_url = "http://llvm.org/svn/llvm-project/compiler-rt/"
+        checkout_dir = "compiler-rt";
+    }
+    # Libomp (required for OpenMP support) [Optional]:
+    # ,@{
+    #     location = "llvm/projects";
+    #     repository_url = "http://llvm.org/svn/llvm-project/openmp/"
+    #     checkout_dir = "openmp";
+    # }
+    # libcxx [Optional]:
+    ,@{
+        location = "llvm/projects";
+        repository_url = "http://llvm.org/svn/llvm-project/libcxx/"
+        checkout_dir = "libcxx";
+    }
+    # libcxxabi [Optional]:
+    ,@{
+        location = "llvm/projects";
+        repository_url = "http://llvm.org/svn/llvm-project/libcxxabi/"
+        checkout_dir = "libcxxabi";
+    }
+    # Test Suite Source Code [Optional]:
+    # ,@{
+    #     location = "llvm/projects";
+    #     repository_url = "http://llvm.org/svn/llvm-project/test-suite/"
+    #     checkout_dir = "test-suite";
+    # }
+)
+

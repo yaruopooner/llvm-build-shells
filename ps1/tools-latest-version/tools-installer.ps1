@@ -16,7 +16,8 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     if ( !( Test-Path $downloaded_file ) )
     {
         Write-Host "#downloading : ${uri}"
-        Invoke-WebRequest -Uri $uri -OutFile $downloaded_file
+        # Invoke-WebRequest -Uri $uri -OutFile $downloaded_file
+        Start-BitsTransfer -Source $uri -Destination $downloaded_file
     }
     else
     {
@@ -80,7 +81,7 @@ function setupEnvironment()
 {
     DownloadFromURI -Uri $URI_7ZIP -Expand
 
-    foreach ( $download in $DOWNLOAD_LIST )
+    foreach ( $download in $global:DOWNLOAD_LIST )
     {
         DownloadFromURI @download
     }

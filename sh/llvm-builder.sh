@@ -108,59 +108,61 @@ function generateCheckoutRootDirectoryName()
 }
 
 
+declare -r LLVM_SVN_INFOS_FILE="llvm-svn.options"
+declare -r LLVM_SVN_INFOS_SRC_FILE="${LLVM_SVN_INFOS_FILE}.sample"
+
+function loadSVNRepositoryInfos()
+{
+    cp -up "./${LLVM_SVN_INFOS_SRC_FILE}" "./${LLVM_SVN_INFOS_FILE}"
+
+    # overwrite vars load
+    if [ -e "./${LLVM_SVN_INFOS_FILE}" ]; then
+        . "./${LLVM_SVN_INFOS_FILE}"
+    fi
+}
+
 function executeCheckoutBySVN()
 {
     echo "----------svn checkout phase----------"
 
-    local readonly REPOSITORY_PATH=`generateRepositoryRelativePath ${1} ${2}`
-    local readonly CHECKOUT_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
+    loadSVNRepositoryInfos
 
-    echo "repository partial path=${REPOSITORY_PATH}"
-    echo "checkout root directory=${CHECKOUT_DIR}"
+    local readonly REPOSITORY_RPATH=`generateRepositoryRelativePath ${1} ${2}`
+    local readonly CO_ROOT_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
 
-    if [ -d ${CHECKOUT_DIR} ]; then
-        echo "remove old root directory ${CHECKOUT_DIR}"
-        rm -rf ${CHECKOUT_DIR}
+    echo "repository partial path=${REPOSITORY_RPATH}"
+    echo "checkout root directory=${CO_ROOT_DIR}"
+
+    if [ -d ${CO_ROOT_DIR} ]; then
+        echo "remove old root directory ${CO_ROOT_DIR}"
+        rm -rf ${CO_ROOT_DIR}
     fi
-    mkdir ${CHECKOUT_DIR}
-    pushd ${CHECKOUT_DIR}
+    mkdir ${CO_ROOT_DIR}
+    pushd ${CO_ROOT_DIR}
 
     # proxy がある場合は ~/.subversion/servers に host と port を指定
 
-    # LLVM
-    svn co http://llvm.org/svn/llvm-project/llvm/${REPOSITORY_PATH} llvm
-    # Clang
-    pushd llvm/tools
-    svn co http://llvm.org/svn/llvm-project/cfe/${REPOSITORY_PATH} clang
-    popd
-    # Clang tools
-    pushd llvm/tools/clang/tools
-    svn co http://llvm.org/svn/llvm-project/clang-tools-extra/${REPOSITORY_PATH} extra
-    popd
-    # Compiler-RT (required to build the sanitizers) [Optional]:
-    pushd llvm/projects
-    svn co http://llvm.org/svn/llvm-project/compiler-rt/${REPOSITORY_PATH} compiler-rt
-    popd
-    # Libomp (required for OpenMP support) [Optional]
-    pushd llvm/projects
-    svn co http://llvm.org/svn/llvm-project/openmp/${REPOSITORY_PATH} openmp
-    popd
-    # libcxx [Optional]
-    pushd llvm/projects
-    svn co http://llvm.org/svn/llvm-project/libcxx/${REPOSITORY_PATH} libcxx
-    popd
-    # libcxxabi [Optional]
-    pushd llvm/projects
-    svn co http://llvm.org/svn/llvm-project/libcxxabi/${REPOSITORY_PATH} libcxxabi
-    popd
-    # Test Suite Source Code [Optional]
-    pushd llvm/projects
-    svn co http://llvm.org/svn/llvm-project/test-suite/${REPOSITORY_PATH} test-suite
-    popd
+    local CO_INFO
+
+    for CO_INFO in ${SvnCheckoutInfos[@]}; do
+        eval local CO_LOCATION="\${${CO_INFO}[location]}"
+        eval local CO_URL="\${${CO_INFO}[repository_url]}"
+        eval local CO_DIR="\${${CO_INFO}[checkout_dir]}"
+
+        echo "====checkout detail===="
+        echo "location     : ${CO_LOCATION}"
+        echo "url          : ${CO_URL}"
+        echo "checkout dir : ${CO_DIR}"
+        echo "command      : svn co ${CO_URL}${REPOSITORY_RPATH} ${CO_DIR}"
+
+        pushd "${CO_LOCATION}"
+        svn co "${CO_URL}${REPOSITORY_RPATH}" "${CO_DIR}"
+        popd
+    done
 
     popd
 
-    echo "${CHECKOUT_DIR}"
+    echo "${CO_ROOT_DIR}"
 }
 
 
