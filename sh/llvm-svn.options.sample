@@ -2,61 +2,61 @@
 #! /bin/sh
 
 # LLVM
-declare -A llvm_co_detail=(
-    [location]=""
+declare -gA llvm_co_detail=(
+    [location]="."
     [repository_url]="http://llvm.org/svn/llvm-project/llvm/"
     [checkout_dir]="llvm"
 )
 # Clang
-declare -A clang_co_detail=(
+declare -gA clang_co_detail=(
     [location]="llvm/tools"
     [repository_url]="http://llvm.org/svn/llvm-project/cfe/"
     [checkout_dir]="clang"
 )
 # Clang tools [Optional]:
-declare -A clang_tools_extra_co_detail=(
+declare -gA clang_tools_extra_co_detail=(
     [location]="llvm/tools/clang/tools"
     [repository_url]="http://llvm.org/svn/llvm-project/clang-tools-extra/"
     [checkout_dir]="extra"
 )
 # LLD linker [Optional]:
-declare -A lld_co_detail=(
+declare -gA lld_co_detail=(
     [location]="llvm/tools"
     [repository_url]="http://llvm.org/svn/llvm-project/lld/"
     [checkout_dir]="lld"
 )
 # Polly Loop Optimizer [Optional]:
-declare -A polly_co_detail=(
+declare -gA polly_co_detail=(
     [location]="llvm/tools"
     [repository_url]="http://llvm.org/svn/llvm-project/polly/"
     [checkout_dir]="polly"
 )
 # Compiler-RT (required to build the sanitizers) [Optional]:
-declare -A compiler_rt_co_detail=(
+declare -gA compiler_rt_co_detail=(
     [location]="llvm/projects"
     [repository_url]="http://llvm.org/svn/llvm-project/compiler-rt/"
     [checkout_dir]="compiler-rt"
 )
 # Libomp (required for OpenMP support) [Optional]:
-declare -A libomp_co_detail=(
+declare -gA libomp_co_detail=(
     [location]="llvm/projects"
     [repository_url]="http://llvm.org/svn/llvm-project/openmp/"
     [checkout_dir]="openmp"
 )
 # libcxx [Optional]:
-declare -A libcxx_co_detail=(
+declare -gA libcxx_co_detail=(
     [location]="llvm/projects"
     [repository_url]="http://llvm.org/svn/llvm-project/libcxx/"
     [checkout_dir]="libcxx"
 )
 # libcxxabi [Optional]:
-declare -A libcxxabi_co_detail=(
+declare -gA libcxxabi_co_detail=(
     [location]="llvm/projects"
     [repository_url]="http://llvm.org/svn/llvm-project/libcxxabi/"
     [checkout_dir]="libcxxabi"
 )
 # Test Suite Source Code [Optional]:
-declare -A test_suite_co_detail=(
+declare -gA test_suite_co_detail=(
     [location]="llvm/projects"
     [repository_url]="http://llvm.org/svn/llvm-project/test-suite/"
     [checkout_dir]="test-suite"
@@ -64,7 +64,7 @@ declare -A test_suite_co_detail=(
 
 
 # llvm 4.00
-declare -a SvnCheckoutInfos=(
+declare -ga SvnCheckoutInfos=(
     llvm_co_detail
     clang_co_detail
     clang_tools_extra_co_detail
