@@ -113,12 +113,12 @@ $LLVMBuildEnv = @{
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2013 = @{
-                    RegEntryKeyName = "13.0";
+                    RegEntryKeyName = "12.0";
                     EnvVarName = "VS120COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2012 = @{
-                    RegEntryKeyName = "12.0";
+                    RegEntryKeyName = "11.0";
                     EnvVarName = "VS110COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
