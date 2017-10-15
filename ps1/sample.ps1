@@ -8,25 +8,26 @@ $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + 
 
 
 $patchInfos = @( 
-    @{ # llvm bug : fixed out of range
+    @{ # llvm bug : fixed out of range access at container.
         applyLocation = "llvm/tools/clang/";
         absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/bugfix000.patch" ) );
     }
-    ,@{ # llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
-        applyLocation = "llvm/";
-        absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/msvc2017-build-error-fixed.patch" ) );
-    }
+    # ,@{ # llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
+    #     applyLocation = "llvm/";
+    #     absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/msvc2017-build-error-fixed.patch" ) );
+    # }
     # ,@{ # This patch is for ac-clang of emacs package.
     #     applyLocation = "llvm/";
-    #     absolutePath = "c:/cygwin-x86_64/home/yaruopooner/.emacs.d/.emacs25/packages/user/ac-clang/clang-server/patch/invalidate-mmap.patch";
+    #     absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/invalidate-mmap.patch" ) );
+    #     # absolutePath = "c:/cygwin-x86_64/home/yaruopooner/.emacs.d/.emacs25/packages/user/ac-clang/clang-server/patch/invalidate-mmap.patch";
     # }
 )
 
 . $builderShell
 
-$clangVersion = 400
-# $msvcVersion = 2017
-$msvcVersion = 2015
+$clangVersion = 500
+$msvcVersion = 2017
+# $msvcVersion = 2015
 
 
 # LLVM ALL Build (full task)
