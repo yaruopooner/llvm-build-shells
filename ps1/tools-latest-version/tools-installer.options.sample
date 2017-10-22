@@ -8,8 +8,7 @@ $global:DOWNLOAD_LIST = @(
         expand = $true;
     }
     ,@{ # MSYS2
-        uri = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20161025.tar.xz";
-        # uri = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20160921.tar.xz";
+        uri = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20170918.tar.xz"
         expand = $true;
         afterTask = {
             Copy-Item -Path "./setup-msys2.sh" -Destination "./msys64/tmp/setup-msys2.sh"
