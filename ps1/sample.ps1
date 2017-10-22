@@ -26,6 +26,7 @@ $patchInfos = @(
 . $builderShell
 
 $clangVersion = 500
+# $clangVersion = 400
 $msvcVersion = 2017
 # $msvcVersion = 2015
 
