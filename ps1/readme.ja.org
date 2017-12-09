@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2017/03/29.03:06:05
+# last updated : 2017/12/09.18:46:04
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -93,3 +93,5 @@
 
 ** パッチ
    sample.ps1でパッチのパスを設定する必要があります。
+
+   [[../patch/details.org][Patch Details]]

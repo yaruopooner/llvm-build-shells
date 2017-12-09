@@ -126,4 +126,6 @@ The following parameters designatable at llvm-build-shells.
 
 ## Patch<a id="sec-4-1" name="sec-4-1"></a>
 
-You need to set the PATH of patch in sample.ps1.
+You need to set the PATH of patch in sample.ps1.  
+
+[Patch Details](../patch/details.md)
