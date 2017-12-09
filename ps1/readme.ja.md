@@ -126,4 +126,6 @@ llvm-build-shellsでは以下を一括で行います。
 
 ## パッチ<a id="sec-4-1" name="sec-4-1"></a>
 
-sample.ps1でパッチのパスを設定する必要があります。
+sample.ps1でパッチのパスを設定する必要があります。  
+
+[Patch Details](../patch/details.md)
