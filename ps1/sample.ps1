@@ -6,7 +6,7 @@ $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + 
 # $python = "c:/Python27"
 # $gnu32 = "c:/cygwin-x86_64/tmp/llvm-build-shells/ps1/tools-latest-version/GnuWin32/bin"
 
-
+# please refer document. : ../patch/details.org
 $patchInfos = @( 
     @{ # llvm bug : fixed out of range access at container.
         applyLocation = "llvm/tools/clang/";
