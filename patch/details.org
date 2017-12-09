@@ -1,0 +1,21 @@
+# -*- mode: org ; coding: utf-8-unix -*-
+# last updated : 2017/12/09.18:37:46
+
+
+#+TITLE:     Patch Details for LLVM
+#+AUTHOR:    yaruopooner
+#+EMAIL:     [https://github.com/yaruopooner]
+#+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
+
+
+* bugfix000.patch
+  Bug 20880 - Header file mmap lock problem by CXTranslationUnit 
+  https://bugs.llvm.org/show_bug.cgi?id=20880
+
+* invalidate-mmap.patch
+  Bug 31150 - Out of range access occurs and a crash occurs in llvm/tools/clang/lib/Lex/HeaderSearch.cpp
+  https://bugs.llvm.org/show_bug.cgi?id=31150
+
+* msvc2017-build-error-fixed.patch
+  I didn't report this error.
+  llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
