@@ -1,7 +1,7 @@
 $launchPath = Split-Path $myInvocation.MyCommand.path -Parent
 $builderShell = Join-Path $launchPath 'llvm-builder.ps1'
 
-$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.7.2-win64-x64/bin"
+$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.10.0-win64-x64/bin"
 $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + ( Join-Path $launchPath "tools-latest-version/msys64/usr/bin" )
 # $python = "c:/Python27"
 # $gnu32 = "c:/cygwin-x86_64/tmp/llvm-build-shells/ps1/tools-latest-version/GnuWin32/bin"
@@ -25,8 +25,8 @@ $patchInfos = @(
 
 . $builderShell
 
-$clangVersion = 500
-# $clangVersion = 400
+$clangVersion = 501
+# $clangVersion = 500
 $msvcVersion = 2017
 # $msvcVersion = 2015
 
