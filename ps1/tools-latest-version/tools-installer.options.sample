@@ -2,37 +2,50 @@
 
 $global:DOWNLOAD_LIST = @(
     @{ # CMAKE
-        uri = "https://cmake.org/files/v3.10/cmake-3.10.0-win64-x64.zip";
+        uri = "https://cmake.org/files/v3.10/cmake-3.10.2-win64-x64.zip";
         # uri = "https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.zip";
         # uri = "https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip";
         expand = $true;
     }
-    ,@{ # MSYS2
-        uri = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20170918.tar.xz"
+    ,@{ # Python2.x [msys2(x64)] http://repo.msys2.org/mingw/x86_64/
+        uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.14-5-any.pkg.tar.xz";
+        # uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-5-any.pkg.tar.xz";
+        # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.14-1-any.pkg.tar.xz";
+        # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.13-1-any.pkg.tar.xz";
         expand = $true;
-        afterTask = {
-            Copy-Item -Path "./setup-msys2.sh" -Destination "./msys64/tmp/setup-msys2.sh"
-            $src_file = "./setup-msys2.options.sample"
-            $dest_file = "./msys64/tmp/setup-msys2.options"
-
-            if ( Test-Path -Path $dest_file -PathType leaf )
-            {
-                $src_time = ( Get-ItemProperty -Path $src_file ).LastWriteTime.Ticks
-                $dest_time = ( Get-ItemProperty -Path $dest_file ).LastWriteTime.Ticks
-
-                if ( $src_time -gt $dest_time )
-                {
-                    Copy-Item -Path $src_file -Destination $dest_file -Force
-                }
-            }
-            else
-            {
-                Copy-Item -Path $src_file -Destination $dest_file
-            }
-            $cmd = "./msys64/mingw64.exe"
-            & $cmd
-        };
     }
+    # ,@{ # Python2.x [msys2(x86)] http://repo.msys2.org/mingw/i686/
+    #     uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-5-any.pkg.tar.xz";
+    #     # uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-1-any.pkg.tar.xz";
+    #     # uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.13-1-any.pkg.tar.xz";
+    #     expand = $true;
+    # }
+    # ,@{ # MSYS2
+    #     uri = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20170918.tar.xz"
+    #     expand = $true;
+    #     afterTask = {
+    #         Copy-Item -Path "./setup-msys2.sh" -Destination "./msys64/tmp/setup-msys2.sh"
+    #         $src_file = "./setup-msys2.options.sample"
+    #         $dest_file = "./msys64/tmp/setup-msys2.options"
+
+    #         if ( Test-Path -Path $dest_file -PathType leaf )
+    #         {
+    #             $src_time = ( Get-ItemProperty -Path $src_file ).LastWriteTime.Ticks
+    #             $dest_time = ( Get-ItemProperty -Path $dest_file ).LastWriteTime.Ticks
+
+    #             if ( $src_time -gt $dest_time )
+    #             {
+    #                 Copy-Item -Path $src_file -Destination $dest_file -Force
+    #             }
+    #         }
+    #         else
+    #         {
+    #             Copy-Item -Path $src_file -Destination $dest_file
+    #         }
+    #         $cmd = "./msys64/mingw64.exe"
+    #         & $cmd
+    #     };
+    # }
     # ,@{ # Python
     #     uri = "https://www.python.org/ftp/python/2.7.12/python-2.7.12.amd64.msi";
     #     install = $true;

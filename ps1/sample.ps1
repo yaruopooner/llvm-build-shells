@@ -1,9 +1,10 @@
 $launchPath = Split-Path $myInvocation.MyCommand.path -Parent
 $builderShell = Join-Path $launchPath 'llvm-builder.ps1'
 
-$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.10.0-win64-x64/bin"
-$msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + ( Join-Path $launchPath "tools-latest-version/msys64/usr/bin" )
-# $python = "c:/Python27"
+$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.10.2-win64-x64/bin"
+$msys2 = Join-Path $launchPath "tools-latest-version/msys64/usr/bin"
+# $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + ( Join-Path $launchPath "tools-latest-version/msys64/usr/bin" )
+$python = Join-Path $launchPath "tools-latest-version/mingw64/bin;"
 # $gnu32 = "c:/cygwin-x86_64/tmp/llvm-build-shells/ps1/tools-latest-version/GnuWin32/bin"
 
 # please refer document. : ../patch/details.org
@@ -16,11 +17,11 @@ $patchInfos = @(
     #     applyLocation = "llvm/";
     #     absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/msvc2017-build-error-fixed.patch" ) );
     # }
-    # ,@{ # This patch is for ac-clang of emacs package.
-    #     applyLocation = "llvm/";
-    #     absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/invalidate-mmap.patch" ) );
-    #     # absolutePath = "c:/cygwin-x86_64/home/yaruopooner/.emacs.d/.emacs25/packages/user/ac-clang/clang-server/patch/invalidate-mmap.patch";
-    # }
+    ,@{ # This patch is for ac-clang of emacs package.
+        applyLocation = "llvm/";
+        absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/invalidate-mmap.patch" ) );
+        # absolutePath = "c:/cygwin-x86_64/home/yaruopooner/.emacs.d/.emacs25/packages/user/ac-clang/clang-server/patch/invalidate-mmap.patch";
+    }
 )
 
 . $builderShell
@@ -32,7 +33,7 @@ $msvcVersion = 2017
 
 
 # LLVM ALL Build (full task)
-executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -patchInfos $patchInfos
+# executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -patchInfos $patchInfos
 
 
 # LLVM Parts Build (full task)
@@ -41,9 +42,11 @@ executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $
 
 
 # LLVM Parts Build (parts task)
-# $target = "Clang libraries\libclang;Clang executables\clang-format"
+$target = "Clang libraries\libclang;Clang executables\clang-format"
 # executeBuilder -tasks @("CHECKOUT", "PATCH") -clangVersion $clangVersion -patchInfos $patchInfos
 # executeBuilder -tasks @("PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -target $target
+# executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -target $target
+executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $python -target $target
 # executeBuilder -tasks @("PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2
 
 

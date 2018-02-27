@@ -536,7 +536,7 @@ function executeCMake( [ref]$result )
     cd $platform_dir
 
     $cmd = "cmake"
-    $cmd_args = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "..\..\llvm")
+    $cmd_args = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "..\..\llvm", "-Thost=x64")
 
     & $cmd $cmd_args
 
