@@ -498,16 +498,16 @@ function setupCMakeVariables( [ref]$result )
 function executeCMake( [ref]$result )
 {
     prependToEnvPath -path $LLVMBuildEnv.CMAKE.ExecPath
+    if ( $LLVMBuildEnv.CMAKE.PythonPath -ne "" )
+    {
+        prependToEnvPath -path $LLVMBuildEnv.CMAKE.PythonPath
+    }
     if ( $LLVMBuildEnv.CMAKE.Msys2Path -ne "" )
     {
         # don't use prepend.
         # because the cmd of 'windows/system32' will not starts, instead the cmd of 'msys2/mingw64' starts.
         # This is not taken over by the environment variable, 'msbuild' can't be executed.
         appendToEnvPath -path $LLVMBuildEnv.CMAKE.Msys2Path
-    }
-    if ( $LLVMBuildEnv.CMAKE.PythonPath -ne "" )
-    {
-        prependToEnvPath -path $LLVMBuildEnv.CMAKE.PythonPath
     }
 
     pushd $LLVMBuildEnv.WorkingDir
@@ -821,10 +821,11 @@ function executeBuilder
         [string]$configuration = "Release", 
         [string]$additionalProperties, 
         [string]$cmakePath, 
-        [string]$msys2Path, 
         [string]$pythonPath, 
-        [string]$perlPath, 
+        [string]$msys2Path, 
         [string]$gnu32Path, 
+        [string]$toolsPrependPath, 
+        [string]$toolsAppendPath, 
         [array]$patchInfos
     )
 
@@ -838,10 +839,11 @@ function executeBuilder
         configuration = $configuration;
         additionalProperties = $additionalProperties;
         cmakePath = $cmakePath;
-        msys2Path = $msys2Path;
         pythonPath = $pythonPath;
-        perlPath = $perlPath;
+        msys2Path = $msys2Path;
         gnu32Path = $gnu32Path;
+        toolsPrependPath = $toolsPrependPath;
+        toolsAppendPath = $toolsAppendPath;
         patchInfos = $patchInfos;
     }
 

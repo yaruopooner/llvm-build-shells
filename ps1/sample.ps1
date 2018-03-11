@@ -2,9 +2,9 @@ $launchPath = Split-Path $myInvocation.MyCommand.path -Parent
 $builderShell = Join-Path $launchPath 'llvm-builder.ps1'
 
 $cmake = Join-Path $launchPath "tools-latest-version/cmake-3.10.2-win64-x64/bin"
-$msys2 = Join-Path $launchPath "tools-latest-version/msys64/usr/bin"
-# $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + ( Join-Path $launchPath "tools-latest-version/msys64/usr/bin" )
 $python = Join-Path $launchPath "tools-latest-version/mingw64/bin;"
+# $msys2 = Join-Path $launchPath "tools-latest-version/msys64/usr/bin"
+# $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + ( Join-Path $launchPath "tools-latest-version/msys64/usr/bin" )
 # $gnu32 = "c:/cygwin-x86_64/tmp/llvm-build-shells/ps1/tools-latest-version/GnuWin32/bin"
 
 # please refer document. : ../patch/details.org
@@ -26,36 +26,34 @@ $patchInfos = @(
 
 . $builderShell
 
-$clangVersion = 501
+$clangVersion = 600
 # $clangVersion = 500
 $msvcVersion = 2017
 # $msvcVersion = 2015
 
 
 # LLVM ALL Build (full task)
-# executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -patchInfos $patchInfos
+# executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
 
 
 # LLVM Parts Build (full task)
-# $target = "Clang libraries\libclang;Clang executables\clang-format"
-# executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -patchInfos $patchInfos -target $target
+$target = "Clang libraries\libclang;Clang executables\clang-format"
+executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos -target $target
 
 
 # LLVM Parts Build (parts task)
-$target = "Clang libraries\libclang;Clang executables\clang-format"
+# $target = "Clang libraries\libclang;Clang executables\clang-format"
 # executeBuilder -tasks @("CHECKOUT", "PATCH") -clangVersion $clangVersion -patchInfos $patchInfos
-# executeBuilder -tasks @("PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -target $target
-# executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2 -target $target
-executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $python -target $target
-# executeBuilder -tasks @("PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -msys2Path $msys2
+# executeBuilder -tasks @("PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -target $target
+# executeBuilder -tasks @("PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python
 
 
 # LLVM Parts Build (single task)
 # $target = "Clang libraries\libclang;Clang executables\clang-format"
 # executeBuilder -tasks @("CHECKOUT") -clangVersion $clangVersion
 # executeBuilder -tasks @("PATCH") -clangVersion $clangVersion -patchInfos $patchInfos
-# executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -cmakePath $cmake -msys2Path $msys2
-# executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 32 -cmakePath $cmake -msys2Path $msys2
+# executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -cmakePath $cmake -pythonPath $python
+# executeBuilder -tasks @("PROJECT") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 32 -cmakePath $cmake -pythonPath $python
 # executeBuilder -tasks @("BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -target $target
 # executeBuilder -tasks @("BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 32 -configuration "Release" -target $target
 
