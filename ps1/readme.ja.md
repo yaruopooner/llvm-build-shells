@@ -8,14 +8,14 @@
 <li><a href="#sec-2-1">2.1. Visual Studio 2017/2015/2013/2012/2010</a></li>
 <li><a href="#sec-2-2">2.2. Subversion</a></li>
 <li><a href="#sec-2-3">2.3. CMake[必須]</a></li>
-<li><a href="#sec-2-4">2.4. MSYS2[推奨]</a></li>
-<li><a href="#sec-2-5">2.5. Python 2.7.x[非推奨]</a></li>
+<li><a href="#sec-2-4">2.4. Python 2.7.x[推奨]</a></li>
+<li><a href="#sec-2-5">2.5. MSYS2[非推奨]</a></li>
 <li><a href="#sec-2-6">2.6. GnuWin32[非推奨]</a></li>
 </ul>
 </li>
 <li><a href="#sec-3">3. 必要なソフトウェアのダウンロードサポート</a>
 <ul>
-<li><a href="#sec-3-1">3.1. MSYS2について</a></li>
+<li><a href="#sec-3-1">3.1. <del>MSYS2について</del> (現在非推奨)</a></li>
 </ul>
 </li>
 <li><a href="#sec-4">4. セルフビルド</a>
@@ -63,7 +63,19 @@ Windows ZIPをダウンロードして何処かへ展開。
 Visual Studio ソリューション＆プロジェクトファイル生成と、カスタムビルドステップ時のスクリプト実行で使用される。  
 sample.ps1でパスを設定する必要があります。  
 
-## MSYS2[推奨]<a id="sec-2-4" name="sec-2-4"></a>
+## Python 2.7.x[推奨]<a id="sec-2-4" name="sec-2-4"></a>
+
+<http://repo.msys2.org/mingw/x86_64/>  
+<http://repo.msys2.org/mingw/i686/>  
+
+Python 2.7.x(msys2) を使用します。  
+3.x 系は使用しない。  
+cmake で LLVM のソリューションファイルを生成する際に必要。  
+sample.ps1でパスを設定する必要があります。  
+
+## MSYS2[非推奨]<a id="sec-2-5" name="sec-2-5"></a>
+
+<span class="underline">msys2のアップデートにより挙動が変わるので非推奨に変更。</span>  
 
 <http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/>  
 
@@ -71,16 +83,6 @@ Python, Perl をサポート。
 PerlはWin32版ビルドでのみ必要。  
 個別にPythonとPerlをインストールするより楽。  
 ポータブル版を使用するので環境を汚さない。  
-sample.ps1でパスを設定する必要があります。  
-
-## Python 2.7.x[非推奨]<a id="sec-2-5" name="sec-2-5"></a>
-
-<http://www.python.org/>  
-<http://www.python.org/download/>  
-
-Python 2.7.x Windows X86-64 Installer を使用  
-3.x 系は使用しない。  
-cmake で LLVMのソリューションファイルを生成する際に必要。  
 sample.ps1でパスを設定する必要があります。  
 
 ## GnuWin32[非推奨]<a id="sec-2-6" name="sec-2-6"></a>
@@ -99,7 +101,9 @@ sample.ps1でパスを設定する必要があります。
 
 `sample.ps1` に記述するツールパスは `./tools-latest-version/` へ展開されたパスを使用する。  
 
-## MSYS2について<a id="sec-3-1" name="sec-3-1"></a>
+デフォルトでは cmake と Python2.7.x(msys2) がダウンロードされます。  
+
+## <del>MSYS2について</del> (現在非推奨)<a id="sec-3-1" name="sec-3-1"></a>
 
 展開後に自動起動する MinGW64 シェルにおいて  
 
@@ -107,10 +111,10 @@ sample.ps1でパスを設定する必要があります。
     $ ./setup-msys2.sh
 
 を実行して、MSYS2を最新の状態に更新する。  
-これを行わないとPython2.7xやPerlがインストールされない。  
+これを行わないとPython2.7.xやPerlがインストールされない。  
 
 プロキシ経由している場合は `setup-msys2.sh` 実行前に  
-`setup-msys2.options` を編集してhttp\_proxy等の設定を行う必要がある。  
+`setup-msys2.options` を編集してhttp\_proxy 等の設定を行う必要がある。  
 
 # セルフビルド<a id="sec-4" name="sec-4"></a>
 

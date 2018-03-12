@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2017/12/09.18:46:04
+# last updated : 2018/03/12.13:13:07
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -36,22 +36,24 @@
    Visual Studio ソリューション＆プロジェクトファイル生成と、カスタムビルドステップ時のスクリプト実行で使用される。
    sample.ps1でパスを設定する必要があります。
 	
-** MSYS2[推奨]
+** Python 2.7.x[推奨]
+   http://repo.msys2.org/mingw/x86_64/
+   http://repo.msys2.org/mingw/i686/
+
+   Python 2.7.x(msys2) を使用します。
+   3.x 系は使用しない。
+   cmake で LLVM のソリューションファイルを生成する際に必要。
+   sample.ps1でパスを設定する必要があります。
+
+** MSYS2[非推奨]
+   _msys2のアップデートにより挙動が変わるので非推奨に変更。_
+
    http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/
 
    Python, Perl をサポート。
    PerlはWin32版ビルドでのみ必要。
    個別にPythonとPerlをインストールするより楽。
    ポータブル版を使用するので環境を汚さない。
-   sample.ps1でパスを設定する必要があります。
-
-** Python 2.7.x[非推奨]
-   http://www.python.org/
-   http://www.python.org/download/
-
-   Python 2.7.x Windows X86-64 Installer を使用
-   3.x 系は使用しない。
-   cmake で LLVMのソリューションファイルを生成する際に必要。
    sample.ps1でパスを設定する必要があります。
 
 ** GnuWin32[非推奨]
@@ -68,17 +70,19 @@
 
   =sample.ps1= に記述するツールパスは =./tools-latest-version/= へ展開されたパスを使用する。
 
-** MSYS2について
+  デフォルトでは cmake と Python2.7.x(msys2) がダウンロードされます。
+
+** +MSYS2について+ (現在非推奨)
    展開後に自動起動する MinGW64 シェルにおいて
    #+begin_src shell-script
      $ cd /tmp
      $ ./setup-msys2.sh
    #+end_src
    を実行して、MSYS2を最新の状態に更新する。
-   これを行わないとPython2.7xやPerlがインストールされない。
+   これを行わないとPython2.7.xやPerlがインストールされない。
 
    プロキシ経由している場合は =setup-msys2.sh= 実行前に
-   =setup-msys2.options= を編集してhttp_proxy等の設定を行う必要がある。
+   =setup-msys2.options= を編集してhttp_proxy 等の設定を行う必要がある。
 
 * セルフビルド
   Power Shell版を使用します。

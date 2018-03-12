@@ -8,14 +8,14 @@
 <li><a href="#sec-2-1">2.1. Visual Studio 2017/2015/2013/2012/2010[required]</a></li>
 <li><a href="#sec-2-2">2.2. Subversion[required]</a></li>
 <li><a href="#sec-2-3">2.3. CMake[required]</a></li>
-<li><a href="#sec-2-4">2.4. MSYS2[recommend]</a></li>
-<li><a href="#sec-2-5">2.5. Python 2.7.x[unrecommend]</a></li>
+<li><a href="#sec-2-4">2.4. Python 2.7.x[recommend]</a></li>
+<li><a href="#sec-2-5">2.5. MSYS2[unrecommend]</a></li>
 <li><a href="#sec-2-6">2.6. GnuWin32[unrecommend]</a></li>
 </ul>
 </li>
 <li><a href="#sec-3">3. Required software download support</a>
 <ul>
-<li><a href="#sec-3-1">3.1. about MSYS2</a></li>
+<li><a href="#sec-3-1">3.1. <del>about MSYS2</del> (unrecommend)</a></li>
 </ul>
 </li>
 <li><a href="#sec-4">4. Self Build</a>
@@ -62,7 +62,19 @@ CMake generate a Visual Studio solution and project file.
 And it is used in the execution on script of custom build step.  
 You need to set the PATH in sample.ps1.  
 
-## MSYS2[recommend]<a id="sec-2-4" name="sec-2-4"></a>
+## Python 2.7.x[recommend]<a id="sec-2-4" name="sec-2-4"></a>
+
+<http://repo.msys2.org/mingw/x86_64/>  
+<http://repo.msys2.org/mingw/i686/>  
+
+Use Python 2.7.x (msys2).  
+Should not use 3.x  
+Required when CMake to generate the project files of LLVM.  
+You need to set the PATH in sample.ps1.  
+
+## MSYS2[unrecommend]<a id="sec-2-5" name="sec-2-5"></a>
+
+<span class="underline">Behavior changed by updating msys2 and changed to deprecated.</span>  
 
 <http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/>  
 
@@ -70,16 +82,6 @@ Python and Perl support.
 Perl is also required when Win32 build.  
 Easier than individually install Python and Perl.  
 Does not pollute the environment because it uses the portable version.  
-You need to set the PATH in sample.ps1.  
-
-## Python 2.7.x[unrecommend]<a id="sec-2-5" name="sec-2-5"></a>
-
-<http://www.python.org/>  
-<http://www.python.org/download/>  
-
-Use Python 2.7.x Windows X86-64 Installer.  
-Should not use 3.x.  
-Required when CMake to generate the project files of LLVM.  
 You need to set the PATH in sample.ps1.  
 
 ## GnuWin32[unrecommend]<a id="sec-2-6" name="sec-2-6"></a>
@@ -97,7 +99,9 @@ Described software in `./tools-latest-version/tools-installer.options` will be d
 
 TOOL-PATH for described to a `sample.ps1` , use the `./tools-latest-version/` that has been archive-expand.  
 
-## about MSYS2<a id="sec-3-1" name="sec-3-1"></a>
+By default, cmake and Python 2.7.x (msys2) will be downloaded.  
+
+## <del>about MSYS2</del> (unrecommend)<a id="sec-3-1" name="sec-3-1"></a>
 
 MinGW64 shell is auto launch after archive-expand.  
 
