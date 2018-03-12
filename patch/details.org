@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2017/12/09.18:37:46
+# last updated : 2018/03/12.12:37:22
 
 
 #+TITLE:     Patch Details for LLVM
@@ -8,11 +8,11 @@
 #+OPTIONS:   author:nil timestamp:t |:t \n:t ^:nil
 
 
-* bugfix000.patch
+* invalidate-mmap.patch
   Bug 20880 - Header file mmap lock problem by CXTranslationUnit 
   https://bugs.llvm.org/show_bug.cgi?id=20880
 
-* invalidate-mmap.patch
+* bugfix000.patch
   Bug 31150 - Out of range access occurs and a crash occurs in llvm/tools/clang/lib/Lex/HeaderSearch.cpp
   https://bugs.llvm.org/show_bug.cgi?id=31150
 
