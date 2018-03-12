@@ -17,11 +17,11 @@ $patchInfos = @(
     #     applyLocation = "llvm/";
     #     absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/msvc2017-build-error-fixed.patch" ) );
     # }
-    ,@{ # This patch is for ac-clang of emacs package.
-        applyLocation = "llvm/";
-        absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/invalidate-mmap.patch" ) );
-        # absolutePath = "c:/cygwin-x86_64/home/yaruopooner/.emacs.d/.emacs25/packages/user/ac-clang/clang-server/patch/invalidate-mmap.patch";
-    }
+    # ,@{ # This patch is for ac-clang of emacs package.
+    #     applyLocation = "llvm/";
+    #     absolutePath = ( Resolve-Path ( Join-Path $launchPath "../patch/invalidate-mmap.patch" ) );
+    #     # absolutePath = "c:/cygwin-x86_64/home/yaruopooner/.emacs.d/.emacs25/packages/user/ac-clang/clang-server/patch/invalidate-mmap.patch";
+    # }
 )
 
 . $builderShell
@@ -33,12 +33,12 @@ $msvcVersion = 2017
 
 
 # LLVM ALL Build (full task)
-# executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
+executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
 
 
 # LLVM Parts Build (full task)
-$target = "Clang libraries\libclang;Clang executables\clang-format"
-executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos -target $target
+# $target = "Clang libraries\libclang;Clang executables\clang-format"
+# executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -clangVersion $clangVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos -target $target
 
 
 # LLVM Parts Build (parts task)

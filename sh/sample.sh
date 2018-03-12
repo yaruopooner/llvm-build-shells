@@ -3,7 +3,7 @@
 
 . ./llvm-builder.sh
 
-declare -r _CLANG_VERSION="${1-500}"
+declare -r _CLANG_VERSION="${1-600}"
 declare -r _PROJECT_PATH=$( cd $(dirname ${0}) && cd .. && pwd )
 declare -r _PATCH_PATH="${_PROJECT_PATH}/patch"
 
