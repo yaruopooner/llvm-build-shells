@@ -20,7 +20,7 @@
 # )
 
 
-# $clangVersion = 350
+# $llvmVersion = 350
 # $platform = 32
 
 
@@ -39,7 +39,7 @@ $projectPath = Split-Path $scriptPath -Parent
 $LLVMBuildInput = @{}
 
 $LLVMBuildEnv = @{
-    ClangBuildVersion = "trunk";
+    LLVMBuildVersion = "trunk";
     CheckoutRepository = "trunk";
     WorkingDir = ".";
     CheckoutRootDir = "";
@@ -269,8 +269,8 @@ function Clone-Object( $DeepCopyObject )
 
 function messageHelp()
 {
-    Write-Host '${clangVersion} designates llvm version number (e.g 33, 34, 35...)'
-    Write-Host 'When ${clangVersion} is empty that will assign trunk.'
+    Write-Host '${llvmVersion} designates llvm version number (e.g 33, 34, 35...)'
+    Write-Host 'When ${llvmVersion} is empty that will assign trunk.'
     Write-Host '${workingDirectory} is working directory.'
     Write-Host 'When ${workingDirectory} is empty that will assign /tmp.'
     Write-Host 'Cautions! When a checkout-path exist a same name directory, it deletes and creates. '
@@ -281,18 +281,18 @@ function messageHelp()
 function setupCommonVariables()
 {
     # common
-    if ( $LLVMBuildInput.clangVersion -gt 0 )
+    if ( $LLVMBuildInput.llvmVersion -gt 0 )
     {
-        $LLVMBuildEnv.ClangBuildVersion = $LLVMBuildInput.clangVersion
-        $LLVMBuildEnv.CheckoutRepository = ( "tags/RELEASE_{0}/final" -f $LLVMBuildInput.clangVersion )
+        $LLVMBuildEnv.LLVMBuildVersion = $LLVMBuildInput.llvmVersion
+        $LLVMBuildEnv.CheckoutRepository = ( "tags/RELEASE_{0}/final" -f $LLVMBuildInput.llvmVersion )
     }
     else
     {
-        $LLVMBuildEnv.ClangBuildVersion = "trunk"
+        $LLVMBuildEnv.LLVMBuildVersion = "trunk"
         $LLVMBuildEnv.CheckoutRepository = "trunk"
     }
 
-    $LLVMBuildEnv.CheckoutRootDir = "clang-" + $LLVMBuildEnv.ClangBuildVersion
+    $LLVMBuildEnv.CheckoutRootDir = "llvm-" + $LLVMBuildEnv.LLVMBuildVersion
     $LLVMBuildEnv.WorkingDir = "."
 
     if ( $LLVMBuildInput.workingDirectory -ne "" )
@@ -316,7 +316,7 @@ function executeCommon()
 
 function messageCheckoutEnvironment()
 {
-    Write-Host "clang build target  = " + $LLVMBuildEnv.ClangBuildVersion
+    Write-Host "LLVM build target  = " + $LLVMBuildEnv.LLVMBuildVersion
     Write-Host "checkout repository = " + $LLVMBuildEnv.CheckoutRepository
     Write-Host "checkout root directory  = " + $LLVMBuildEnv.CheckoutRootDir
     Write-Host "working directory   = " + $LLVMBuildEnv.WorkingDir
@@ -813,7 +813,7 @@ function executeBuilder
 {
     Param( 
         [array]$tasks = @(), 
-        [int]$clangVersion, 
+        [int]$llvmVersion,
         [string]$workingDirectory = ".", 
         [int]$msvcVersion = 2013, 
         [string]$target, 
@@ -831,7 +831,7 @@ function executeBuilder
 
     $LLVMBuildInput = @{
         tasks = $tasks;
-        clangVersion = $clangVersion;
+        llvmVersion = $llvmVersion;
         workingDirectory = $workingDirectory;
         msvcVersion = $msvcVersion;
         target = $target;
