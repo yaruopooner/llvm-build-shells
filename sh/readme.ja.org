@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2016/10/13.11:46:54
+# last updated : 2018/03/16.10:55:32
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -56,4 +56,6 @@
 
 ** パッチ
    sample.shでパッチのパスを設定する必要があります。
+
+   [[../patch/details.org][Patch Details]]
 

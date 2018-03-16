@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2016/10/13.11:46:36
+# last updated : 2018/03/16.10:55:58
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -56,3 +56,5 @@
     
 ** Patch
    You need to set the path of the patch in sample.sh.
+
+   [[../patch/details.org][Patch Details]]

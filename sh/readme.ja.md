@@ -70,4 +70,6 @@ llvm-build-shellsでは以下を一括で行います。
 
 ## パッチ<a id="sec-3-1" name="sec-3-1"></a>
 
-sample.shでパッチのパスを設定する必要があります。
+sample.shでパッチのパスを設定する必要があります。  
+
+[Patch Details](../patch/details.md)
