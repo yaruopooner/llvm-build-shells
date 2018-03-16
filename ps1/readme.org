@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2017/12/09.18:46:38
+# last updated : 2018/03/12.13:13:34
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -35,23 +35,24 @@
    And it is used in the execution on script of custom build step.
    You need to set the PATH in sample.ps1.
 	
-** MSYS2[recommend]
+** Python 2.7.x[recommend]
+   http://repo.msys2.org/mingw/x86_64/
+   http://repo.msys2.org/mingw/i686/
+
+   Use Python 2.7.x (msys2).
+   Should not use 3.x
+   Required when CMake to generate the project files of LLVM.
+   You need to set the PATH in sample.ps1.
+
+** MSYS2[unrecommend]
+   _Behavior changed by updating msys2 and changed to deprecated._
+
    http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/
 
    Python and Perl support.
    Perl is also required when Win32 build.
    Easier than individually install Python and Perl.
    Does not pollute the environment because it uses the portable version.
-   You need to set the PATH in sample.ps1.
-
-** Python 2.7.x[unrecommend]
-   
-   http://www.python.org/
-   http://www.python.org/download/
-
-   Use Python 2.7.x Windows X86-64 Installer.
-   Should not use 3.x.
-   Required when CMake to generate the project files of LLVM.
    You need to set the PATH in sample.ps1.
 
 ** GnuWin32[unrecommend]
@@ -67,7 +68,9 @@
 
   TOOL-PATH for described to a =sample.ps1= , use the =./tools-latest-version/= that has been archive-expand.
 
-** about MSYS2
+  By default, cmake and Python 2.7.x (msys2) will be downloaded.
+
+** +about MSYS2+ (unrecommend)
    MinGW64 shell is auto launch after archive-expand.
    #+begin_src shell-script
      $ cd /tmp

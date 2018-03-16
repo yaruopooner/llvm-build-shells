@@ -15,7 +15,7 @@ function usage()
     echo 'Options:'
     echo ' --checkout'
     echo '     checkout LLVM by SVN'
-    echo '     validate option > --clangVersion'
+    echo '     validate option > --llvmVersion'
     echo ' --patch'
     echo '     apply patch by SVN'
     echo '     validate option > --patchApplyLocation, --patchPath, --patchInfo'
@@ -23,7 +23,7 @@ function usage()
     echo '     generate Makefile'
     echo ' --build'
     echo '     execute make'
-    echo ' --clangVersion [VersionNumber]'
+    echo ' --llvmVersion [VersionNumber]'
     echo '     LLVM checkout version'
     echo '     default is trunk'
     echo ' --patchApplyLocation "APPLY_LOCATION"'
@@ -104,7 +104,7 @@ function generateCheckoutRootDirectoryName()
         fi
     fi
 
-    echo "clang-${MAJOR_VERSION}${MINOR_VERSION}"
+    echo "llvm-${MAJOR_VERSION}${MINOR_VERSION}"
 }
 
 
@@ -342,25 +342,25 @@ function executeBuildByCMake()
 
 function executeRebuild()
 {
-    local CLANG_VERSION=
-    local CLANG_MINOR_VERSION=
+    local LLVM_VERSION=
+    local LLVM_MINOR_VERSION=
     local OPT
 
     for OPT in $@
     do
         case $OPT in
-            '-clangVersion' )
-                CLANG_VERSION=${2}
+            '-llvmVersion' )
+                LLVM_VERSION=${2}
                 shift 2
                 ;;
-            '-clangMinorVersion' )
-                CLANG_MINOR_VERSION=${2}
+            '-llvmMinorVersion' )
+                LLVM_MINOR_VERSION=${2}
                 shift 2
                 ;;
         esac
     done
 
-    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
+    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
     local readonly BUILD_DIR="build"
 
     
@@ -403,8 +403,8 @@ function executeBuilder()
     local TASK_PATCH=
     local TASK_CONFIGURE=
     local TASK_BUILD=
-    local CLANG_VERSION=
-    local CLANG_MINOR_VERSION=
+    local LLVM_VERSION=
+    local LLVM_MINOR_VERSION=
     local PATCH_APPLY_LOCATIONS=()
     local PATCH_PATHS=()
     local PATCH_INFOS=()
@@ -434,12 +434,12 @@ function executeBuilder()
                 BUILD_TYPE=${2}
                 shift 2
                 ;;
-            '--clangVersion' )
-                CLANG_VERSION=${2}
+            '--llvmVersion' )
+                LLVM_VERSION=${2}
                 shift 2
                 ;;
-            '--clangMinorVersion' )
-                CLANG_MINOR_VERSION=${2}
+            '--llvmMinorVersion' )
+                LLVM_MINOR_VERSION=${2}
                 shift 2
                 ;;
             '--patchApplyLocation' )
@@ -466,11 +466,11 @@ function executeBuilder()
     done
 
 
-    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${CLANG_VERSION} ${CLANG_MINOR_VERSION}`
+    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
 
 
     if [ ${TASK_CHECKOUT} ]; then
-       executeCheckoutBySVN ${CLANG_VERSION} ${CLANG_MINOR_VERSION}
+       executeCheckoutBySVN ${LLVM_VERSION} ${LLVM_MINOR_VERSION}
 
        if [ $? -ne 0 ]; then
            echo "abort executeCheckoutBySVN"

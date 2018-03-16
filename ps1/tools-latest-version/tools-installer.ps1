@@ -3,6 +3,9 @@
 
 function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask )
 {
+    Write-Host "========== DownloadFromURI =========="
+    Write-Host "#URI : ${uri}"
+
     if ( $uri.Length -eq 0 )
     {
         Write-Host "invalid URI=$uri"
@@ -11,6 +14,7 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     }
 
     # download
+    Write-Host "---------- Download ----------"
     $downloaded_file = [System.IO.Path]::GetFileName( $uri )
 
     if ( !( Test-Path $downloaded_file ) )
@@ -26,6 +30,7 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     
 
     # archive expand
+    Write-Host "---------- Expand ----------"
     if ( $expand )
     {
         Write-Host "#expand : ${downloaded_file}"
@@ -65,12 +70,14 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     # installer execute 
     if ( $install )
     {
+        Write-Host "---------- Install ----------"
         Start-Process -FilePath $downloaded_file
     }
 
     # afterTask execute 
     if ( $afterTask )
     {
+        Write-Host "---------- AfterTask ----------"
         & $afterTask
     }
 }
