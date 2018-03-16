@@ -70,4 +70,6 @@ llvm-build-shells performs the following steps.
 
 ## Patch<a id="sec-3-1" name="sec-3-1"></a>
 
-You need to set the path of the patch in sample.sh.
+You need to set the path of the patch in sample.sh.  
+
+[Patch Details](../patch/details.md)
