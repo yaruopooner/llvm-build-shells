@@ -38,6 +38,7 @@ executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -llvmVersion $l
 
 # LLVM Parts Build (full task)
 # $target = "Clang libraries\libclang;Clang executables\clang-format"
+# $target = "Clang libraries\libclang;Clang executables\clang-format;Clang executables\clang-include-fixer;Clang executables\clang-rename;Clang executables\clang-tidy"
 # executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos -target $target
 
 
