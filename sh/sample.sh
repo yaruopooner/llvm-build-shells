@@ -3,7 +3,7 @@
 
 . ./llvm-builder.sh
 
-declare -r _LLVM_VERSION="${1-700}"
+declare -r _LLVM_VERSION="${1-800}"
 declare -r _PROJECT_PATH=$( cd $(dirname ${0}) && cd .. && pwd )
 declare -r _PATCH_PATH="${_PROJECT_PATH}/patch"
 

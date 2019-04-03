@@ -26,8 +26,8 @@ $patchInfos = @(
 
 . $builderShell
 
-$llvmVersion = 700
-# $llvmVersion = 600
+$llvmVersion = 800
+# $llvmVersion = 700
 $msvcVersion = 2017
 # $msvcVersion = 2015
 
@@ -47,6 +47,7 @@ executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -llvmVersion $l
 # executeBuilder -tasks @("CHECKOUT", "PATCH") -llvmVersion $llvmVersion -patchInfos $patchInfos
 # executeBuilder -tasks @("PROJECT", "BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -target $target
 # executeBuilder -tasks @("PROJECT", "BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python
+# executeBuilder -tasks @("PROJECT", "BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python
 
 
 # LLVM Parts Build (single task)
