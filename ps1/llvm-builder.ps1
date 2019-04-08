@@ -61,6 +61,7 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
+                2019 = "16 2019";
                 2017 = "15 2017";
                 2015 = "14 2015";
                 2013 = "12 2013";
@@ -82,6 +83,7 @@ $LLVMBuildEnv = @{
         Msys2Path = "";
         Gnu32Path = "";
         # MSVCVersion = "";
+        VcInstallationVersion = ""
         VcRegEntryKeyName = ""
         VcEnvVarName = "";
         VcVarsBatPath = "";
@@ -97,37 +99,50 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
+                # 2019 = "VS160COMNTOOLS";
                 # 2017 = "VS150COMNTOOLS";
                 # 2015 = "VS140COMNTOOLS";
                 # 2013 = "VS120COMNTOOLS";
                 # 2012 = "VS110COMNTOOLS";
                 # 2010 = "VS100COMNTOOLS";
+                2019 = @{
+                    InstallationVersion = "16.*"
+                    RegEntryKeyName = "16.0";
+                    EnvVarName = "VS160COMNTOOLS";
+                    VarsBatPath = "VC\Auxiliary\Build\vcvarsall.bat";
+                };
                 2017 = @{
+                    InstallationVersion = "15.*"
                     RegEntryKeyName = "15.0";
                     EnvVarName = "VS150COMNTOOLS";
                     VarsBatPath = "VC\Auxiliary\Build\vcvarsall.bat";
                 };
                 2015 = @{
+                    InstallationVersion = "14.*"
                     RegEntryKeyName = "14.0";
                     EnvVarName = "VS140COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2013 = @{
+                    InstallationVersion = "12.*"
                     RegEntryKeyName = "12.0";
                     EnvVarName = "VS120COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2012 = @{
+                    InstallationVersion = "11.*"
                     RegEntryKeyName = "11.0";
                     EnvVarName = "VS110COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2010 = @{
+                    InstallationVersion = "10.*"
                     RegEntryKeyName = "10.0";
                     EnvVarName = "VS100COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
             };
+            VSWHERE = "c:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe";
             REGISTRY_QUERY = @(
                 # 64 = @{
                 @{
@@ -615,6 +630,87 @@ function getVsCmdPromptFromRegistry( [ref]$result )
     $result.value = $false
 }
 
+function getVsCmdPromptFromVsWhere( [ref]$result )
+{
+    $cmd = $LLVMBuildEnv.BUILD.CONST.VSWHERE
+    $cmd_args = @( "-legacy" )
+    $regex_version = [regex] "^installationVersion:\s+(.+)$"
+    $regex_path = [regex] "^installationPath:\s+(.+)$"
+
+    if ( !(Test-Path -Path $cmd -PathType leaf) )
+    {
+        $result.value = $false
+
+        return
+    }
+
+    $query_result = & $cmd $cmd_args
+
+    if ( -not $? )
+    {
+        $result.value = $false
+
+        return
+    }
+
+    $entries = $query_result.Split("`n", [System.StringSplitOptions]::RemoveEmptyEntries)
+
+    # find version
+    $versions = @();
+    $installation_paths = @();
+
+    foreach ( $entry in $entries )
+    {
+        # Write-Host "entry = $entry"
+
+        $regex_result = $regex_version.Matches( $entry )
+
+        if ( $regex_result.Groups.Length -eq 2 )
+        {
+            # Write-Host ( "version result = {0}" -f $regex_result.Groups[1] )
+
+            $versions += $regex_result.Groups[1].value
+        }
+
+        $regex_result = $regex_path.Matches( $entry )
+
+        if ( $regex_result.Groups.Length -eq 2 )
+        {
+            # Write-Host ( "installationPath result = {0}" -f $regex_result.Groups[1] )
+
+            $installation_paths += $regex_result.Groups[1].value
+        }
+    }
+
+    if ( $versions.Length -ne $installation_paths.Length )
+    {
+        $result.value = $false
+
+        return
+    }
+
+    $index = 0
+    foreach ( $version in $versions )
+    {
+        # Write-Host "version = $version"
+
+        if ( $version -like $LLVMBuildEnv.BUILD.VcInstallationVersion )
+        {
+            $LLVMBuildEnv.BUILD.VsCmdPrompt = $installation_paths[ $index ]
+
+            $result.value = $true
+
+            return
+        }
+
+        $index += 1
+    }
+
+
+    $result.value = $false
+}
+
+
 function setupBuildVariables( [ref]$result )
 {
     $LLVMBuildEnv.BUILD.Gnu32Path = $LLVMBuildInput.gnu32Path
@@ -624,6 +720,7 @@ function setupBuildVariables( [ref]$result )
 
     if ( $LLVMBuildInput.msvcVersion -ne 0 )
     {
+        $LLVMBuildEnv.BUILD.VcInstallationVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].InstallationVersion
         $LLVMBuildEnv.BUILD.VcRegEntryKeyName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].RegEntryKeyName
         # $LLVMBuildEnv.BUILD.MSVCVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ]
         $LLVMBuildEnv.BUILD.VcEnvVarName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].EnvVarName
@@ -661,7 +758,8 @@ function setupBuildVariables( [ref]$result )
     $exit_result = $false
 
     # getVsCmdPromptFromEnvVars -result ([ref]$exit_result)
-    getVsCmdPromptFromRegistry -result ([ref]$exit_result)
+    # getVsCmdPromptFromRegistry -result ([ref]$exit_result)
+    getVsCmdPromptFromVsWhere -result ([ref]$exit_result)
     # check exit code
     # if ( -not $? )
     if ( -not $exit_result )
@@ -759,6 +857,17 @@ $phase_infos = @{
         execute = {
             param( [ref]$result )
             executeBuild -result $result
+        };
+    };
+    TEST = @{
+        setup = {
+            param( [ref]$result )
+            setupBuildVariables -result $result
+        };
+        execute = {
+            param( [ref]$result )
+            $result.value = $true
+            # executeBuild -result $result
         };
     };
 }
