@@ -33,7 +33,7 @@ $msvcVersion = 2017
 
 
 # LLVM ALL Build (full task)
-executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
+# executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
 
 
 # LLVM Parts Build (full task)
@@ -59,7 +59,11 @@ executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -llvmVersion $l
 # executeBuilder -tasks @("BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -target $target
 # executeBuilder -tasks @("BUILD") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 32 -configuration "Release" -target $target
 
-
+# Test
+executeBuilder -tasks @("TEST") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
+executeBuilder -tasks @("TEST") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
+# executeBuilder -tasks @("PROJECT") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
+# executeBuilder -tasks @("PROJECT") -llvmVersion $llvmVersion -msvcVersion $msvcVersion -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python -patchInfos $patchInfos
 
 
 

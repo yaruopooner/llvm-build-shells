@@ -53,7 +53,7 @@ $LLVMBuildEnv = @{
         Msys2Path = "";
         PythonPath = "";
         MSVCVersion = "12 2013";
-        Platform = "Win64";
+        Platform = "x64";
         PlatformDir = "msvc2015-64";
         BuildDir = "build";
         GeneratorName = $null;
@@ -70,10 +70,10 @@ $LLVMBuildEnv = @{
             };
             PLATFORM = @{
                 32 = @{
-                    Name = $null;
+                    Name = "Win32";
                 };
                 64 = @{
-                    Name = "Win64";
+                    Name = "x64";
                 };
             };
         };
@@ -497,10 +497,10 @@ function setupCMakeVariables( [ref]$result )
     {
         $LLVMBuildEnv.CMAKE.GeneratorName = "Visual Studio " + $LLVMBuildEnv.CMAKE.MSVCVersion
 
-        $platform_option = $const_vars.PLATFORM[ $LLVMBuildInput.platform ].Name
-        if ( $platform_option -ne $null )
+        $platform = $const_vars.PLATFORM[ $LLVMBuildInput.platform ].Name
+        if ( $platform -ne $null )
         {
-            $LLVMBuildEnv.CMAKE.GeneratorName += " " + $platform_option
+            $LLVMBuildEnv.CMAKE.Platform = $platform
         }
 
         $LLVMBuildEnv.CMAKE.PlatformDir = getPlatformDirectoryName
@@ -551,7 +551,10 @@ function executeCMake( [ref]$result )
     cd $platform_dir
 
     $cmd = "cmake"
-    $cmd_args = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "..\..\llvm", "-Thost=x64")
+
+    # Write-Host ( "CMAKE.Platform {0}" $LLVMBuildEnv.CMAKE.Platform )
+
+    $cmd_args = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "-A", $LLVMBuildEnv.CMAKE.Platform, "..\..\llvm", "-Thost=x64")
 
     & $cmd $cmd_args
 
@@ -627,6 +630,8 @@ function getVsCmdPromptFromRegistry( [ref]$result )
         }
     }
 
+    Write-Host "Visual Studio is not detected from Registry!!"
+
     $result.value = $false
 }
 
@@ -634,11 +639,14 @@ function getVsCmdPromptFromVsWhere( [ref]$result )
 {
     $cmd = $LLVMBuildEnv.BUILD.CONST.VSWHERE
     $cmd_args = @( "-legacy" )
+
     $regex_version = [regex] "^installationVersion:\s+(.+)$"
     $regex_path = [regex] "^installationPath:\s+(.+)$"
 
-    if ( !(Test-Path -Path $cmd -PathType leaf) )
+    if ( !( Test-Path -Path $cmd -PathType leaf ) )
     {
+        Write-Host ( "{0} is not found!!" -f $cmd )
+
         $result.value = $false
 
         return
@@ -648,6 +656,8 @@ function getVsCmdPromptFromVsWhere( [ref]$result )
 
     if ( -not $? )
     {
+        Write-Host ( "{0} is failed!!" -f $cmd )
+
         $result.value = $false
 
         return
@@ -706,6 +716,7 @@ function getVsCmdPromptFromVsWhere( [ref]$result )
         $index += 1
     }
 
+    Write-Host "Visual Studio is not detected by VsWhere!!"
 
     $result.value = $false
 }
@@ -764,10 +775,15 @@ function setupBuildVariables( [ref]$result )
     # if ( -not $? )
     if ( -not $exit_result )
     {
-        Write-Host ( "not detect Microsoft Visual Studio {0}" -f $LLVMBuildInput.msvcVersion )
-        $result.value = $false
+        getVsCmdPromptFromRegistry -result ([ref]$exit_result)
 
-        return
+        if ( -not $exit_result )
+        {
+            Write-Host ( "Microsoft Visual Studio {0} is not detected!!" -f $LLVMBuildInput.msvcVersion )
+            $result.value = $false
+
+            return
+        }
     }
 
     # $LLVMBuildEnv.BUILD.VsCmdPrompt += "../../VC/vcvarsall.bat"
