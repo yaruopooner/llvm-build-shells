@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2018/03/12.13:13:07
+# last updated : 2019/04/09.11:00:28
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -17,7 +17,7 @@
 * セルフビルドに必要なソフトウェア
   以下が必要になります。
 
-** Visual Studio 2017/2015/2013/2012/2010
+** Visual Studio 2019/2017/2015/2013/2012/2010
    どれでもOK
 
 ** Subversion

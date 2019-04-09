@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. 使用方法</a></li>
 <li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Visual Studio 2017/2015/2013/2012/2010</a></li>
+<li><a href="#sec-2-1">2.1. Visual Studio 2019/2017/2015/2013/2012/2010</a></li>
 <li><a href="#sec-2-2">2.2. Subversion</a></li>
 <li><a href="#sec-2-3">2.3. CMake[必須]</a></li>
 <li><a href="#sec-2-4">2.4. Python 2.7.x[推奨]</a></li>
@@ -41,7 +41,7 @@ CYGWINやMSYSから実行すると実行時パス解釈がおかしくなるた�
 
 以下が必要になります。  
 
-## Visual Studio 2017/2015/2013/2012/2010<a id="sec-2-1" name="sec-2-1"></a>
+## Visual Studio 2019/2017/2015/2013/2012/2010<a id="sec-2-1" name="sec-2-1"></a>
 
 どれでもOK  
 
