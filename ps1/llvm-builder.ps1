@@ -640,8 +640,11 @@ function getVsCmdPromptFromVsWhere( [ref]$result )
     $cmd = $LLVMBuildEnv.BUILD.CONST.VSWHERE
     $cmd_args = @( "-legacy" )
 
-    $regex_version = [regex] "^installationVersion:\s+(.+)$"
-    $regex_path = [regex] "^installationPath:\s+(.+)$"
+    $regex_segment_header = [regex] "^instanceId:"
+    $regex_version = [regex] "(?m:installationVersion:\s+(.+)$)"
+    $regex_path = [regex] "(?m:installationPath:\s+(.+)$)"
+    # $regex_version = [regex] "(?m:^installationVersion:)"
+    # $regex_path = [regex] "(?m:^installationPath:)"
 
     if ( !( Test-Path -Path $cmd -PathType leaf ) )
     {
@@ -663,58 +666,66 @@ function getVsCmdPromptFromVsWhere( [ref]$result )
         return
     }
 
-    $entries = $query_result.Split("`n", [System.StringSplitOptions]::RemoveEmptyEntries)
+    # The result value is array.
+    # If there are multiple lines of command result data, powershell splited the data by "`n" code and returns it.
+    # Rejoin them.
+    $query_result = $query_result -Join "`n"
+
+    # $entries = $query_result.Split([regex]"(?m:^)`n", [System.StringSplitOptions]::RemoveEmptyEntries)
+    # $entries = $query_result.Split([string[]]"^`n", [System.StringSplitOptions]::RemoveEmptyEntries, "RegexMatch")
+    # $entries = $query_result.Split($pattern)
+    # $entries = $query_result.Split([regex]"^`r`n", [System.StringSplitOptions]::RemoveEmptyEntries)
+    $entries = $query_result -Split "^`n", 0, "RegexMatch, Multiline"
 
     # find version
-    $versions = @();
-    $installation_paths = @();
-
     foreach ( $entry in $entries )
     {
         # Write-Host "entry = $entry"
 
-        $regex_result = $regex_version.Matches( $entry )
+        $regex_result = $regex_segment_header.Matches( $entry )
 
-        if ( $regex_result.Groups.Length -eq 2 )
+        if ( !$regex_result.Success )
+        {
+            continue
+        }
+
+        $version = $null
+        $installation_path = $null
+
+        $regex_result = $regex_version.Matches( $entry )
+        # Write-Host ("version result {0}" -f $regex_result.Count)
+
+        if ( $regex_result.Success -and ($regex_result.Groups.Length -eq 2) )
         {
             # Write-Host ( "version result = {0}" -f $regex_result.Groups[1] )
 
-            $versions += $regex_result.Groups[1].value
+            $version = $regex_result.Groups[1].value
         }
 
         $regex_result = $regex_path.Matches( $entry )
 
-        if ( $regex_result.Groups.Length -eq 2 )
+        # Write-Host ("path result {0}" -f $regex_result.Count)
+
+        if ( $regex_result.Success -and ($regex_result.Groups.Length -eq 2) )
         {
             # Write-Host ( "installationPath result = {0}" -f $regex_result.Groups[1] )
 
-            $installation_paths += $regex_result.Groups[1].value
+            $installation_path = $regex_result.Groups[1].value
         }
-    }
 
-    if ( $versions.Length -ne $installation_paths.Length )
-    {
-        $result.value = $false
-
-        return
-    }
-
-    $index = 0
-    foreach ( $version in $versions )
-    {
-        # Write-Host "version = $version"
-
-        if ( $version -like $LLVMBuildEnv.BUILD.VcInstallationVersion )
+        if ( ($version -ne $null) -and ($installation_path -ne $null) )
         {
-            $LLVMBuildEnv.BUILD.VsCmdPrompt = $installation_paths[ $index ]
+            if ( $version -like $LLVMBuildEnv.BUILD.VcInstallationVersion )
+            {
+                $LLVMBuildEnv.BUILD.VsCmdPrompt = $installation_path
 
-            $result.value = $true
+                $result.value = $true
 
-            return
+                return
+            }
         }
-
-        $index += 1
     }
+
 
     Write-Host "Visual Studio is not detected by VsWhere!!"
 
