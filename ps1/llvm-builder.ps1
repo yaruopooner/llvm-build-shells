@@ -52,8 +52,8 @@ $LLVMBuildEnv = @{
         ExecPath = "";
         Msys2Path = "";
         PythonPath = "";
-        MSVCVersion = "12 2013";
-        Platform = "Win64";
+        MSVCProductName = "12 2013";
+        Platform = "x64";
         PlatformDir = "msvc2015-64";
         BuildDir = "build";
         GeneratorName = $null;
@@ -61,6 +61,7 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
+                2019 = "16 2019";
                 2017 = "15 2017";
                 2015 = "14 2015";
                 2013 = "12 2013";
@@ -69,10 +70,10 @@ $LLVMBuildEnv = @{
             };
             PLATFORM = @{
                 32 = @{
-                    Name = $null;
+                    Name = "Win32";
                 };
                 64 = @{
-                    Name = "Win64";
+                    Name = "x64";
                 };
             };
         };
@@ -81,7 +82,8 @@ $LLVMBuildEnv = @{
     BUILD = @{
         Msys2Path = "";
         Gnu32Path = "";
-        # MSVCVersion = "";
+        # MSVCProductName = "";
+        VcInstallationVersion = ""
         VcRegEntryKeyName = ""
         VcEnvVarName = "";
         VcVarsBatPath = "";
@@ -97,37 +99,50 @@ $LLVMBuildEnv = @{
 
         CONST = @{
             MSVC = @{
+                # 2019 = "VS160COMNTOOLS";
                 # 2017 = "VS150COMNTOOLS";
                 # 2015 = "VS140COMNTOOLS";
                 # 2013 = "VS120COMNTOOLS";
                 # 2012 = "VS110COMNTOOLS";
                 # 2010 = "VS100COMNTOOLS";
+                2019 = @{
+                    InstallationVersion = "16.*"
+                    RegEntryKeyName = "16.0";
+                    EnvVarName = "VS160COMNTOOLS";
+                    VarsBatPath = "VC\Auxiliary\Build\vcvarsall.bat";
+                };
                 2017 = @{
+                    InstallationVersion = "15.*"
                     RegEntryKeyName = "15.0";
                     EnvVarName = "VS150COMNTOOLS";
                     VarsBatPath = "VC\Auxiliary\Build\vcvarsall.bat";
                 };
                 2015 = @{
+                    InstallationVersion = "14.*"
                     RegEntryKeyName = "14.0";
                     EnvVarName = "VS140COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2013 = @{
+                    InstallationVersion = "12.*"
                     RegEntryKeyName = "12.0";
                     EnvVarName = "VS120COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2012 = @{
+                    InstallationVersion = "11.*"
                     RegEntryKeyName = "11.0";
                     EnvVarName = "VS110COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
                 2010 = @{
+                    InstallationVersion = "10.*"
                     RegEntryKeyName = "10.0";
                     EnvVarName = "VS100COMNTOOLS";
                     VarsBatPath = "VC\vcvarsall.bat";
                 };
             };
+            VSWHERE = "c:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe";
             REGISTRY_QUERY = @(
                 # 64 = @{
                 @{
@@ -235,6 +250,8 @@ function importScriptEnvVariables( [string]$script, [string]$scriptArg )
 {
     $temp_file = [IO.Path]::GetTempFileName()
 
+    Write-Host ( "invoke environment {0} {1}" -f $script, $scriptArg )
+
     cmd /c " `"$script`" $scriptArg && set > `"$temp_file`" "
 
     Get-Content $temp_file | Foreach-Object {
@@ -250,8 +267,8 @@ function importScriptEnvVariables( [string]$script, [string]$scriptArg )
 
 function getPlatformDirectoryName()
 {
-    "msvc{0}-{1}" -f $LLVMBuildInput.msvcVersion, $LLVMBuildInput.platform
-    # "msvc${msvcVersion}-${platform}"
+    "msvc{0}-{1}" -f $LLVMBuildInput.msvcProductName, $LLVMBuildInput.platform
+    # "msvc${msvcProductName}-${platform}"
 }
 
 
@@ -473,19 +490,19 @@ function setupCMakeVariables( [ref]$result )
         return
     }
 
-    if ( $LLVMBuildInput.msvcVersion -ne 0 )
+    if ( $LLVMBuildInput.msvcProductName -ne 0 )
     {
-        $LLVMBuildEnv.CMAKE.MSVCVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ]
+        $LLVMBuildEnv.CMAKE.MSVCProductName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ]
     }
 
     if ( $LLVMBuildInput.platform -ne 0 )
     {
-        $LLVMBuildEnv.CMAKE.GeneratorName = "Visual Studio " + $LLVMBuildEnv.CMAKE.MSVCVersion
+        $LLVMBuildEnv.CMAKE.GeneratorName = "Visual Studio " + $LLVMBuildEnv.CMAKE.MSVCProductName
 
-        $platform_option = $const_vars.PLATFORM[ $LLVMBuildInput.platform ].Name
-        if ( $platform_option -ne $null )
+        $platform = $const_vars.PLATFORM[ $LLVMBuildInput.platform ].Name
+        if ( $platform -ne $null )
         {
-            $LLVMBuildEnv.CMAKE.GeneratorName += " " + $platform_option
+            $LLVMBuildEnv.CMAKE.Platform = $platform
         }
 
         $LLVMBuildEnv.CMAKE.PlatformDir = getPlatformDirectoryName
@@ -536,7 +553,10 @@ function executeCMake( [ref]$result )
     cd $platform_dir
 
     $cmd = "cmake"
-    $cmd_args = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "..\..\llvm", "-Thost=x64")
+
+    # Write-Host ( "CMAKE.Platform {0}" $LLVMBuildEnv.CMAKE.Platform )
+
+    $cmd_args = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "-A", $LLVMBuildEnv.CMAKE.Platform, "..\..\llvm", "-Thost=x64")
 
     & $cmd $cmd_args
 
@@ -612,8 +632,108 @@ function getVsCmdPromptFromRegistry( [ref]$result )
         }
     }
 
+    Write-Host "Visual Studio is not detected from Registry!!"
+
     $result.value = $false
 }
+
+function getVsCmdPromptFromVsWhere( [ref]$result )
+{
+    $cmd = $LLVMBuildEnv.BUILD.CONST.VSWHERE
+    $cmd_args = @( "-legacy" )
+
+    $regex_segment_header = [regex] "^instanceId:"
+    $regex_version = [regex] "(?m:installationVersion:\s+(.+)$)"
+    $regex_path = [regex] "(?m:installationPath:\s+(.+)$)"
+    # $regex_version = [regex] "(?m:^installationVersion:)"
+    # $regex_path = [regex] "(?m:^installationPath:)"
+
+    if ( !( Test-Path -Path $cmd -PathType leaf ) )
+    {
+        Write-Host ( "{0} is not found!!" -f $cmd )
+
+        $result.value = $false
+
+        return
+    }
+
+    $query_result = & $cmd $cmd_args
+
+    if ( -not $? )
+    {
+        Write-Host ( "{0} is failed!!" -f $cmd )
+
+        $result.value = $false
+
+        return
+    }
+
+    # The result value is array.
+    # If there are multiple lines of command result data, powershell splited the data by "`n" code and returns it.
+    # Rejoin them.
+    $query_result = $query_result -Join "`n"
+
+    # $entries = $query_result.Split([regex]"(?m:^)`n", [System.StringSplitOptions]::RemoveEmptyEntries)
+    # $entries = $query_result.Split([string[]]"^`n", [System.StringSplitOptions]::RemoveEmptyEntries, "RegexMatch")
+    # $entries = $query_result.Split($pattern)
+    # $entries = $query_result.Split([regex]"^`r`n", [System.StringSplitOptions]::RemoveEmptyEntries)
+    $entries = $query_result -Split "^`n", 0, "RegexMatch, Multiline"
+
+    # find version
+    foreach ( $entry in $entries )
+    {
+        # Write-Host "entry = $entry"
+
+        $regex_result = $regex_segment_header.Matches( $entry )
+
+        if ( !$regex_result.Success )
+        {
+            continue
+        }
+
+        $version = $null
+        $installation_path = $null
+
+        $regex_result = $regex_version.Matches( $entry )
+        # Write-Host ("version result {0}" -f $regex_result.Count)
+
+        if ( $regex_result.Success -and ($regex_result.Groups.Length -eq 2) )
+        {
+            # Write-Host ( "version result = {0}" -f $regex_result.Groups[1] )
+
+            $version = $regex_result.Groups[1].value
+        }
+
+        $regex_result = $regex_path.Matches( $entry )
+
+        # Write-Host ("path result {0}" -f $regex_result.Count)
+
+        if ( $regex_result.Success -and ($regex_result.Groups.Length -eq 2) )
+        {
+            # Write-Host ( "installationPath result = {0}" -f $regex_result.Groups[1] )
+
+            $installation_path = $regex_result.Groups[1].value
+        }
+
+        if ( ($version -ne $null) -and ($installation_path -ne $null) )
+        {
+            if ( $version -like $LLVMBuildEnv.BUILD.VcInstallationVersion )
+            {
+                $LLVMBuildEnv.BUILD.VsCmdPrompt = $installation_path
+
+                $result.value = $true
+
+                return
+            }
+        }
+    }
+
+
+    Write-Host "Visual Studio is not detected by VsWhere!!"
+
+    $result.value = $false
+}
+
 
 function setupBuildVariables( [ref]$result )
 {
@@ -622,12 +742,13 @@ function setupBuildVariables( [ref]$result )
     # local vars
     $const_vars = $LLVMBuildEnv.BUILD.CONST
 
-    if ( $LLVMBuildInput.msvcVersion -ne 0 )
+    if ( $LLVMBuildInput.msvcProductName -ne 0 )
     {
-        $LLVMBuildEnv.BUILD.VcRegEntryKeyName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].RegEntryKeyName
-        # $LLVMBuildEnv.BUILD.MSVCVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ]
-        $LLVMBuildEnv.BUILD.VcEnvVarName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].EnvVarName
-        $LLVMBuildEnv.BUILD.VcVarsBatPath = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].VarsBatPath
+        $LLVMBuildEnv.BUILD.VcInstallationVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].InstallationVersion
+        $LLVMBuildEnv.BUILD.VcRegEntryKeyName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].RegEntryKeyName
+        # $LLVMBuildEnv.BUILD.MSVCProductName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ]
+        $LLVMBuildEnv.BUILD.VcEnvVarName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].EnvVarName
+        $LLVMBuildEnv.BUILD.VcVarsBatPath = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].VarsBatPath
     }
 
     if ( $LLVMBuildInput.target -ne "" )
@@ -654,26 +775,32 @@ function setupBuildVariables( [ref]$result )
     }
 
 
-    # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCVersion, 'Machine')
-    # $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCVersion
+    # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCProductName, 'Machine')
+    # $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCProductName
     # $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var -ErrorAction Ignore
 
     $exit_result = $false
 
     # getVsCmdPromptFromEnvVars -result ([ref]$exit_result)
-    getVsCmdPromptFromRegistry -result ([ref]$exit_result)
+    # getVsCmdPromptFromRegistry -result ([ref]$exit_result)
+    getVsCmdPromptFromVsWhere -result ([ref]$exit_result)
     # check exit code
     # if ( -not $? )
     if ( -not $exit_result )
     {
-        Write-Host ( "not detect Microsoft Visual Studio {0}" -f $LLVMBuildInput.msvcVersion )
-        $result.value = $false
+        getVsCmdPromptFromRegistry -result ([ref]$exit_result)
 
-        return
+        if ( -not $exit_result )
+        {
+            Write-Host ( "Microsoft Visual Studio {0} is not detected!!" -f $LLVMBuildInput.msvcProductName )
+            $result.value = $false
+
+            return
+        }
     }
 
     # $LLVMBuildEnv.BUILD.VsCmdPrompt += "../../VC/vcvarsall.bat"
-    $LLVMBuildEnv.BUILD.VsCmdPrompt += $LLVMBuildEnv.BUILD.VcVarsBatPath
+    $LLVMBuildEnv.BUILD.VsCmdPrompt = Join-Path $LLVMBuildEnv.BUILD.VsCmdPrompt $LLVMBuildEnv.BUILD.VcVarsBatPath
 
     # Write-Host $LLVMBuildEnv.BUILD.VsCmdPrompt
 
@@ -761,6 +888,17 @@ $phase_infos = @{
             executeBuild -result $result
         };
     };
+    TEST = @{
+        setup = {
+            param( [ref]$result )
+            setupBuildVariables -result $result
+        };
+        execute = {
+            param( [ref]$result )
+            $result.value = $true
+            # executeBuild -result $result
+        };
+    };
 }
 
 
@@ -815,7 +953,7 @@ function executeBuilder
         [array]$tasks = @(), 
         [int]$llvmVersion,
         [string]$workingDirectory = ".", 
-        [int]$msvcVersion = 2013, 
+        [int]$msvcProductName = 2013, 
         [string]$target, 
         [int]$platform = 64, 
         [string]$configuration = "Release", 
@@ -833,7 +971,7 @@ function executeBuilder
         tasks = $tasks;
         llvmVersion = $llvmVersion;
         workingDirectory = $workingDirectory;
-        msvcVersion = $msvcVersion;
+        msvcProductName = $msvcProductName;
         target = $target;
         platform = $platform;
         configuration = $configuration;

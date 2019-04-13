@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. Usage</a></li>
 <li><a href="#sec-2">2. Requirements</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Visual Studio 2017/2015/2013/2012/2010[required]</a></li>
+<li><a href="#sec-2-1">2.1. Visual Studio 2019/2017/2015/2013/2012/2010[required]</a></li>
 <li><a href="#sec-2-2">2.2. Subversion[required]</a></li>
 <li><a href="#sec-2-3">2.3. CMake[required]</a></li>
 <li><a href="#sec-2-4">2.4. Python 2.7.x[recommend]</a></li>
@@ -43,7 +43,7 @@ There is a need to launch from the Windows CMD or EXPLORER.
 
 The following is required.  
 
-## Visual Studio 2017/2015/2013/2012/2010[required]<a id="sec-2-1" name="sec-2-1"></a>
+## Visual Studio 2019/2017/2015/2013/2012/2010[required]<a id="sec-2-1" name="sec-2-1"></a>
 
 any ok.  
 
