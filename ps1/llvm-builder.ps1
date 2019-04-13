@@ -52,7 +52,7 @@ $LLVMBuildEnv = @{
         ExecPath = "";
         Msys2Path = "";
         PythonPath = "";
-        MSVCVersion = "12 2013";
+        MSVCProductName = "12 2013";
         Platform = "x64";
         PlatformDir = "msvc2015-64";
         BuildDir = "build";
@@ -82,7 +82,7 @@ $LLVMBuildEnv = @{
     BUILD = @{
         Msys2Path = "";
         Gnu32Path = "";
-        # MSVCVersion = "";
+        # MSVCProductName = "";
         VcInstallationVersion = ""
         VcRegEntryKeyName = ""
         VcEnvVarName = "";
@@ -250,6 +250,8 @@ function importScriptEnvVariables( [string]$script, [string]$scriptArg )
 {
     $temp_file = [IO.Path]::GetTempFileName()
 
+    Write-Host ( "invoke environment {0} {1}" -f $script, $scriptArg )
+
     cmd /c " `"$script`" $scriptArg && set > `"$temp_file`" "
 
     Get-Content $temp_file | Foreach-Object {
@@ -265,8 +267,8 @@ function importScriptEnvVariables( [string]$script, [string]$scriptArg )
 
 function getPlatformDirectoryName()
 {
-    "msvc{0}-{1}" -f $LLVMBuildInput.msvcVersion, $LLVMBuildInput.platform
-    # "msvc${msvcVersion}-${platform}"
+    "msvc{0}-{1}" -f $LLVMBuildInput.msvcProductName, $LLVMBuildInput.platform
+    # "msvc${msvcProductName}-${platform}"
 }
 
 
@@ -488,14 +490,14 @@ function setupCMakeVariables( [ref]$result )
         return
     }
 
-    if ( $LLVMBuildInput.msvcVersion -ne 0 )
+    if ( $LLVMBuildInput.msvcProductName -ne 0 )
     {
-        $LLVMBuildEnv.CMAKE.MSVCVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ]
+        $LLVMBuildEnv.CMAKE.MSVCProductName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ]
     }
 
     if ( $LLVMBuildInput.platform -ne 0 )
     {
-        $LLVMBuildEnv.CMAKE.GeneratorName = "Visual Studio " + $LLVMBuildEnv.CMAKE.MSVCVersion
+        $LLVMBuildEnv.CMAKE.GeneratorName = "Visual Studio " + $LLVMBuildEnv.CMAKE.MSVCProductName
 
         $platform = $const_vars.PLATFORM[ $LLVMBuildInput.platform ].Name
         if ( $platform -ne $null )
@@ -740,13 +742,13 @@ function setupBuildVariables( [ref]$result )
     # local vars
     $const_vars = $LLVMBuildEnv.BUILD.CONST
 
-    if ( $LLVMBuildInput.msvcVersion -ne 0 )
+    if ( $LLVMBuildInput.msvcProductName -ne 0 )
     {
-        $LLVMBuildEnv.BUILD.VcInstallationVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].InstallationVersion
-        $LLVMBuildEnv.BUILD.VcRegEntryKeyName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].RegEntryKeyName
-        # $LLVMBuildEnv.BUILD.MSVCVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ]
-        $LLVMBuildEnv.BUILD.VcEnvVarName = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].EnvVarName
-        $LLVMBuildEnv.BUILD.VcVarsBatPath = $const_vars.MSVC[ $LLVMBuildInput.msvcVersion ].VarsBatPath
+        $LLVMBuildEnv.BUILD.VcInstallationVersion = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].InstallationVersion
+        $LLVMBuildEnv.BUILD.VcRegEntryKeyName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].RegEntryKeyName
+        # $LLVMBuildEnv.BUILD.MSVCProductName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ]
+        $LLVMBuildEnv.BUILD.VcEnvVarName = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].EnvVarName
+        $LLVMBuildEnv.BUILD.VcVarsBatPath = $const_vars.MSVC[ $LLVMBuildInput.msvcProductName ].VarsBatPath
     }
 
     if ( $LLVMBuildInput.target -ne "" )
@@ -773,8 +775,8 @@ function setupBuildVariables( [ref]$result )
     }
 
 
-    # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCVersion, 'Machine')
-    # $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCVersion
+    # $LLVMBuildEnv.BUILD.VsCmdPrompt = [Environment]::GetEnvironmentVariable($LLVMBuildEnv.BUILD.MSVCProductName, 'Machine')
+    # $env_var = "env:" + $LLVMBuildEnv.BUILD.MSVCProductName
     # $LLVMBuildEnv.BUILD.VsCmdPrompt = Get-Content $env_var -ErrorAction Ignore
 
     $exit_result = $false
@@ -790,7 +792,7 @@ function setupBuildVariables( [ref]$result )
 
         if ( -not $exit_result )
         {
-            Write-Host ( "Microsoft Visual Studio {0} is not detected!!" -f $LLVMBuildInput.msvcVersion )
+            Write-Host ( "Microsoft Visual Studio {0} is not detected!!" -f $LLVMBuildInput.msvcProductName )
             $result.value = $false
 
             return
@@ -798,7 +800,7 @@ function setupBuildVariables( [ref]$result )
     }
 
     # $LLVMBuildEnv.BUILD.VsCmdPrompt += "../../VC/vcvarsall.bat"
-    $LLVMBuildEnv.BUILD.VsCmdPrompt += $LLVMBuildEnv.BUILD.VcVarsBatPath
+    $LLVMBuildEnv.BUILD.VsCmdPrompt = Join-Path $LLVMBuildEnv.BUILD.VsCmdPrompt $LLVMBuildEnv.BUILD.VcVarsBatPath
 
     # Write-Host $LLVMBuildEnv.BUILD.VsCmdPrompt
 
@@ -951,7 +953,7 @@ function executeBuilder
         [array]$tasks = @(), 
         [int]$llvmVersion,
         [string]$workingDirectory = ".", 
-        [int]$msvcVersion = 2013, 
+        [int]$msvcProductName = 2013, 
         [string]$target, 
         [int]$platform = 64, 
         [string]$configuration = "Release", 
@@ -969,7 +971,7 @@ function executeBuilder
         tasks = $tasks;
         llvmVersion = $llvmVersion;
         workingDirectory = $workingDirectory;
-        msvcVersion = $msvcVersion;
+        msvcProductName = $msvcProductName;
         target = $target;
         platform = $platform;
         configuration = $configuration;
