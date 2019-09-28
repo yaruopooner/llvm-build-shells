@@ -26,8 +26,8 @@ $patchInfos = @(
 
 . $builderShell
 
-$llvmVersion = 800
-# $llvmVersion = 700
+$llvmVersion = 900
+# $llvmVersion = 800
 $msvcProductName = 2019
 # $msvcProductName = 2017
 
