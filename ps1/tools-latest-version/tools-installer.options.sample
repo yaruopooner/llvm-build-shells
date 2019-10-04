@@ -56,4 +56,10 @@ $global:DOWNLOAD_LIST = @(
     #     uri = "http://jaist.dl.sourceforge.net/project/getgnuwin32/getgnuwin32/0.6.30/GetGnuWin32-0.6.3.exe";
     #     install = $true;
     # }
+    ,@{ # PortableGit
+        uri = "https://github.com/git-for-windows/git/releases/download/v2.23.0.windows.1/PortableGit-2.23.0-64-bit.7z.exe"
+        expand = $true;
+        expandPathFromArchiveName = $true;
+        # expandPath = "PortableGit";
+    }
 )

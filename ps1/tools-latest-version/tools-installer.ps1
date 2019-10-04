@@ -1,7 +1,7 @@
 # -*- mode: powershell ; coding: utf-8-dos -*-
 
 
-function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask )
+function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask, [switch]$expandPathFromArchiveName, [string]$expandPath )
 {
     Write-Host "========== DownloadFromURI =========="
     Write-Host "#URI : ${uri}"
@@ -11,6 +11,12 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
         Write-Host "invalid URI=$uri"
     
         return
+    }
+
+    if ( $expandPath.Length -eq 0 )
+    {
+        # current path
+        $expandPath = "./"
     }
 
     # download
@@ -35,33 +41,40 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     {
         Write-Host "#expand : ${downloaded_file}"
 
-        $extension = [System.IO.Path]::GetExtension( $downloaded_file )
-        $expanded_path = [System.IO.Path]::GetFileNameWithoutExtension( $downloaded_file )
+        $archive_extension = [System.IO.Path]::GetExtension( $downloaded_file )
+        $archive_file_name = [System.IO.Path]::GetFileNameWithoutExtension( $downloaded_file )
 
-        if ( $extension -eq ".zip" )
+        if ( $expandPathFromArchiveName )
         {
-            if ( !( Test-Path -Path $expanded_path -PathType container ) )
+            $expandPath = $archive_file_name
+        }
+
+        if ( $archive_extension -eq ".zip" )
+        {
+            if ( !( Test-Path -Path $archive_file_name -PathType container ) )
             {
                 Write-Host "#expanding : ${downloaded_file}"
-                Expand-Archive -Path $downloaded_file -DestinationPath "./" -Force
+                Expand-Archive -Path $downloaded_file -DestinationPath $expandPath -Force
             }
         }
         $cmd = "./7za.exe"
-        if ( ( ( $extension -eq ".xz" ) -or ( $extension -eq ".gz" ) ) -and ( Test-Path $cmd ) )
+        if ( ( $archive_extension -ne ".zip" ) -and ( Test-Path $cmd ) )
         {
-            if ( !( Test-Path -Path $expanded_path -PathType any ) )
+            $check_path = Join-Path $expandPath $archive_file_name
+
+            if ( !( Test-Path -Path $check_path -PathType container ) )
             {
                 Write-Host "#expanding : ${downloaded_file}"
-                & $cmd x $downloaded_file -aos
+                & $cmd x $downloaded_file -aos -o"${expandPath}"
             }
 
-            $extension2 = [System.IO.Path]::GetExtension( $expanded_path )
-            if ( $extension2 -eq ".tar" )
+            $archive_extension2 = [System.IO.Path]::GetExtension( $archive_file_name )
+            if ( $archive_extension2 -eq ".tar" )
             {
-                $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $expanded_path )
-                if ( !( Test-Path -Path $extract_name -PathType any ) )
+                $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $archive_file_name )
+                if ( !( Test-Path -Path $extract_name -PathType container ) )
                 {
-                    & $cmd x $expanded_path -aos
+                    & $cmd x $archive_file_name -aos -o"${expandPath}"
                 }
             }
         }
