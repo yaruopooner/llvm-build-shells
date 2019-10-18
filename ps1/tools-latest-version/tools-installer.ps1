@@ -27,7 +27,9 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     {
         Write-Host "#downloading : ${uri}"
         # Invoke-WebRequest -Uri $uri -OutFile $downloaded_file
-        Start-BitsTransfer -Source $uri -Destination $downloaded_file
+        # Start-BitsTransfer -Source $uri -Destination $downloaded_file
+        $wc = New-Object System.Net.WebClient
+        $wc.DownloadFile( $uri, $downloaded_file )
     }
     else
     {
