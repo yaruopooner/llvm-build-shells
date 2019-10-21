@@ -62,16 +62,25 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
         $cmd = "./7za.exe"
         if ( ( $archive_extension -ne ".zip" ) -and ( Test-Path $cmd ) )
         {
-            $check_path = Join-Path $expandPath $archive_file_name
+            $archive_extension2 = [System.IO.Path]::GetExtension( $archive_file_name )
+            $is_tar = $archive_extension2 -eq ".tar"
+
+            $tmp_path = $expandPath
+
+            if ( $is_tar )
+            {
+                $tmp_path = "./"
+            }
+
+            $check_path = Join-Path $tmp_path $archive_file_name
 
             if ( !( Test-Path -Path $check_path -PathType container ) )
             {
                 Write-Host "#expanding : ${downloaded_file}"
-                & $cmd x $downloaded_file -aos -o"${expandPath}"
+                & $cmd x $downloaded_file -aos -o"${tmp_path}"
             }
 
-            $archive_extension2 = [System.IO.Path]::GetExtension( $archive_file_name )
-            if ( $archive_extension2 -eq ".tar" )
+            if ( $is_tar )
             {
                 $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $archive_file_name )
                 if ( !( Test-Path -Path $extract_name -PathType container ) )
