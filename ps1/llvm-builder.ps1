@@ -399,7 +399,7 @@ function executeCheckout( [ref]$result )
             Write-Host $cmd_args
             & $cmd $cmd_args
             # fetch all tags
-            $cmd_args = @("--tags")
+            $cmd_args = @("fetch" "--tags")
             Write-Host $cmd_args
             & $cmd $cmd_args
 
