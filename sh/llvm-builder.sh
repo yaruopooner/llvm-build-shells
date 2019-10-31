@@ -26,6 +26,9 @@ function usage()
     echo ' --llvmVersion [VersionNumber]'
     echo '     LLVM checkout version'
     echo '     default is trunk'
+    echo ' --llvmCheckoutTag "CHECKOUT_TAG_NAME"'
+    echo '     LLVM checkout tag name'
+    echo '     default is leatest version tag'
     echo ' --patchApplyLocation "APPLY_LOCATION"'
     echo '     patch apply target relative directory from checkout directory'
     echo '     example : llvm/, llvm/tools/clang/'
@@ -33,9 +36,9 @@ function usage()
     echo '     patch file path'
     echo ' --patchInfo "APPLY_LOCATION;PATH"'
     echo '     patch apply target directory and patch file path'
-    echo ' --buildType [Release|Debug]'
+    echo ' --buildType "[Release|Debug]"'
     echo '     default is Release'
-    echo ' --projectBuilder [make|cmake]'
+    echo ' --projectBuilder "[make|cmake]"'
     echo '     default is cmake'
     echo ' --help'
 }
@@ -110,6 +113,21 @@ function generateCheckoutRootDirectoryName()
 
 declare -r LLVM_SVN_INFOS_FILE="llvm-svn.options"
 declare -r LLVM_SVN_INFOS_SRC_FILE="${LLVM_SVN_INFOS_FILE}.sample"
+declare -r LLVM_GIT_INFOS_FILE="llvm-git.options"
+declare -r LLVM_GIT_INFOS_SRC_FILE="${LLVM_GIT_INFOS_FILE}.sample"
+
+function loadVariablesOnOptionFile()
+{
+    local readonly OPTION_FILE_PATH=${1}
+    local readonly ORIGINAL_OPTION_FILE_PATH=${2}
+
+    cp -up "./${ORIGINAL_OPTION_FILE_PATH}" "./${OPTION_FILE_PATH}"
+
+    # overwrite vars load
+    if [ -e "./${OPTION_FILE_PATH}" ]; then
+        . "./${OPTION_FILE_PATH}"
+    fi
+}
 
 function loadSVNRepositoryInfos()
 {
@@ -119,6 +137,11 @@ function loadSVNRepositoryInfos()
     if [ -e "./${LLVM_SVN_INFOS_FILE}" ]; then
         . "./${LLVM_SVN_INFOS_FILE}"
     fi
+}
+
+function loadGITRepositoryInfos()
+{
+    loadVariablesOnOptionFile "${LLVM_GIT_INFOS_FILE}" "${LLVM_GIT_INFOS_SRC_FILE}"
 }
 
 function executeCheckoutBySVN()
@@ -166,7 +189,100 @@ function executeCheckoutBySVN()
 }
 
 
+function executeCheckoutByGIT()
+{
+    echo "----------git checkout phase----------"
+
+    loadGITRepositoryInfos
+
+    local readonly REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
+    local readonly REPOSITORY_URL="${GitCheckoutInfos[RepositoryURL]}"
+    local readonly DEFAULT_CHECKOUT_TAG="${GitCheckoutInfos[DefaultCheckoutTag]}"
+    local readonly FETCH="${GitCheckoutInfos[Fetch]}"
+    eval local ADDITIONAL_OPTIONS="\${${GitCheckoutInfos[AdditionalOptions]}}"
+
+    local CHECKOUT_TAG=${DEFAULT_CHECKOUT_TAG}
+
+    # checkout tag
+    if [ ${1} ]; then
+        CHECKOUT_TAG=${1}
+    fi
+
+
+    if [ -d ${REPOSITORY_NAME} ]; then
+        if ${FETCH}; then
+            pushd ${REPOSITORY_NAME}
+
+            echo "====fetch===="
+
+            git fetch
+            git fetch --tags
+
+            popd
+        fi
+    else
+        local readonly CMD_ARGS=("clone" "${REPOSITORY_URL}" "${ADDITIONAL_OPTIONS}")
+
+        echo "====clone detail===="
+        echo "repository   : ${REPOSITORY_NAME}"
+        echo "url          : ${REPOSITORY_URL}"
+        echo "command      : git ${CMD_ARGS[@]}"
+
+        git ${CMD_ARGS[@]}
+    fi
+
+    if [ -d ${REPOSITORY_NAME} ]; then
+        pushd ${REPOSITORY_NAME}
+
+        # branch clean
+        git clean -df
+
+        # branch checkout
+        local readonly START_POINT="refs/tags/${CHECKOUT_TAG}"
+        local readonly BRANCH=${CHECKOUT_TAG}
+        local readonly CMD_ARGS=("checkout" "--force" "-B" "${BRANCH}" "${START_POINT}")
+
+        echo "====checkout branch===="
+        echo "checkout tag : ${CHECKOUT_TAG}"
+        echo "command      : git ${CMD_ARGS[@]}"
+
+        git ${CMD_ARGS[@]}
+
+        popd
+    fi
+}
+
+
 function executePatchBySVN()
+{
+    local readonly CHECKOUTED_DIR=${1}
+    local readonly PATCH_APPLY_LOCATION=${2}
+    local readonly PATCH_PATH=${3}
+
+    echo "----------svn patch phase----------"
+    echo "CHECKOUTED_DIR       : ${CHECKOUTED_DIR}"
+    echo "PATCH_APPLY_LOCATION : ${PATCH_APPLY_LOCATION}"
+    echo "PATCH_PATH           : ${PATCH_PATH}"
+    pwd
+
+    if [ ! -d ${CHECKOUTED_DIR} ]; then
+        echo "not found checkout root directory"
+        return 1
+    fi
+
+    pushd ${CHECKOUTED_DIR}
+    pushd ${PATCH_APPLY_LOCATION}
+
+    svn patch ${PATCH_PATH}
+
+    popd
+    popd
+
+    return 0
+}
+
+
+function executePatchByGIT()
 {
     local readonly CHECKOUTED_DIR=${1}
     local readonly PATCH_APPLY_LOCATION=${2}
@@ -404,6 +520,7 @@ function executeBuilder()
     local TASK_CONFIGURE=
     local TASK_BUILD=
     local LLVM_VERSION=
+    local LLVM_CHECKOUT_TAG=
     local LLVM_MINOR_VERSION=
     local PATCH_APPLY_LOCATIONS=()
     local PATCH_PATHS=()
@@ -438,6 +555,10 @@ function executeBuilder()
                 LLVM_VERSION=${2}
                 shift 2
                 ;;
+            '--llvmCheckoutTag' )
+                LLVM_CHECKOUT_TAG=${2}
+                shift 2
+                ;;
             '--llvmMinorVersion' )
                 LLVM_MINOR_VERSION=${2}
                 shift 2
@@ -466,14 +587,16 @@ function executeBuilder()
     done
 
 
-    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
+    # local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
+    local readonly CHECKOUTED_DIR="."
 
 
     if [ ${TASK_CHECKOUT} ]; then
-       executeCheckoutBySVN ${LLVM_VERSION} ${LLVM_MINOR_VERSION}
+       # executeCheckoutBySVN ${LLVM_VERSION} ${LLVM_MINOR_VERSION}
+       executeCheckoutByGIT ${LLVM_CHECKOUT_TAG}
 
        if [ $? -ne 0 ]; then
-           echo "abort executeCheckoutBySVN"
+           echo "abort executeCheckoutByGIT"
            exit 1
        fi
     fi
@@ -482,7 +605,8 @@ function executeBuilder()
        if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ]; then
            local i
            for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i)); do
-               executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
+               # executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
+               executePatchByGIT ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
 
                if [ $? -ne 0 ]; then
                    echo "abort executePatchBySVN"
