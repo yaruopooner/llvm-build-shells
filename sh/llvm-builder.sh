@@ -14,28 +14,18 @@ function usage()
     echo
     echo 'Options:'
     echo ' --checkout'
-    echo '     checkout LLVM by SVN'
+    echo '     checkout LLVM by GIT'
     echo '     validate option > --llvmVersion'
     echo ' --patch'
-    echo '     apply patch by SVN'
-    echo '     validate option > --patchApplyLocation, --patchPath, --patchInfo'
+    echo '     apply patch by GIT'
+    echo '     The patch file path is referenced from "llvm.git.options"'
     echo ' --configure'
     echo '     generate Makefile'
     echo ' --build'
     echo '     execute make'
-    echo ' --llvmVersion [VersionNumber]'
-    echo '     LLVM checkout version'
-    echo '     default is trunk'
     echo ' --llvmCheckoutTag "CHECKOUT_TAG_NAME"'
     echo '     LLVM checkout tag name'
     echo '     default is leatest version tag'
-    echo ' --patchApplyLocation "APPLY_LOCATION"'
-    echo '     patch apply target relative directory from checkout directory'
-    echo '     example : llvm/, llvm/tools/clang/'
-    echo ' --patchPath "PATH"'
-    echo '     patch file path'
-    echo ' --patchInfo "APPLY_LOCATION;PATH"'
-    echo '     patch apply target directory and patch file path'
     echo ' --buildType "[Release|Debug]"'
     echo '     default is Release'
     echo ' --projectBuilder "[make|cmake]"'
@@ -46,26 +36,26 @@ function usage()
 
 function get_command_version()
 {
-    local readonly COMMAND="${1}"
-    local readonly RESULT=$( echo `${COMMAND} --version` )
-    local readonly REGEX_PATTERN='^.*([0-9]+\.[0-9]+\.[0-9]+).*$'
-    local readonly VERSION=$( echo "${RESULT}" | sed -r "s/${REGEX_PATTERN}/\1/" )
+    local -r COMMAND="${1}"
+    local -r RESULT=$( echo `${COMMAND} --version` )
+    local -r REGEX_PATTERN='^.*([0-9]+\.[0-9]+\.[0-9]+).*$'
+    local -r VERSION=$( echo "${RESULT}" | sed -r "s/${REGEX_PATTERN}/\1/" )
 
     echo "${VERSION}"
 }
 
 function is_valid_version()
 {
-    local readonly COMMAND="${1}"
-    local readonly REGEX_PATTERN='^.*([0-9]+)\.([0-9]+)\.([0-9]+).*$'
-    local readonly VERSION=$( get_command_version "${COMMAND}" )
-    local readonly MAJAR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
-    local readonly MINOR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
-    local readonly MAINTENANCE=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
-    local readonly REQUIRE_VERSION="${2}"
-    local readonly REQUIRE_MAJAR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
-    local readonly REQUIRE_MINOR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
-    local readonly REQUIRE_MAINTENANCE=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
+    local -r COMMAND="${1}"
+    local -r REGEX_PATTERN='^.*([0-9]+)\.([0-9]+)\.([0-9]+).*$'
+    local -r VERSION=$( get_command_version "${COMMAND}" )
+    local -r MAJAR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
+    local -r MINOR=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
+    local -r MAINTENANCE=$( echo "${VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
+    local -r REQUIRE_VERSION="${2}"
+    local -r REQUIRE_MAJAR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\1/" )
+    local -r REQUIRE_MINOR=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\2/" )
+    local -r REQUIRE_MAINTENANCE=$( echo "${REQUIRE_VERSION}" | sed -r "s/${REGEX_PATTERN}/\3/" )
 
     if $( [ ${MAJAR} -gt ${REQUIRE_MAJAR} ] || $( [ ${MAJAR} -eq ${REQUIRE_MAJAR} ] && $( [ ${MINOR} -gt ${REQUIRE_MINOR} ] || $( [ ${MINOR} -eq ${REQUIRE_MINOR} ] && [ ${MAINTENANCE} -ge ${REQUIRE_MAINTENANCE} ] ) ) ) ); then
         # valid
@@ -77,49 +67,13 @@ function is_valid_version()
 }
 
 
-function generateRepositoryRelativePath()
-{
-    local MAJOR_VERSION=trunk
-    local MINOR_VERSION=""
-    local REPOSITORY_PATH=${MAJOR_VERSION}
-
-    if [ ${1} ]; then
-        MAJOR_VERSION=${1}
-        if [ ${2} ]; then
-            MINOR_VERSION="dot${2}-"
-        fi
-        REPOSITORY_PATH="tags/RELEASE_${MAJOR_VERSION}/${MINOR_VERSION}final"
-    fi
-
-    echo "${REPOSITORY_PATH}"
-}
-
-
-function generateCheckoutRootDirectoryName()
-{
-    local MAJOR_VERSION=trunk
-    local MINOR_VERSION=""
-
-    if [ ${1} ]; then
-        MAJOR_VERSION=${1}
-        if [ ${2} ]; then
-            MINOR_VERSION="dot${2}-"
-        fi
-    fi
-
-    echo "llvm-${MAJOR_VERSION}${MINOR_VERSION}"
-}
-
-
-declare -r LLVM_SVN_INFOS_FILE="llvm-svn.options"
-declare -r LLVM_SVN_INFOS_SRC_FILE="${LLVM_SVN_INFOS_FILE}.sample"
 declare -r LLVM_GIT_INFOS_FILE="llvm-git.options"
 declare -r LLVM_GIT_INFOS_SRC_FILE="${LLVM_GIT_INFOS_FILE}.sample"
 
 function loadVariablesOnOptionFile()
 {
-    local readonly OPTION_FILE_PATH=${1}
-    local readonly ORIGINAL_OPTION_FILE_PATH=${2}
+    local -r OPTION_FILE_PATH=${1}
+    local -r ORIGINAL_OPTION_FILE_PATH=${2}
 
     cp -up "./${ORIGINAL_OPTION_FILE_PATH}" "./${OPTION_FILE_PATH}"
 
@@ -129,63 +83,9 @@ function loadVariablesOnOptionFile()
     fi
 }
 
-function loadSVNRepositoryInfos()
-{
-    cp -up "./${LLVM_SVN_INFOS_SRC_FILE}" "./${LLVM_SVN_INFOS_FILE}"
-
-    # overwrite vars load
-    if [ -e "./${LLVM_SVN_INFOS_FILE}" ]; then
-        . "./${LLVM_SVN_INFOS_FILE}"
-    fi
-}
-
 function loadGITRepositoryInfos()
 {
     loadVariablesOnOptionFile "${LLVM_GIT_INFOS_FILE}" "${LLVM_GIT_INFOS_SRC_FILE}"
-}
-
-function executeCheckoutBySVN()
-{
-    echo "----------svn checkout phase----------"
-
-    loadSVNRepositoryInfos
-
-    local readonly REPOSITORY_RPATH=`generateRepositoryRelativePath ${1} ${2}`
-    local readonly CO_ROOT_DIR=`generateCheckoutRootDirectoryName ${1} ${2}`
-
-    echo "repository partial path=${REPOSITORY_RPATH}"
-    echo "checkout root directory=${CO_ROOT_DIR}"
-
-    if [ -d ${CO_ROOT_DIR} ]; then
-        echo "remove old root directory ${CO_ROOT_DIR}"
-        rm -rf ${CO_ROOT_DIR}
-    fi
-    mkdir ${CO_ROOT_DIR}
-    pushd ${CO_ROOT_DIR}
-
-    # proxy がある場合は ~/.subversion/servers に host と port を指定
-
-    local CO_INFO
-
-    for CO_INFO in ${SvnCheckoutInfos[@]}; do
-        eval local CO_LOCATION="\${${CO_INFO}[location]}"
-        eval local CO_URL="\${${CO_INFO}[repository_url]}"
-        eval local CO_DIR="\${${CO_INFO}[checkout_dir]}"
-
-        echo "====checkout detail===="
-        echo "location     : ${CO_LOCATION}"
-        echo "url          : ${CO_URL}"
-        echo "checkout dir : ${CO_DIR}"
-        echo "command      : svn co ${CO_URL}${REPOSITORY_RPATH} ${CO_DIR}"
-
-        pushd "${CO_LOCATION}"
-        svn co "${CO_URL}${REPOSITORY_RPATH}" "${CO_DIR}"
-        popd
-    done
-
-    popd
-
-    echo "${CO_ROOT_DIR}"
 }
 
 
@@ -195,11 +95,11 @@ function executeCheckoutByGIT()
 
     loadGITRepositoryInfos
 
-    local readonly REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
-    local readonly REPOSITORY_URL="${GitCheckoutInfos[RepositoryURL]}"
-    local readonly DEFAULT_CHECKOUT_TAG="${GitCheckoutInfos[DefaultCheckoutTag]}"
-    local readonly FETCH="${GitCheckoutInfos[Fetch]}"
-    eval local ADDITIONAL_OPTIONS="\${${GitCheckoutInfos[AdditionalOptions]}}"
+    local -r REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
+    local -r REPOSITORY_URL="${GitCheckoutInfos[RepositoryURL]}"
+    local -r DEFAULT_CHECKOUT_TAG="${GitCheckoutInfos[DefaultCheckoutTag]}"
+    local -r FETCH="${GitCheckoutInfos[Fetch]}"
+    local -rn ADDITIONAL_OPTIONS="${GitCheckoutInfos[AdditionalOptions]}"
 
     local CHECKOUT_TAG=${DEFAULT_CHECKOUT_TAG}
 
@@ -221,7 +121,7 @@ function executeCheckoutByGIT()
             popd
         fi
     else
-        local readonly CMD_ARGS=("clone" "${REPOSITORY_URL}" "${ADDITIONAL_OPTIONS}")
+        local -r CMD_ARGS=("clone" "${REPOSITORY_URL}" "${ADDITIONAL_OPTIONS}")
 
         echo "====clone detail===="
         echo "repository   : ${REPOSITORY_NAME}"
@@ -238,9 +138,9 @@ function executeCheckoutByGIT()
         git clean -df
 
         # branch checkout
-        local readonly START_POINT="refs/tags/${CHECKOUT_TAG}"
-        local readonly BRANCH=${CHECKOUT_TAG}
-        local readonly CMD_ARGS=("checkout" "--force" "-B" "${BRANCH}" "${START_POINT}")
+        local -r START_POINT="refs/tags/${CHECKOUT_TAG}"
+        local -r BRANCH=${CHECKOUT_TAG}
+        local -r CMD_ARGS=("checkout" "--force" "-B" "${BRANCH}" "${START_POINT}")
 
         echo "====checkout branch===="
         echo "checkout tag : ${CHECKOUT_TAG}"
@@ -253,58 +153,28 @@ function executeCheckoutByGIT()
 }
 
 
-function executePatchBySVN()
-{
-    local readonly CHECKOUTED_DIR=${1}
-    local readonly PATCH_APPLY_LOCATION=${2}
-    local readonly PATCH_PATH=${3}
-
-    echo "----------svn patch phase----------"
-    echo "CHECKOUTED_DIR       : ${CHECKOUTED_DIR}"
-    echo "PATCH_APPLY_LOCATION : ${PATCH_APPLY_LOCATION}"
-    echo "PATCH_PATH           : ${PATCH_PATH}"
-    pwd
-
-    if [ ! -d ${CHECKOUTED_DIR} ]; then
-        echo "not found checkout root directory"
-        return 1
-    fi
-
-    pushd ${CHECKOUTED_DIR}
-    pushd ${PATCH_APPLY_LOCATION}
-
-    svn patch ${PATCH_PATH}
-
-    popd
-    popd
-
-    return 0
-}
-
-
 function executePatchByGIT()
 {
-    local readonly CHECKOUTED_DIR=${1}
-    local readonly PATCH_APPLY_LOCATION=${2}
-    local readonly PATCH_PATH=${3}
+    local -r REPOSITORY_DIR=${1}
+    local -r PATCH_PATH=${2}
+    local -r CMD_ARGS=("apply" "${PATCH_PATH}")
+    # local -r CMD_ARGS=("apply" "--check" "${PATCH_PATH}")
 
-    echo "----------svn patch phase----------"
-    echo "CHECKOUTED_DIR       : ${CHECKOUTED_DIR}"
-    echo "PATCH_APPLY_LOCATION : ${PATCH_APPLY_LOCATION}"
-    echo "PATCH_PATH           : ${PATCH_PATH}"
+    echo "----------git patch phase----------"
+    echo "repository_dir       : ${REPOSITORY_DIR}"
+    echo "patch_path           : ${PATCH_PATH}"
+    echo "command              : git ${CMD_ARGS[@]}"
     pwd
 
-    if [ ! -d ${CHECKOUTED_DIR} ]; then
-        echo "not found checkout root directory"
+    if [ ! -d ${REPOSITORY_DIR} ]; then
+        echo "not found repository directory"
         return 1
     fi
 
-    pushd ${CHECKOUTED_DIR}
-    pushd ${PATCH_APPLY_LOCATION}
+    pushd ${REPOSITORY_DIR}
 
-    svn patch ${PATCH_PATH}
+    git ${CMD_ARGS[@]}
 
-    popd
     popd
 
     return 0
@@ -314,9 +184,9 @@ function executePatchByGIT()
 function executeConfigure()
 {
     echo "----------configure phase----------"
-    local readonly CHECKOUTED_DIR="${1}"
-    local readonly BUILD_TYPE="${2}"
-    local readonly BUILD_DIR="build-${BUILD_TYPE}"
+    local -r CHECKOUTED_DIR="${1}"
+    local -r BUILD_TYPE="${2}"
+    local -r BUILD_DIR="build-${BUILD_TYPE}"
 
     echo "checkout root dir > ${CHECKOUTED_DIR}"
     echo "build type        > ${BUILD_TYPE}"
@@ -376,10 +246,10 @@ function executeConfigure()
 function executeConfigureByCMake()
 {
     echo "----------configure by cmake phase----------"
-    local readonly CHECKOUTED_DIR="${1}"
-    local readonly BUILD_TYPE="${2}"
-    local readonly BUILD_DIR="build-${BUILD_TYPE}"
-    local readonly REQUIRE_VERSION="3.4.3"
+    local -r CHECKOUTED_DIR="${1}"
+    local -r BUILD_TYPE="${2}"
+    local -r BUILD_DIR="build-${BUILD_TYPE}"
+    local -r REQUIRE_VERSION="3.4.3"
     
     if ! is_valid_version "cmake" "${REQUIRE_VERSION}"; then
         echo "cmake not enough version"
@@ -420,9 +290,9 @@ function executeBuild()
 {
     echo "----------build phase----------"
 
-    local readonly CHECKOUTED_DIR="${1}"
-    local readonly BUILD_TYPE="${2}"
-    local readonly BUILD_DIR="build-${BUILD_TYPE}"
+    local -r CHECKOUTED_DIR="${1}"
+    local -r BUILD_TYPE="${2}"
+    local -r BUILD_DIR="build-${BUILD_TYPE}"
 
     pushd ${CHECKOUTED_DIR}
     pushd ${BUILD_DIR}
@@ -440,9 +310,9 @@ function executeBuildByCMake()
 {
     echo "----------build by cmake phase----------"
 
-    local readonly CHECKOUTED_DIR="${1}"
-    local readonly BUILD_TYPE="${2}"
-    local readonly BUILD_DIR="build-${BUILD_TYPE}"
+    local -r CHECKOUTED_DIR="${1}"
+    local -r BUILD_TYPE="${2}"
+    local -r BUILD_DIR="build-${BUILD_TYPE}"
 
     pushd ${CHECKOUTED_DIR}
     pushd ${BUILD_DIR}
@@ -465,10 +335,6 @@ function executeRebuild()
     for OPT in $@
     do
         case $OPT in
-            '-llvmVersion' )
-                LLVM_VERSION=${2}
-                shift 2
-                ;;
             '-llvmMinorVersion' )
                 LLVM_MINOR_VERSION=${2}
                 shift 2
@@ -476,8 +342,8 @@ function executeRebuild()
         esac
     done
 
-    local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
-    local readonly BUILD_DIR="build"
+    local -r CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
+    local -r BUILD_DIR="build"
 
     
     echo "checkout root dir > ${CHECKOUTED_DIR}"
@@ -519,12 +385,7 @@ function executeBuilder()
     local TASK_PATCH=
     local TASK_CONFIGURE=
     local TASK_BUILD=
-    local LLVM_VERSION=
     local LLVM_CHECKOUT_TAG=
-    local LLVM_MINOR_VERSION=
-    local PATCH_APPLY_LOCATIONS=()
-    local PATCH_PATHS=()
-    local PATCH_INFOS=()
     local BUILD_TYPE="Release"
     local PROJECT_BUILDER="cmake"
 
@@ -551,28 +412,8 @@ function executeBuilder()
                 BUILD_TYPE=${2}
                 shift 2
                 ;;
-            '--llvmVersion' )
-                LLVM_VERSION=${2}
-                shift 2
-                ;;
             '--llvmCheckoutTag' )
                 LLVM_CHECKOUT_TAG=${2}
-                shift 2
-                ;;
-            '--llvmMinorVersion' )
-                LLVM_MINOR_VERSION=${2}
-                shift 2
-                ;;
-            '--patchApplyLocation' )
-                PATCH_APPLY_LOCATIONS+=(${2})
-                shift 2
-                ;;
-            '--patchPath' )
-                PATCH_PATHS+=(${2})
-                shift 2
-                ;;
-            '--patchInfo' )
-                PATCH_INFOS+=(${2})
                 shift 2
                 ;;
             '--projectBuilder' )
@@ -587,12 +428,10 @@ function executeBuilder()
     done
 
 
-    # local readonly CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
-    local readonly CHECKOUTED_DIR="."
+    local -r CHECKOUTED_DIR="."
 
 
     if [ ${TASK_CHECKOUT} ]; then
-       # executeCheckoutBySVN ${LLVM_VERSION} ${LLVM_MINOR_VERSION}
        executeCheckoutByGIT ${LLVM_CHECKOUT_TAG}
 
        if [ $? -ne 0 ]; then
@@ -602,34 +441,17 @@ function executeBuilder()
     fi
     
     if [ ${TASK_PATCH} ]; then
-       if [ ${#PATCH_PATHS[@]} -eq ${#PATCH_APPLY_LOCATIONS[@]} ]; then
-           local i
-           for ((i = 0; i < ${#PATCH_PATHS[@]}; ++i)); do
-               # executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
-               executePatchByGIT ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATIONS[$i]} ${PATCH_PATHS[$i]}
+        local -r REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
+        local -rn PATCHES="${GitCheckoutInfos[Patches]}"
 
-               if [ $? -ne 0 ]; then
-                   echo "abort executePatchBySVN"
-                   exit 1
-               fi
-           done
-       fi
+        for PATCH_PATH in "${PATCHES[@]}"; do
+            executePatchByGIT ${REPOSITORY_NAME} ${PATCH_PATH}
 
-       local readonly EXTRACT_PATTERN='([^;]+);(.*)'
-       local PATCH_INFO
-       for PATCH_INFO in "${PATCH_INFOS[@]}"; do
-           local PATCH_APPLY_LOCATION=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\1/" )
-           local PATCH_PATH=$( echo "${PATCH_INFO}" | sed -r "s/${EXTRACT_PATTERN}/\2/" )
-
-           if $( [ -n ${PATCH_APPLY_LOCATION} ] && [ -n ${PATCH_PATH} ] ); then
-               executePatchBySVN ${CHECKOUTED_DIR} ${PATCH_APPLY_LOCATION} ${PATCH_PATH}
-
-               if [ $? -ne 0 ]; then
-                   echo "abort executePatchBySVN"
-                   exit 1
-               fi
-           fi
-       done
+            if [ $? -ne 0 ]; then
+                echo "abort executePatchByGIT"
+                exit 1
+            fi
+        done
     fi
 
     if [ ${TASK_CONFIGURE} ]; then

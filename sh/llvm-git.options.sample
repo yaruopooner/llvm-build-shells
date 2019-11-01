@@ -3,11 +3,13 @@
 
 declare -ga LLVMPatches=(
     # llvm bug : fixed out of range access at container.
-    "../patch/bugfix000.patch"
+    "../../patch/bugfix000.patch"
+
     # llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
-    # "../patch/msvc2017-build-error-fixed.patch"
+    # "../../patch/msvc2017-build-error-fixed.patch"
+
     # This patch is for ac-clang of emacs package.
-    "../patch/invalidate-mmap.patch"
+    "../../patch/invalidate-mmap.patch"
 )
 
 declare -ga GitAdditionalOptions=(
