@@ -1,0 +1,16 @@
+# -*- mode: shell-script  coding: utf-8-unix -*-
+#! /bin/sh
+
+
+declare -rga CMakeAdditionalOptions=(
+    # "-Thost=x64"
+    # "-DCMAKE_BUILD_TYPE=Release"
+    # "-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;libcxx;libcxxabi;libunwind;lldb;compiler-rt;lld;polly"
+    "-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;libcxx;libcxxabi;libunwind;compiler-rt;lld;polly"
+)
+
+
+declare -rgA CMakeInfos=(
+    [AdditionalOptions]=CMakeAdditionalOptions
+)
+

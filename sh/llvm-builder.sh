@@ -69,6 +69,8 @@ function is_valid_version()
 
 declare -r LLVM_GIT_INFOS_FILE="llvm-git.options"
 declare -r LLVM_GIT_INFOS_SRC_FILE="${LLVM_GIT_INFOS_FILE}.sample"
+declare -r LLVM_CMAKE_INFOS_FILE="llvm-cmake.options"
+declare -r LLVM_CMAKE_INFOS_SRC_FILE="${LLVM_CMAKE_INFOS_FILE}.sample"
 
 function loadVariablesOnOptionFile()
 {
@@ -83,30 +85,27 @@ function loadVariablesOnOptionFile()
     fi
 }
 
-function loadGITRepositoryInfos()
+function loadGITCheckoutInfos()
 {
     loadVariablesOnOptionFile "${LLVM_GIT_INFOS_FILE}" "${LLVM_GIT_INFOS_SRC_FILE}"
 }
+
+function loadCMakeInfos()
+{
+    loadVariablesOnOptionFile "${LLVM_CMAKE_INFOS_FILE}" "${LLVM_CMAKE_INFOS_SRC_FILE}"
+}
+
 
 
 function executeCheckoutByGIT()
 {
     echo "----------git checkout phase----------"
 
-    loadGITRepositoryInfos
-
     local -r REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
     local -r REPOSITORY_URL="${GitCheckoutInfos[RepositoryURL]}"
-    local -r DEFAULT_CHECKOUT_TAG="${GitCheckoutInfos[DefaultCheckoutTag]}"
     local -r FETCH="${GitCheckoutInfos[Fetch]}"
+    local -r CHECKOUT_TAG=${1}
     local -rn ADDITIONAL_OPTIONS="${GitCheckoutInfos[AdditionalOptions]}"
-
-    local CHECKOUT_TAG=${DEFAULT_CHECKOUT_TAG}
-
-    # checkout tag
-    if [ ${1} ]; then
-        CHECKOUT_TAG=${1}
-    fi
 
 
     if [ -d ${REPOSITORY_NAME} ]; then
@@ -161,8 +160,8 @@ function executePatchByGIT()
     # local -r CMD_ARGS=("apply" "--check" "${PATCH_PATH}")
 
     echo "----------git patch phase----------"
-    echo "repository_dir       : ${REPOSITORY_DIR}"
-    echo "patch_path           : ${PATCH_PATH}"
+    echo "repository directory : ${REPOSITORY_DIR}"
+    echo "patch path           : ${PATCH_PATH}"
     echo "command              : git ${CMD_ARGS[@]}"
     pwd
 
@@ -188,8 +187,8 @@ function executeConfigure()
     local -r BUILD_TYPE="${2}"
     local -r BUILD_DIR="build-${BUILD_TYPE}"
 
-    echo "checkout root dir > ${CHECKOUTED_DIR}"
-    echo "build type        > ${BUILD_TYPE}"
+    echo "checkout repository directory : ${CHECKOUTED_DIR}"
+    echo "build type                    : ${BUILD_TYPE}"
 
     if [ ! -d ${CHECKOUTED_DIR} ]; then
         echo "not found checkout root directory"
@@ -246,9 +245,12 @@ function executeConfigure()
 function executeConfigureByCMake()
 {
     echo "----------configure by cmake phase----------"
-    local -r CHECKOUTED_DIR="${1}"
-    local -r BUILD_TYPE="${2}"
-    local -r BUILD_DIR="build-${BUILD_TYPE}"
+    local -r REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
+    local -r CHECKOUT_TAG=${1}
+    local -r BUILD_TYPE=${2}
+    local -rn ADDITIONAL_OPTIONS="${CMakeInfos[AdditionalOptions]}"
+    local -r BUILD_DIR="build"
+    local -r BUILD_VERSION="${CHECKOUT_TAG}"
     local -r REQUIRE_VERSION="3.4.3"
     
     if ! is_valid_version "cmake" "${REQUIRE_VERSION}"; then
@@ -258,28 +260,39 @@ function executeConfigureByCMake()
         return 1
     fi
 
-    echo "checkout root dir > ${CHECKOUTED_DIR}"
-    echo "build type        > ${BUILD_TYPE}"
+    echo "checkout repository directory : ${REPOSITORY_NAME}"
+    echo "build type                    : ${BUILD_TYPE}"
 
-    if [ ! -d ${CHECKOUTED_DIR} ]; then
-        echo "not found checkout root directory"
+    if [ ! -d ${REPOSITORY_NAME} ]; then
+        echo "not found repository directory"
         return 2
     fi
-    pushd ${CHECKOUTED_DIR}
 
-    # if [ ! -d ${BUILD_DIR} ]; then
-    #     # rm -rf ${BUILD_DIR}
-    #     mkdir ${BUILD_DIR}
-    # fi
-    if [ -d ${BUILD_DIR} ]; then
-        rm -rf ${BUILD_DIR}
+    pushd .
+    # build directory
+    if [ ! -d ${BUILD_DIR} ]; then
+        mkdir ${BUILD_DIR}
     fi
-    mkdir ${BUILD_DIR}
-    pushd ${BUILD_DIR}
+    cd ${BUILD_DIR}
 
-    cmake ../llvm -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+    # build version directory
+    if [ ! -d ${BUILD_VERSION} ]; then
+        mkdir ${BUILD_VERSION}
+    fi
+    cd ${BUILD_VERSION}
 
-    popd
+    # build type directory
+    if [ -d ${BUILD_TYPE} ]; then
+        rm -rf ${BUILD_TYPE}
+    fi
+    mkdir ${BUILD_TYPE}
+    cd ${BUILD_TYPE}
+
+    local -r CMD_ARGS=("../../../${REPOSITORY_NAME}/llvm" "-DCMAKE_BUILD_TYPE=${BUILD_TYPE}" "${ADDITIONAL_OPTIONS[@]}")
+
+    # echo "cmd_args:${CMD_ARGS[@]}"
+    cmake ${CMD_ARGS[@]}
+
     popd
 
     return 0
@@ -290,16 +303,19 @@ function executeBuild()
 {
     echo "----------build phase----------"
 
-    local -r CHECKOUTED_DIR="${1}"
-    local -r BUILD_TYPE="${2}"
-    local -r BUILD_DIR="build-${BUILD_TYPE}"
+    local -r REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
+    local -r CHECKOUT_TAG=${1}
+    local -r BUILD_TYPE=${2}
+    local -r BUILD_DIR="build"
+    local -r BUILD_VERSION="${CHECKOUT_TAG}"
 
-    pushd ${CHECKOUTED_DIR}
-    pushd ${BUILD_DIR}
+    pushd .
+    cd ${BUILD_DIR}
+    cd ${BUILD_VERSION}
+    cd ${BUILD_TYPE}
 
     make -j4
 
-    popd
     popd
 
     return 0
@@ -310,16 +326,19 @@ function executeBuildByCMake()
 {
     echo "----------build by cmake phase----------"
 
-    local -r CHECKOUTED_DIR="${1}"
-    local -r BUILD_TYPE="${2}"
-    local -r BUILD_DIR="build-${BUILD_TYPE}"
+    local -r REPOSITORY_NAME="${GitCheckoutInfos[RepositoryName]}"
+    local -r CHECKOUT_TAG=${1}
+    local -r BUILD_TYPE=${2}
+    local -r BUILD_DIR="build"
+    local -r BUILD_VERSION="${CHECKOUT_TAG}"
 
-    pushd ${CHECKOUTED_DIR}
-    pushd ${BUILD_DIR}
+    pushd .
+    cd ${BUILD_DIR}
+    cd ${BUILD_VERSION}
+    cd ${BUILD_TYPE}
 
     cmake --build .
 
-    popd
     popd
 
     return 0
@@ -431,6 +450,15 @@ function executeBuilder()
     local -r CHECKOUTED_DIR="."
 
 
+    loadGITCheckoutInfos
+    loadCMakeInfos
+
+    if [ ! ${LLVM_CHECKOUT_TAG} ]; then
+        local -r DEFAULT_CHECKOUT_TAG="${GitCheckoutInfos[DefaultCheckoutTag]}"
+
+        LLVM_CHECKOUT_TAG=${DEFAULT_CHECKOUT_TAG}
+    fi
+
     if [ ${TASK_CHECKOUT} ]; then
        executeCheckoutByGIT ${LLVM_CHECKOUT_TAG}
 
@@ -457,7 +485,7 @@ function executeBuilder()
     if [ ${TASK_CONFIGURE} ]; then
         case ${PROJECT_BUILDER} in
             'make' )
-                executeConfigure ${CHECKOUTED_DIR} ${BUILD_TYPE}
+                executeConfigure ${LLVM_CHECKOUT_TAG} ${BUILD_TYPE}
 
                 if [ $? -ne 0 ]; then
                     echo "abort executeConfigure"
@@ -465,7 +493,7 @@ function executeBuilder()
                 fi
                 ;;
             'cmake' )
-                executeConfigureByCMake ${CHECKOUTED_DIR} ${BUILD_TYPE}
+                executeConfigureByCMake ${LLVM_CHECKOUT_TAG} ${BUILD_TYPE}
 
                 if [ $? -ne 0 ]; then
                     echo "abort executeConfigureByCMake"
@@ -478,7 +506,7 @@ function executeBuilder()
     if [ ${TASK_BUILD} ]; then
         case ${PROJECT_BUILDER} in
             'make' )
-                executeBuild ${CHECKOUTED_DIR} ${BUILD_TYPE}
+                executeBuild ${LLVM_CHECKOUT_TAG} ${BUILD_TYPE}
 
                 if [ $? -ne 0 ]; then
                     echo "abort executeBuild"
@@ -486,7 +514,7 @@ function executeBuilder()
                 fi
                 ;;
             'cmake' )
-                executeBuildByCMake ${CHECKOUTED_DIR} ${BUILD_TYPE}
+                executeBuildByCMake ${LLVM_CHECKOUT_TAG} ${BUILD_TYPE}
 
                 if [ $? -ne 0 ]; then
                     echo "abort executeBuildByCMake"

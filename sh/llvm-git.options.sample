@@ -1,7 +1,7 @@
 # -*- mode: shell-script  coding: utf-8-unix -*-
 #! /bin/sh
 
-declare -ga LLVMPatches=(
+declare -rga LLVMPatches=(
     # llvm bug : fixed out of range access at container.
     "../../patch/bugfix000.patch"
 
@@ -12,7 +12,7 @@ declare -ga LLVMPatches=(
     "../../patch/invalidate-mmap.patch"
 )
 
-declare -ga GitAdditionalOptions=(
+declare -rga GitAdditionalOptions=(
     # "--config"
     # ,"http.[URL].proxy"
     # ,"http://[proxy]:[port]"
@@ -20,7 +20,7 @@ declare -ga GitAdditionalOptions=(
 
 
 # llvm 9.0.0
-declare -gA GitCheckoutInfos=(
+declare -rgA GitCheckoutInfos=(
     [RepositoryName]="llvm-project"
     [RepositoryURL]="https://github.com/llvm/llvm-project.git"
     [DefaultCheckoutTag]="llvmorg-9.0.0"
