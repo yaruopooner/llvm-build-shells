@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2019/11/06.14:01:14
+# last updated : 2019/11/06.14:20:22
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -16,7 +16,7 @@
 * Requirements
   The following is required.
 
-** GIT
+** Git
    #+begin_src shell-script
      $ sudo apt-get install git
    #+end_src

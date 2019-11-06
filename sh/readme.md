@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. Usage</a></li>
 <li><a href="#sec-2">2. Requirements</a>
 <ul>
-<li><a href="#sec-2-1">2.1. GIT</a></li>
+<li><a href="#sec-2-1">2.1. Git</a></li>
 <li><a href="#sec-2-2">2.2. CMake</a></li>
 <li><a href="#sec-2-3">2.3. Python 2.7.x</a></li>
 </ul>
@@ -32,7 +32,7 @@ Please edit it if necessary, for example the patch path.
 
 The following is required.  
 
-## GIT<a id="sec-2-1" name="sec-2-1"></a>
+## Git<a id="sec-2-1" name="sec-2-1"></a>
 
     $ sudo apt-get install git
 

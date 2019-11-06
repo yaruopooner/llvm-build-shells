@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. 使用方法</a></li>
 <li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
 <ul>
-<li><a href="#sec-2-1">2.1. GIT</a></li>
+<li><a href="#sec-2-1">2.1. Git</a></li>
 <li><a href="#sec-2-2">2.2. CMake</a></li>
 <li><a href="#sec-2-3">2.3. Python 2.7.x</a></li>
 </ul>
@@ -32,7 +32,7 @@ patchパスなど必要に応じて編集してください。
 
 以下が必要になります。  
 
-## GIT<a id="sec-2-1" name="sec-2-1"></a>
+## Git<a id="sec-2-1" name="sec-2-1"></a>
 
     $ sudo apt-get install git
 
@@ -61,7 +61,7 @@ patchパスなど必要に応じて編集してください。
 Bash版を使用します。  
 
 llvm-build-shellsでは以下を一括で行います。  
--   LLVMチェックアウト
+-   LLVMレポジトリのクローンとチェックアウト
 -   パッチ適用(optional)
 -   cmakeによるLLVM Makefile生成
 -   ビルド

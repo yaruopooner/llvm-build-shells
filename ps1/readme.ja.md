@@ -6,7 +6,7 @@
 <li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
 <ul>
 <li><a href="#sec-2-1">2.1. Visual Studio 2019/2017/2015/2013/2012/2010</a></li>
-<li><a href="#sec-2-2">2.2. Subversion</a></li>
+<li><a href="#sec-2-2">2.2. Git[必須]</a></li>
 <li><a href="#sec-2-3">2.3. CMake[必須]</a></li>
 <li><a href="#sec-2-4">2.4. Python 2.7.x[推奨]</a></li>
 <li><a href="#sec-2-5">2.5. MSYS2[非推奨]</a></li>
@@ -45,15 +45,12 @@ CYGWINやMSYSから実行すると実行時パス解釈がおかしくなるた�
 
 どれでもOK  
 
-## Subversion<a id="sec-2-2" name="sec-2-2"></a>
+## Git[必須]<a id="sec-2-2" name="sec-2-2"></a>
 
-<http://tortoisesvn.net/>  
+<https://git-scm.com/download/win>  
 
-ソリューションビルド時にsvnコマンドラインが呼び出されるのでTortoiseSVNにパスが通っている必要がある。  
-checkout/updateだけならCYGWINのsvnで可能だがお勧めしない。  
-svnを呼び出してリビジョンナンバーなどを埋め込んだヘッダファイルを生成したりするが  
-CYGWINのsvnだとパス解釈が正しく実行されない場合がありビルド時に該当ファイルがないといわれてしまうケースがある。  
-なのでCYGWINのshellなどから実行しないほうがよい。  
+PortableGit を使用します  
+sample.ps1でパスを設定する必要があります。  
 
 ## CMake[必須]<a id="sec-2-3" name="sec-2-3"></a>
 
@@ -121,7 +118,7 @@ sample.ps1でパスを設定する必要があります。
 Power Shell版を使用します。  
 
 llvm-build-shellsでは以下を一括で行います。  
--   LLVMチェックアウト
+-   LLVMレポジトリのクローンとチェックアウト
 -   パッチ適用(optional)
 -   cmakeによるLLVMソリューションファイル生成
 -   Visual Studio(MSBuild)によるビルド
