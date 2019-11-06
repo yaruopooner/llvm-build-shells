@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. 使用方法</a></li>
 <li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Subversion</a></li>
+<li><a href="#sec-2-1">2.1. GIT</a></li>
 <li><a href="#sec-2-2">2.2. CMake</a></li>
 <li><a href="#sec-2-3">2.3. Python 2.7.x</a></li>
 </ul>
@@ -32,11 +32,9 @@ patchパスなど必要に応じて編集してください。
 
 以下が必要になります。  
 
-## Subversion<a id="sec-2-1" name="sec-2-1"></a>
+## GIT<a id="sec-2-1" name="sec-2-1"></a>
 
-<http://tortoisesvn.net/>  
-
-    $ sudo apt-get install subversion subversion-tools
+    $ sudo apt-get install git
 
 ## CMake<a id="sec-2-2" name="sec-2-2"></a>
 
@@ -65,7 +63,7 @@ Bash版を使用します。
 llvm-build-shellsでは以下を一括で行います。  
 -   LLVMチェックアウト
 -   パッチ適用(optional)
--   configureによるLLVM Makefile生成
+-   cmakeによるLLVM Makefile生成
 -   ビルド
 
 ## パッチ<a id="sec-3-1" name="sec-3-1"></a>

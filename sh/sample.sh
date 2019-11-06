@@ -12,18 +12,11 @@ declare -r _LOG_FILE="llvm-build_${_START_DATE}.log"
 # please refer document. : ../patch/details.org
 
 
-# echo "llvm/tools/clang/;${_PATCH_PATH}/bugfix000.patch"
-
 # executeBuilder --help
 
-# executeBuilder --checkout --patch --configure --build --patchPath "${_PATCH_PATH}/invalidate-mmap.patch" --buildType "Debug" 2>&1 | tee "${_LOG_FILE}"
+# default
+executeBuilder --checkout --llvmCheckoutTag "${_LLVM_CHECKOUT_TAG}" --patch --configure --build 2>&1 | tee "release-${_LOG_FILE}"
 
-# executeBuilder --checkout --patch --configure --build --patchInfo "llvm/tools/clang/;${_PATCH_PATH}/bugfix000.patch" --patchInfo "llvm/;${_PATCH_PATH}/invalidate-mmap.patch" 2>&1 | tee "${_LOG_FILE}"
-# executeBuilder --checkout --patch --configure --build --patchInfo "llvm/tools/clang/;${_PATCH_PATH}/bugfix000.patch" 2>&1 | tee "${_LOG_FILE}"
-# executeBuilder --checkout --llvmCheckoutTag "${_LLVM_CHECKOUT_TAG}" --patch 2>&1 | tee "${_LOG_FILE}"
-
-# executeBuilder --checkout --patch --patchPath "${_PATCH_PATH}/invalidate-mmap.patch" 2>&1 | tee "prepare-${_LOG_FILE}"
-# executeBuilder --configure --build --buildType "Debug" --projectBuilder "cmake" 2>&1 | tee "debug-${_LOG_FILE}"
-# executeBuilder --configure --build --buildType "Release" --projectBuilder "cmake" 2>&1 | tee "release-${_LOG_FILE}"
-executeBuilder --checkout --patch --configure --projectBuilder "cmake" --build 2>&1 | tee "release-${_LOG_FILE}"
+# full option
+# executeBuilder --checkout --llvmCheckoutTag "${_LLVM_CHECKOUT_TAG}" --patch --configure --build --buildType "Release" --projectBuilder "cmake" 2>&1 | tee "release-${_LOG_FILE}"
 

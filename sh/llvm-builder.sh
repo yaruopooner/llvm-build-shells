@@ -3,34 +3,34 @@
 
 # build passed : 1.7.34(0.282/5/3) 2014-12-17 13:43 x86_64 Cygwin
 
-# $1 は 31 32 33 34 350 という書式で指定
-# $2 は 1 2 3 という書式で指定
-# $1 未指定の場合は trunk がバインドされる
-# チェックアウト先に同名ディレクトリがある場合は削除して作成するので注意
-
 function usage()
 {
     echo 'Usage: executeBuilder [OPTIONS]'
     echo
     echo 'Options:'
     echo ' --checkout'
-    echo '     checkout LLVM by GIT'
-    echo '     validate option > --llvmVersion'
+    echo '     checkout LLVM by git'
+    echo '     checkout tag is referenced from "llvm.git.options"'
+    echo '     or'
+    echo '     Specify option > --llvmCheckoutTag'
     echo ' --patch'
-    echo '     apply patch by GIT'
+    echo '     apply patch by git'
     echo '     The patch file path is referenced from "llvm.git.options"'
     echo ' --configure'
-    echo '     generate Makefile'
+    echo '     generate makefile by cmake'
+    echo '     The additional option is referenced from "llvm.cmake.options"'
     echo ' --build'
     echo '     execute make'
     echo ' --llvmCheckoutTag "CHECKOUT_TAG_NAME"'
-    echo '     LLVM checkout tag name'
+    echo '     The tag name to checkout from the LLVM repository'
     echo '     default is leatest version tag'
     echo ' --buildType "[Release|Debug]"'
     echo '     default is Release'
     echo ' --projectBuilder "[make|cmake]"'
+    echo '     Specify generator to use for project builder'
     echo '     default is cmake'
     echo ' --help'
+    echo '     This message'
 }
 
 
@@ -180,68 +180,6 @@ function executePatchByGIT()
 }
 
 
-function executeConfigure()
-{
-    echo "----------configure phase----------"
-    local -r CHECKOUTED_DIR="${1}"
-    local -r BUILD_TYPE="${2}"
-    local -r BUILD_DIR="build-${BUILD_TYPE}"
-
-    echo "checkout repository directory : ${CHECKOUTED_DIR}"
-    echo "build type                    : ${BUILD_TYPE}"
-
-    if [ ! -d ${CHECKOUTED_DIR} ]; then
-        echo "not found checkout root directory"
-        return 1
-    fi
-    pushd ${CHECKOUTED_DIR}
-
-    # if [ ! -d ${BUILD_DIR} ]; then
-    #     # rm -rf ${BUILD_DIR}
-    #     mkdir ${BUILD_DIR}
-    # fi
-    if [ -d ${BUILD_DIR} ]; then
-        rm -rf ${BUILD_DIR}
-    fi
-    mkdir ${BUILD_DIR}
-    pushd ${BUILD_DIR}
-
-
-    local CCACHE_CMD=""
-
-    if [ ${ENABLE_CCACHE} ]; then
-	    CCACHE_CMD="ccache "
-    fi
-
-    CC_CMD="${CCACHE_CMD}gcc"
-    CXX_CMD="${CCACHE_CMD}g++"
-
-    # CC と CXX を指定しないと何故かコケる
-    # CC=gcc CXX=g++ ../llvm/configure --enable-optimized --disable-docs --prefix=/opt/ll
-    # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
-    # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=x86,x86_64,cpp
-
-    # release options
-    local OPTIONS="--enable-optimized --enable-assertions=no --enable-targets=host-only"
-
-    if [ ${BUILD_TYPE} = "Debug" ]; then
-        OPTIONS="--disable-optimized --enable-assertions --enable-debug-runtime --enable-debug-symbols --enable-targets=host-only"
-    fi
-
-    CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure ${OPTIONS}
-    
-    # CC と CXX を指定しないと何故かコケる
-    # CC=gcc CXX=g++ ../llvm/configure --enable-optimized --disable-docs --prefix=/opt/ll
-    # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
-    # CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
-
-    popd
-    popd
-    
-    return 0
-}
-
-
 function executeConfigureByCMake()
 {
     echo "----------configure by cmake phase----------"
@@ -345,59 +283,6 @@ function executeBuildByCMake()
 }
 
 
-function executeRebuild()
-{
-    local LLVM_VERSION=
-    local LLVM_MINOR_VERSION=
-    local OPT
-
-    for OPT in $@
-    do
-        case $OPT in
-            '-llvmMinorVersion' )
-                LLVM_MINOR_VERSION=${2}
-                shift 2
-                ;;
-        esac
-    done
-
-    local -r CHECKOUTED_DIR=`generateCheckoutRootDirectoryName ${LLVM_VERSION} ${LLVM_MINOR_VERSION}`
-    local -r BUILD_DIR="build"
-
-    
-    echo "checkout root dir > ${CHECKOUTED_DIR}"
-
-    if [ ! -d ${CHECKOUTED_DIR} ]; then
-        echo "not found checkout root directory"
-        return 1
-    fi
-    cd ${CHECKOUTED_DIR}
-
-    if [ ! -d ${BUILD_DIR} ]; then
-        echo "not found build root directory"
-        return 1
-    fi
-    cd ${BUILD_DIR}
-
-
-    make clean
-
-    local CCACHE_CMD=""
-
-    if [ ${ENABLE_CCACHE} ]; then
-	    CCACHE_CMD="ccache "
-    fi
-
-    CC_CMD="${CCACHE_CMD}gcc"
-    CXX_CMD="${CCACHE_CMD}g++"
-    CC=${CC_CMD} CXX=${CXX_CMD} ../llvm/configure --enable-optimized --enable-assertions=no --enable-targets=host-only
-
-    make -j4
-
-    return 0
-}
-
-
 function executeBuilder()
 {
     local TASK_CHECKOUT=
@@ -483,24 +368,12 @@ function executeBuilder()
     fi
 
     if [ ${TASK_CONFIGURE} ]; then
-        case ${PROJECT_BUILDER} in
-            'make' )
-                executeConfigure ${LLVM_CHECKOUT_TAG} ${BUILD_TYPE}
+        executeConfigureByCMake ${LLVM_CHECKOUT_TAG} ${BUILD_TYPE}
 
-                if [ $? -ne 0 ]; then
-                    echo "abort executeConfigure"
-                    exit 1
-                fi
-                ;;
-            'cmake' )
-                executeConfigureByCMake ${LLVM_CHECKOUT_TAG} ${BUILD_TYPE}
-
-                if [ $? -ne 0 ]; then
-                    echo "abort executeConfigureByCMake"
-                    exit 1
-                fi
-                ;;
-        esac
+        if [ $? -ne 0 ]; then
+            echo "abort executeConfigureByCMake"
+            exit 1
+        fi
     fi
 
     if [ ${TASK_BUILD} ]; then

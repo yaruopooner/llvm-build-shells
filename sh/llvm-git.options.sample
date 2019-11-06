@@ -9,7 +9,7 @@ declare -rga LLVMPatches=(
     # "../../patch/msvc2017-build-error-fixed.patch"
 
     # This patch is for ac-clang of emacs package.
-    "../../patch/invalidate-mmap.patch"
+    # "../../patch/invalidate-mmap.patch"
 )
 
 declare -rga GitAdditionalOptions=(

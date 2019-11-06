@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2018/03/16.10:55:58
+# last updated : 2019/11/06.14:01:14
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -16,11 +16,9 @@
 * Requirements
   The following is required.
 
-** Subversion
-   http://tortoisesvn.net/
-
+** GIT
    #+begin_src shell-script
-     $ sudo apt-get install subversion subversion-tools
+     $ sudo apt-get install git
    #+end_src
 
 ** CMake
@@ -49,9 +47,9 @@
   Use Bash version.
 
   llvm-build-shells performs the following steps.
-  - LLVM checkout
+  - LLVM repository clone and checkout
   - Apply patch(optional)
-  - Makefile generation by configure
+  - Makefile generation by cmake
   - Build
     
 ** Patch
