@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2019/11/06.14:18:15
+# last updated : 2019/11/07.14:05:42
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -67,7 +67,7 @@
 
   =sample.ps1= に記述するツールパスは =./tools-latest-version/= へ展開されたパスを使用する。
 
-  デフォルトでは cmake と Python2.7.x(msys2) がダウンロードされます。
+  デフォルトでは PortableGit, Cmake, Python2.7.x(msys2) がダウンロードされます。
 
 ** +MSYS2について+ (現在非推奨)
    展開後に自動起動する MinGW64 シェルにおいて

@@ -98,7 +98,7 @@ sample.ps1でパスを設定する必要があります。
 
 `sample.ps1` に記述するツールパスは `./tools-latest-version/` へ展開されたパスを使用する。  
 
-デフォルトでは cmake と Python2.7.x(msys2) がダウンロードされます。  
+デフォルトでは PortableGit, Cmake, Python2.7.x(msys2) がダウンロードされます。  
 
 ## <del>MSYS2について</del> (現在非推奨)<a id="sec-3-1" name="sec-3-1"></a>
 

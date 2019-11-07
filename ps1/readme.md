@@ -100,7 +100,7 @@ Described software in `./tools-latest-version/tools-installer.options` will be d
 
 TOOL-PATH for described to a `sample.ps1` , use the `./tools-latest-version/` that has been archive-expand.  
 
-By default, cmake and Python 2.7.x (msys2) will be downloaded.  
+By default, PortableGit and Cmake and Python 2.7.x (msys2) will be downloaded.  
 
 ## <del>about MSYS2</del> (unrecommend)<a id="sec-3-1" name="sec-3-1"></a>
 
