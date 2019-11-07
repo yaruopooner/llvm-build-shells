@@ -1,7 +1,7 @@
 # -*- mode: powershell ; coding: utf-8-dos -*-
 
 
-function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask )
+function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask, [switch]$expandPathFromArchiveName, [string]$expandPath )
 {
     Write-Host "========== DownloadFromURI =========="
     Write-Host "#URI : ${uri}"
@@ -13,6 +13,12 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
         return
     }
 
+    if ( $expandPath.Length -eq 0 )
+    {
+        # current path
+        $expandPath = "./"
+    }
+
     # download
     Write-Host "---------- Download ----------"
     $downloaded_file = [System.IO.Path]::GetFileName( $uri )
@@ -21,7 +27,9 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     {
         Write-Host "#downloading : ${uri}"
         # Invoke-WebRequest -Uri $uri -OutFile $downloaded_file
-        Start-BitsTransfer -Source $uri -Destination $downloaded_file
+        # Start-BitsTransfer -Source $uri -Destination $downloaded_file
+        $wc = New-Object System.Net.WebClient
+        $wc.DownloadFile( $uri, $downloaded_file )
     }
     else
     {
@@ -35,33 +43,49 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
     {
         Write-Host "#expand : ${downloaded_file}"
 
-        $extension = [System.IO.Path]::GetExtension( $downloaded_file )
-        $expanded_path = [System.IO.Path]::GetFileNameWithoutExtension( $downloaded_file )
+        $archive_extension = [System.IO.Path]::GetExtension( $downloaded_file )
+        $archive_file_name = [System.IO.Path]::GetFileNameWithoutExtension( $downloaded_file )
 
-        if ( $extension -eq ".zip" )
+        if ( $expandPathFromArchiveName )
         {
-            if ( !( Test-Path -Path $expanded_path -PathType container ) )
+            $expandPath = $archive_file_name
+        }
+
+        if ( $archive_extension -eq ".zip" )
+        {
+            if ( !( Test-Path -Path $archive_file_name -PathType container ) )
             {
                 Write-Host "#expanding : ${downloaded_file}"
-                Expand-Archive -Path $downloaded_file -DestinationPath "./" -Force
+                Expand-Archive -Path $downloaded_file -DestinationPath $expandPath -Force
             }
         }
         $cmd = "./7za.exe"
-        if ( ( ( $extension -eq ".xz" ) -or ( $extension -eq ".gz" ) ) -and ( Test-Path $cmd ) )
+        if ( ( $archive_extension -ne ".zip" ) -and ( Test-Path $cmd ) )
         {
-            if ( !( Test-Path -Path $expanded_path -PathType any ) )
+            $archive_extension2 = [System.IO.Path]::GetExtension( $archive_file_name )
+            $is_tar = $archive_extension2 -eq ".tar"
+
+            $tmp_path = $expandPath
+
+            if ( $is_tar )
             {
-                Write-Host "#expanding : ${downloaded_file}"
-                & $cmd x $downloaded_file -aos
+                $tmp_path = "./"
             }
 
-            $extension2 = [System.IO.Path]::GetExtension( $expanded_path )
-            if ( $extension2 -eq ".tar" )
+            $check_path = Join-Path $tmp_path $archive_file_name
+
+            if ( !( Test-Path -Path $check_path -PathType container ) )
             {
-                $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $expanded_path )
-                if ( !( Test-Path -Path $extract_name -PathType any ) )
+                Write-Host "#expanding : ${downloaded_file}"
+                & $cmd x $downloaded_file -aos -o"${tmp_path}"
+            }
+
+            if ( $is_tar )
+            {
+                $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $archive_file_name )
+                if ( !( Test-Path -Path $extract_name -PathType container ) )
                 {
-                    & $cmd x $expanded_path -aos
+                    & $cmd x $archive_file_name -aos -o"${expandPath}"
                 }
             }
         }

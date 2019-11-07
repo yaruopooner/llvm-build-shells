@@ -1,67 +1,25 @@
 # -*- mode: powershell ; coding: utf-8-dos -*-
 
 
-# llvm 4.00
-$global:GitCheckoutInfos = @(
+# llvm 9.00
+$global:GitCheckoutInfos = @{
     # LLVM
-    @{
-        location = "";
-        repository_url = "http://llvm.org/git/llvm.git"
-        checkout_dir = "llvm"
-    }
-    # Clang
-    ,@{
-        location = "llvm/tools";
-        repository_url = "http://llvm.org/git/clang.git"
-        checkout_dir = "clang";
-    }
-    # Clang tools [Optional]:
-    ,@{
-        location = "llvm/tools/clang/tools";
-        repository_url = "http://llvm.org/git/clang-tools-extra.git"
-        checkout_dir = "extra";
-    }
-    # LLD linker [Optional]:
-    ,@{
-        location = "llvm/tools";
-        repository_url = "http://llvm.org/git/lld.git"
-        checkout_dir = "lld";
-    }
-    # Polly Loop Optimizer [Optional]:
-    # ,@{
-    #     location = "llvm/tools";
-    #     repository_url = "http://llvm.org/git/polly.git"
-    #     checkout_dir = "polly";
-    # }
-    # Compiler-RT (required to build the sanitizers) [Optional]:
-    ,@{
-        location = "llvm/projects";
-        repository_url = "http://llvm.org/git/compiler-rt.git"
-        checkout_dir = "compiler-rt";
-    }
-    # Libomp (required for OpenMP support) [Optional]:
-    # ,@{
-    #     location = "llvm/projects";
-    #     repository_url = "http://llvm.org/git/openmp.git"
-    #     checkout_dir = "openmp";
-    # }
-    # libcxx [Optional]:
-    ,@{
-        location = "llvm/projects";
-        repository_url = "http://llvm.org/git/libcxx.git"
-        checkout_dir = "libcxx";
-    }
-    # libcxxabi [Optional]:
-    ,@{
-        location = "llvm/projects";
-        repository_url = "http://llvm.org/git/libcxxabi.git"
-        checkout_dir = "libcxxabi";
-    }
-    # Test Suite Source Code [Optional]:
-    # ,@{
-    #     location = "llvm/projects";
-    #     repository_url = "http://llvm.org/git/test-suite.git"
-    #     checkout_dir = "test-suite";
-    # }
-)
+    RepositoryName = "llvm-project";
+    RepositoryURL = "https://github.com/llvm/llvm-project.git";
+    DefaultCheckoutTag = "llvmorg-9.0.0";
+    Fetch = $false;
+    Patches = @(
+        # llvm bug : fixed out of range access at container.
+        "../patch/bugfix000.patch"
+        # llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
+        # ,"../patch/msvc2017-build-error-fixed.patch"
+        # This patch is for ac-clang of emacs package.
+        ,"../patch/invalidate-mmap.patch"
+    );
+    AdditionalOptions = @(
+        # "--config"
+        # ,"http.[URL].proxy"
+        # ,"http://[proxy]:[port]"
+    );
+}
 

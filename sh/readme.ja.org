@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2018/03/16.10:55:32
+# last updated : 2019/11/06.14:20:03
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -16,11 +16,9 @@
 * セルフビルドに必要なソフトウェア
   以下が必要になります。
 
-** Subversion
-   http://tortoisesvn.net/
-
+** Git
    #+begin_src shell-script
-     $ sudo apt-get install subversion subversion-tools
+     $ sudo apt-get install git
    #+end_src
 
 ** CMake
@@ -49,9 +47,9 @@
   Bash版を使用します。
 
   llvm-build-shellsでは以下を一括で行います。
-  - LLVMチェックアウト
+  - LLVMレポジトリのクローンとチェックアウト
   - パッチ適用(optional)
-  - configureによるLLVM Makefile生成
+  - cmakeによるLLVM Makefile生成
   - ビルド
 
 ** パッチ

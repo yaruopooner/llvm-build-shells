@@ -1,0 +1,13 @@
+# -*- mode: powershell ; coding: utf-8-dos -*-
+
+
+$global:CMakeInfos = @{
+    AdditionalOptions = @(
+        "-Thost=x64"
+        ,"-DCMAKE_BUILD_TYPE=Release"
+        # LLVM
+        # ,"-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;libcxx;libcxxabi;libunwind;lldb;compiler-rt;lld;polly"
+        ,"-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;libcxx;libcxxabi;libunwind;compiler-rt;lld;polly"
+    );
+}
+
