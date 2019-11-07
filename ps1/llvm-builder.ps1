@@ -399,7 +399,7 @@ function executeCheckout( [ref]$result )
             Write-Host $cmd_args
             & $cmd $cmd_args
             # fetch all tags
-            $cmd_args = @("fetch" "--tags")
+            $cmd_args = @("fetch", "--tags")
             Write-Host $cmd_args
             & $cmd $cmd_args
 
@@ -587,7 +587,9 @@ function executeCMake( [ref]$result )
 
     # Write-Host ( "CMAKE.Platform {0}" $LLVMBuildEnv.CMAKE.Platform )
 
-    $base_options = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "-A", $LLVMBuildEnv.CMAKE.Platform, "..\..\..\llvm-project\llvm")
+    $cmake_project_path = "..\..\..\" + $global:GitCheckoutInfos.RepositoryName + "\llvm"
+
+    $base_options = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "-A", $LLVMBuildEnv.CMAKE.Platform, $cmake_project_path)
 
     # add external options
     $cmd_args = $base_options + $global:CMakeInfos.AdditionalOptions
