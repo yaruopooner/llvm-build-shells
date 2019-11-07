@@ -1,0 +1,31 @@
+# -*- mode: shell-script  coding: utf-8-unix -*-
+#! /bin/sh
+
+declare -rga LLVMPatches=(
+    # llvm bug : fixed out of range access at container.
+    "../../patch/bugfix000.patch"
+
+    # llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
+    # "../../patch/msvc2017-build-error-fixed.patch"
+
+    # This patch is for ac-clang of emacs package.
+    # "../../patch/invalidate-mmap.patch"
+)
+
+declare -rga GitAdditionalOptions=(
+    # "--config"
+    # ,"http.[URL].proxy"
+    # ,"http://[proxy]:[port]"
+)
+
+
+# llvm 9.0.0
+declare -rgA GitCheckoutInfos=(
+    [RepositoryName]="llvm-project"
+    [RepositoryURL]="https://github.com/llvm/llvm-project.git"
+    [DefaultCheckoutTag]="llvmorg-9.0.0"
+    [Fetch]=false
+    [Patches]=LLVMPatches
+    [AdditionalOptions]=GitAdditionalOptions
+)
+

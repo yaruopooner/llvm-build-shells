@@ -1,7 +1,6 @@
-Index: include/llvm/ADT/DenseSet.h
-===================================================================
---- include/llvm/ADT/DenseSet.h	(revision 297704)
-+++ include/llvm/ADT/DenseSet.h	(working copy)
+diff --git a/llvm/include/llvm/ADT/DenseSet.h b/llvm/include/llvm/ADT/DenseSet.h
+--- a/llvm/include/llvm/ADT/DenseSet.h
++++ b/llvm/include/llvm/ADT/DenseSet.h
 @@ -104,7 +104,9 @@
      Iterator(const typename MapTy::iterator &i) : I(i) {}
  

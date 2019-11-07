@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. Usage</a></li>
 <li><a href="#sec-2">2. Requirements</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Subversion</a></li>
+<li><a href="#sec-2-1">2.1. Git</a></li>
 <li><a href="#sec-2-2">2.2. CMake</a></li>
 <li><a href="#sec-2-3">2.3. Python 2.7.x</a></li>
 </ul>
@@ -32,11 +32,9 @@ Please edit it if necessary, for example the patch path.
 
 The following is required.  
 
-## Subversion<a id="sec-2-1" name="sec-2-1"></a>
+## Git<a id="sec-2-1" name="sec-2-1"></a>
 
-<http://tortoisesvn.net/>  
-
-    $ sudo apt-get install subversion subversion-tools
+    $ sudo apt-get install git
 
 ## CMake<a id="sec-2-2" name="sec-2-2"></a>
 
@@ -63,9 +61,9 @@ You should have it if on Linux.
 Use Bash version.  
 
 llvm-build-shells performs the following steps.  
--   LLVM checkout
+-   LLVM repository clone and checkout
 -   Apply patch(optional)
--   Makefile generation by configure
+-   Makefile generation by cmake
 -   Build
 
 ## Patch<a id="sec-3-1" name="sec-3-1"></a>

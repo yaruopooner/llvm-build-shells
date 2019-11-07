@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2019/04/09.11:00:28
+# last updated : 2019/11/07.14:05:42
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -20,14 +20,11 @@
 ** Visual Studio 2019/2017/2015/2013/2012/2010
    どれでもOK
 
-** Subversion
-   http://tortoisesvn.net/
+** Git[必須]
+   https://git-scm.com/download/win
 
-   ソリューションビルド時にsvnコマンドラインが呼び出されるのでTortoiseSVNにパスが通っている必要がある。
-   checkout/updateだけならCYGWINのsvnで可能だがお勧めしない。
-   svnを呼び出してリビジョンナンバーなどを埋め込んだヘッダファイルを生成したりするが
-   CYGWINのsvnだとパス解釈が正しく実行されない場合がありビルド時に該当ファイルがないといわれてしまうケースがある。
-   なのでCYGWINのshellなどから実行しないほうがよい。
+   PortableGit を使用します
+   sample.ps1でパスを設定する必要があります。
 
 ** CMake[必須]
    http://www.cmake.org/
@@ -70,7 +67,7 @@
 
   =sample.ps1= に記述するツールパスは =./tools-latest-version/= へ展開されたパスを使用する。
 
-  デフォルトでは cmake と Python2.7.x(msys2) がダウンロードされます。
+  デフォルトでは PortableGit, Cmake, Python2.7.x(msys2) がダウンロードされます。
 
 ** +MSYS2について+ (現在非推奨)
    展開後に自動起動する MinGW64 シェルにおいて
@@ -88,7 +85,7 @@
   Power Shell版を使用します。
 
   llvm-build-shellsでは以下を一括で行います。
-  - LLVMチェックアウト
+  - LLVMレポジトリのクローンとチェックアウト
   - パッチ適用(optional)
   - cmakeによるLLVMソリューションファイル生成
   - Visual Studio(MSBuild)によるビルド

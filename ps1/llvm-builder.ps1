@@ -6,27 +6,15 @@
 # $tasks = @("CHECKOUT")
 # $tasks = @("PROJECT")
 
-# $patchInfos = @( 
-#     @{
-#         # apply a patch to relative path from checkout root dir .
-#         applyLocation = "llvm/";
-#         # patch absolute path
-#         absolutePath = "ac-clang/clang-server/patch/invalidate-mmap.patch";
-#     }
-#     ,@{
-#         applyLocation = "llvm/tools/clang/";
-#         absolutePath = "ac-clang/clang-server/patch/libclang-x86_64.patch";
-#     }
-# )
-
-
-# $llvmVersion = 350
 # $platform = 32
 
 
-$SvnCheckoutInfos = @()
-$LLVMSvnOptionFile = "./llvm-svn.options"
-$LLVMSvnOptionSrcFile = "${LLVMSvnOptionFile}.sample"
+$GitCheckoutInfos = @()
+$LLVMGitOptionFile = "./llvm-git.options"
+$LLVMGitOptionSrcFile = "${LLVMGitOptionFile}.sample"
+$CMakeInfos = @()
+$LLVMCMakeOptionFile = "./llvm-cmake.options"
+$LLVMCMakeOptionSrcFile = "${LLVMCMakeOptionFile}.sample"
 
 
 # $cmakePath = "c:/cygwin-x86_64/tmp/cmake-3.0.2-win32-x86/bin"
@@ -39,13 +27,12 @@ $projectPath = Split-Path $scriptPath -Parent
 $LLVMBuildInput = @{}
 
 $LLVMBuildEnv = @{
-    LLVMBuildVersion = "trunk";
-    CheckoutRepository = "trunk";
+    LLVMBuildVersion = "llvmorg-9.0.0";
     WorkingDir = ".";
-    CheckoutRootDir = "";
     BuildDir = "";
 
-    SVN = @{
+    GIT = @{
+        ExecPath = "";
     };
 
     CMAKE = @{
@@ -294,22 +281,48 @@ function messageHelp()
 }
 
 
-
-function setupCommonVariables()
+function setupVariablesOnOptionFile( [string]$inOptionFilePath, [string]$inOriginalOptionFilePath )
 {
-    # common
-    if ( $LLVMBuildInput.llvmVersion -gt 0 )
+    # setup option file
+    if ( Test-Path -Path $inOptionFilePath -PathType leaf )
     {
-        $LLVMBuildEnv.LLVMBuildVersion = $LLVMBuildInput.llvmVersion
-        $LLVMBuildEnv.CheckoutRepository = ( "tags/RELEASE_{0}/final" -f $LLVMBuildInput.llvmVersion )
+        $src_time = ( Get-ItemProperty -Path $inOriginalOptionFilePath ).LastWriteTime.Ticks
+        $dest_time = ( Get-ItemProperty -Path $inOptionFilePath ).LastWriteTime.Ticks
+
+        if ( $src_time -gt $dest_time )
+        {
+            Copy-Item -Path $inOriginalOptionFilePath -Destination $inOptionFilePath -Force
+        }
     }
     else
     {
-        $LLVMBuildEnv.LLVMBuildVersion = "trunk"
-        $LLVMBuildEnv.CheckoutRepository = "trunk"
+        Copy-Item -Path $inOriginalOptionFilePath -Destination $inOptionFilePath
     }
 
-    $LLVMBuildEnv.CheckoutRootDir = "llvm-" + $LLVMBuildEnv.LLVMBuildVersion
+    # overwrite option-files variables
+    # load to $global: variables
+    if ( Test-Path -Path $inOptionFilePath -PathType leaf )
+    {
+        Get-Content $inOptionFilePath -Raw | Invoke-Expression
+    }
+}
+
+
+function setupCommonVariables()
+{
+    setupVariablesOnOptionFile -inOptionFilePath $LLVMGitOptionFile -inOriginalOptionFilePath $LLVMGitOptionSrcFile
+    setupVariablesOnOptionFile -inOptionFilePath $LLVMCMakeOptionFile -inOriginalOptionFilePath $LLVMCMakeOptionSrcFile
+
+    # common
+    if ( $LLVMBuildInput.llvmCheckoutTag.Length -ne 0 )
+    {
+        $LLVMBuildEnv.LLVMBuildVersion = $LLVMBuildInput.llvmCheckoutTag
+    }
+    else
+    {
+        $LLVMBuildEnv.LLVMBuildVersion = $global:GitCheckoutInfos.DefaultCheckoutTag
+    }
+
     $LLVMBuildEnv.WorkingDir = "."
 
     if ( $LLVMBuildInput.workingDirectory -ne "" )
@@ -323,107 +336,114 @@ function setupCommonVariables()
     }
 }
 
+
+
+
 function executeCommon()
 {
 }
 
 
-# SVN funcs
+# GIT funcs
 
 
 function messageCheckoutEnvironment()
 {
     Write-Host "LLVM build target  = " + $LLVMBuildEnv.LLVMBuildVersion
-    Write-Host "checkout repository = " + $LLVMBuildEnv.CheckoutRepository
-    Write-Host "checkout root directory  = " + $LLVMBuildEnv.CheckoutRootDir
     Write-Host "working directory   = " + $LLVMBuildEnv.WorkingDir
 }
 
+
+
+# GIT funcs
+
 function setupCheckoutVariables( [ref]$result )
 {
-    # setup svn repository URI
-    if ( Test-Path -Path $LLVMSvnOptionFile -PathType leaf )
-    {
-        $src_time = ( Get-ItemProperty -Path $LLVMSvnOptionSrcFile ).LastWriteTime.Ticks
-        $dest_time = ( Get-ItemProperty -Path $LLVMSvnOptionFile ).LastWriteTime.Ticks
-     
-        if ( $src_time -gt $dest_time )
-        {
-            Copy-Item -Path $LLVMSvnOptionSrcFile -Destination $LLVMSvnOptionFile -Force
-        }
-    }
-    else
-    {
-        Copy-Item -Path $LLVMSvnOptionSrcFile -Destination $LLVMSvnOptionFile
-    }
-     
-    # overwrite svn vars load
-    # load to $global:SvnCheckoutInfos
-    if ( Test-Path -Path $LLVMSvnOptionFile -PathType leaf )
-    {
-        Get-Content $LLVMSvnOptionFile -Raw | Invoke-Expression
-    }
-
-    $result.value = $true
+    $LLVMBuildEnv.GIT.ExecPath = $LLVMBuildInput.gitPath
 }
 
-function executeCheckoutBySVN( [ref]$result )
+function executeCheckout( [ref]$result )
 {
-    pushd $LLVMBuildEnv.WorkingDir
-
-    $checkout_root_dir = $LLVMBuildEnv.CheckoutRootDir
-
-    $sync_result = $true
-    syncNewDirectory -targetPath $checkout_root_dir -result ([ref]$sync_result)
-    if ( !$sync_result )
+    if ( $LLVMBuildEnv.GIT.ExecPath -ne "" )
     {
-        $result.value = $false
-
-        return
+        prependToEnvPath -path $LLVMBuildEnv.GIT.ExecPath
     }
 
+    pushd $LLVMBuildEnv.WorkingDir
 
-    # proxy がある場合は ~/.subversion/servers に host と port を指定
-    $cmd = "svn"
-    $checkout_infos = Clone-Object -DeepCopyObject $global:SvnCheckoutInfos
+    # proxy がある場合は ~/.gitconfig に host と port を指定 or AdditionalOptions に記述
+    $checkout_infos = Clone-Object -DeepCopyObject $global:GitCheckoutInfos
 
     # normalized PATH and URI
 
     # normalize format
-    # $checkout_infos = @(
+    # $global:GitCheckoutInfos = @(
     #     # LLVM
-    #     @{
-    #         location = $checkout_root_dir;
-    #         repository_url = "http://llvm.org/svn/llvm-project/llvm/" + $LLVMBuildEnv.CheckoutRepository;
-    #         checkout_dir = "llvm"
-    #     }
-    #     # Clang
-    #     ,@{
-    #         location = Join-Path $checkout_root_dir "llvm/tools";
-    #         repository_url = "http://llvm.org/svn/llvm-project/cfe/" + $LLVMBuildEnv.CheckoutRepository;
-    #         checkout_dir = "clang";
-    #     }
+    #     RepositoryURL = "https://github.com/llvm/llvm-project.git";
+    #     DefaultCheckoutTag = "llvmorg-9.0.0";
+    #     Fetch = $false;
     # )
 
-    foreach ( $info in $checkout_infos )
-    {
-        $info.location = Join-Path $checkout_root_dir $info.location
-        $info.repository_url += $LLVMBuildEnv.CheckoutRepository
 
-        # Write-Host $info.location
-        # Write-Host $info.repository_url
+    $cmd = "git"
+
+    # check exist repository
+    if ( Test-Path $checkout_infos.RepositoryName )
+    {
+        if ( $checkout_infos.Fetch )
+        {
+            pushd $checkout_infos.RepositoryName
+
+            # fetch
+            $cmd_args = @("fetch")
+            Write-Host $cmd_args
+            & $cmd $cmd_args
+            # fetch all tags
+            $cmd_args = @("fetch", "--tags")
+            Write-Host $cmd_args
+            & $cmd $cmd_args
+
+            popd
+        }
+    }
+    else
+    {
+        # clone
+        $base_options = @("clone", "--config", "core.autocrlf=false", $checkout_infos.RepositoryURL)
+
+        # add external options
+        $cmd_args = $base_options + $checkout_infos.AdditionalOptions
+
+        Write-Host $cmd_args
+        & $cmd $cmd_args
     }
 
-    foreach ( $info in $checkout_infos )
+    # checkout branch
+    if ( Test-Path $checkout_infos.RepositoryName )
     {
-        pushd $info.location
-        $cmd_args = @("co", "--force", $info.repository_url, $info.checkout_dir)
+        pushd $checkout_infos.RepositoryName
+
+        $tag = $LLVMBuildEnv.LLVMBuildVersion
+
+        # branch clean
+        $cmd_args = @("clean", "-df")
+        Write-Host $cmd_args
         & $cmd $cmd_args
+
+        # branch reset
+        # $cmd_args = @("reset", "--hard")
         # Write-Host $cmd_args
+        # & $cmd $cmd_args
+
+        # branch checkout
+        $start_point = "refs/tags/" + $tag
+        $branch = $tag
+        $cmd_args = @("checkout", "--force", "-B", $branch, $start_point)
+        Write-Host $cmd_args
+        & $cmd $cmd_args
+
         popd
     }
-
-    popd
 
     $result.value = $true
 }
@@ -433,22 +453,30 @@ function executeCheckoutBySVN( [ref]$result )
 
 function setupPatchVariables( [ref]$result )
 {
+    $LLVMBuildEnv.GIT.ExecPath = $LLVMBuildInput.gitPath
+
     $result.value = $true
 }
 
-function executePatchBySVN( [ref]$result )
+function executePatch( [ref]$result )
 {
-    $checkout_root_dir = $LLVMBuildEnv.CheckoutRootDir
-    pushd $checkout_root_dir
-
-    $cmd = "svn"
-
-    foreach ( $info in $LLVMBuildInput.patchInfos )
+    if ( $LLVMBuildEnv.GIT.ExecPath -ne "" )
     {
-        pushd $info.applyLocation
-        $cmd_args = @("patch", $info.absolutePath)
+        prependToEnvPath -path $LLVMBuildEnv.GIT.ExecPath
+    }
+
+    pushd $global:GitCheckoutInfos.RepositoryName
+
+    $cmd = "git"
+
+    foreach ( $patch in $global:GitCheckoutInfos.Patches )
+    {
+        $resolved_path = ( Resolve-Path ( Join-Path $scriptPath $patch ) )
+
+        $cmd_args = @("apply", $resolved_path)
+        # $cmd_args = @("apply", "--check", $resolved_path)
+        Write-Host $cmd_args
         & $cmd $cmd_args
-        popd
     }
 
     popd
@@ -528,35 +556,44 @@ function executeCMake( [ref]$result )
     }
 
     pushd $LLVMBuildEnv.WorkingDir
-    cd $LLVMBuildEnv.CheckoutRootDir
 
-    # local vars
-    $build_dir = $LLVMBuildEnv.BuildDir
-    $platform_dir = $LLVMBuildEnv.CMAKE.PlatformDir
-
-    if ( !( Test-Path $build_dir ) )
+    # build directory
+    if ( !( Test-Path $LLVMBuildEnv.BuildDir ) )
     {
-        New-Item -name $build_dir -type directory
+        New-Item -name $LLVMBuildEnv.BuildDir -type directory
     }
-    cd $build_dir
+    cd $LLVMBuildEnv.BuildDir
 
+    # llvm build version directory
+    if ( !( Test-Path $LLVMBuildEnv.LLVMBuildVersion ) )
+    {
+        New-Item -name $LLVMBuildEnv.LLVMBuildVersion -type directory
+    }
+    cd $LLVMBuildEnv.LLVMBuildVersion
+
+    # platform directory
     $sync_result = $true
-    syncNewDirectory -targetPath $platform_dir -result ([ref]$sync_result)
+    syncNewDirectory -targetPath $LLVMBuildEnv.CMAKE.PlatformDir -result ([ref]$sync_result)
     if ( !$sync_result )
     {
         $result.value = $false
 
         return
     }
-
     
-    cd $platform_dir
+    cd $LLVMBuildEnv.CMAKE.PlatformDir
 
     $cmd = "cmake"
 
     # Write-Host ( "CMAKE.Platform {0}" $LLVMBuildEnv.CMAKE.Platform )
 
-    $cmd_args = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "-A", $LLVMBuildEnv.CMAKE.Platform, "..\..\llvm", "-Thost=x64")
+    $cmake_project_path = "..\..\..\" + $global:GitCheckoutInfos.RepositoryName + "\llvm"
+
+    $base_options = @("-G", $LLVMBuildEnv.CMAKE.GeneratorName, "-A", $LLVMBuildEnv.CMAKE.Platform, $cmake_project_path)
+
+    # add external options
+    $cmd_args = $base_options + $global:CMakeInfos.AdditionalOptions
+
 
     & $cmd $cmd_args
 
@@ -819,8 +856,8 @@ function executeBuild( [ref]$result )
     importScriptEnvVariables -script $LLVMBuildEnv.BUILD.VsCmdPrompt -scriptArg $LLVMBuildEnv.BUILD.VsCmdPromptArg
 
     pushd $LLVMBuildEnv.WorkingDir
-    cd $LLVMBuildEnv.CheckoutRootDir
     cd $LLVMBuildEnv.BuildDir
+    cd $LLVMBuildEnv.LLVMBuildVersion
     cd $LLVMBuildEnv.BUILD.PlatformDir
 
     # return
@@ -855,7 +892,7 @@ $phase_infos = @{
         };
         execute = {
             param( [ref]$result )
-            executeCheckoutBySVN -result $result
+            executeCheckout -result $result
         };
     };
     PATCH = @{
@@ -865,7 +902,7 @@ $phase_infos = @{
         };
         execute = {
             param( [ref]$result )
-            executePatchBySVN -result $result
+            executePatch -result $result
         };
     };
     PROJECT = @{
@@ -951,38 +988,38 @@ function executeBuilder
 {
     Param( 
         [array]$tasks = @(), 
-        [int]$llvmVersion,
+        [string]$llvmCheckoutTag,
         [string]$workingDirectory = ".", 
         [int]$msvcProductName = 2013, 
         [string]$target, 
         [int]$platform = 64, 
         [string]$configuration = "Release", 
         [string]$additionalProperties, 
+        [string]$gitPath, 
         [string]$cmakePath, 
         [string]$pythonPath, 
         [string]$msys2Path, 
         [string]$gnu32Path, 
         [string]$toolsPrependPath, 
-        [string]$toolsAppendPath, 
-        [array]$patchInfos
+        [string]$toolsAppendPath
     )
 
     $LLVMBuildInput = @{
         tasks = $tasks;
-        llvmVersion = $llvmVersion;
+        llvmCheckoutTag = $llvmCheckoutTag;
         workingDirectory = $workingDirectory;
         msvcProductName = $msvcProductName;
         target = $target;
         platform = $platform;
         configuration = $configuration;
         additionalProperties = $additionalProperties;
+        gitPath = $gitPath;
         cmakePath = $cmakePath;
         pythonPath = $pythonPath;
         msys2Path = $msys2Path;
         gnu32Path = $gnu32Path;
         toolsPrependPath = $toolsPrependPath;
         toolsAppendPath = $toolsAppendPath;
-        patchInfos = $patchInfos;
     }
 
     $setup_result = $true
@@ -1015,7 +1052,7 @@ function executeBuilder
 }
 
 # Write-Host $LLVMBuildEnv
-# Write-Host $LLVMBuildEnv.SVN
+# Write-Host $LLVMBuildEnv.GIT
 # Write-Host $LLVMBuildEnv.CMAKE
 # Write-Host $LLVMBuildEnv.BUILD
 # Write-Host $env:Path

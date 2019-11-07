@@ -15,12 +15,14 @@ $global:DOWNLOAD_LIST = @(
         # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.14-1-any.pkg.tar.xz";
         # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.13-1-any.pkg.tar.xz";
         expand = $true;
+        expandPath = "msys64";
     }
     # ,@{ # Python2.x [msys2(x86)] http://repo.msys2.org/mingw/i686/
     #     uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-5-any.pkg.tar.xz";
     #     # uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-1-any.pkg.tar.xz";
     #     # uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.13-1-any.pkg.tar.xz";
     #     expand = $true;
+    #     expandPath = "msys64";
     # }
     # ,@{ # MSYS2
     #     uri = "http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20170918.tar.xz"
@@ -56,4 +58,9 @@ $global:DOWNLOAD_LIST = @(
     #     uri = "http://jaist.dl.sourceforge.net/project/getgnuwin32/getgnuwin32/0.6.30/GetGnuWin32-0.6.3.exe";
     #     install = $true;
     # }
+    ,@{ # PortableGit
+        uri = "https://github.com/git-for-windows/git/releases/download/v2.23.0.windows.1/PortableGit-2.23.0-64-bit.7z.exe"
+        expand = $true;
+        expandPath = "PortableGit-2.23.0-x86_64";
+    }
 )

@@ -6,7 +6,7 @@
 <li><a href="#sec-2">2. Requirements</a>
 <ul>
 <li><a href="#sec-2-1">2.1. Visual Studio 2019/2017/2015/2013/2012/2010[required]</a></li>
-<li><a href="#sec-2-2">2.2. Subversion[required]</a></li>
+<li><a href="#sec-2-2">2.2. Git[required]</a></li>
 <li><a href="#sec-2-3">2.3. CMake[required]</a></li>
 <li><a href="#sec-2-4">2.4. Python 2.7.x[recommend]</a></li>
 <li><a href="#sec-2-5">2.5. MSYS2[unrecommend]</a></li>
@@ -47,11 +47,12 @@ The following is required.
 
 any ok.  
 
-## Subversion[required]<a id="sec-2-2" name="sec-2-2"></a>
+## Git[required]<a id="sec-2-2" name="sec-2-2"></a>
 
-<http://tortoisesvn.net/>  
+<https://git-scm.com/download/win>  
 
-svn Should not use from CYGWIN or MSYS.  
+Use the PortableGit.  
+You need to set the PATH in sample.ps1.  
 
 ## CMake[required]<a id="sec-2-3" name="sec-2-3"></a>
 
@@ -99,7 +100,7 @@ Described software in `./tools-latest-version/tools-installer.options` will be d
 
 TOOL-PATH for described to a `sample.ps1` , use the `./tools-latest-version/` that has been archive-expand.  
 
-By default, cmake and Python 2.7.x (msys2) will be downloaded.  
+By default, PortableGit and Cmake and Python 2.7.x (msys2) will be downloaded.  
 
 ## <del>about MSYS2</del> (unrecommend)<a id="sec-3-1" name="sec-3-1"></a>
 
@@ -119,7 +120,7 @@ it is necessary to set such http\_proxy by editing the `setup-msys2.options` .
 Use Power Shell version.  
 
 llvm-build-shells performs the following step at a time.  
--   LLVM checkout
+-   LLVM repository clone and checkout
 -   apply patch(optional)
 -   project files generation by CMake
 -   build by Visual Studio(MSBuild)
