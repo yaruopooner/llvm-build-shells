@@ -11,7 +11,7 @@ $python = Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;"
 
 . $builderShell
 
-$llvmCheckoutTag = "llvmorg-9.0.0"
+$llvmCheckoutTag = "llvmorg-10.0.0"
 $msvcProductName = 2019
 # $msvcProductName = 2017
 

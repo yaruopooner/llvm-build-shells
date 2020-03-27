@@ -6,7 +6,7 @@ $global:GitCheckoutInfos = @{
     # LLVM
     RepositoryName = "llvm-project";
     RepositoryURL = "https://github.com/llvm/llvm-project.git";
-    DefaultCheckoutTag = "llvmorg-9.0.0";
+    DefaultCheckoutTag = "llvmorg-10.0.0";
     Fetch = $false;
     Patches = @(
         # llvm bug : fixed out of range access at container.

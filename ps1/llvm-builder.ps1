@@ -469,6 +469,15 @@ function executePatch( [ref]$result )
 
     $cmd = "git"
 
+    # branch reset execute before apply the patch
+    if ( $global:GitCheckoutInfos.Patches.Length -ne 0 )
+    {
+        $cmd_args = @("reset", "--hard")
+        Write-Host $cmd_args
+        & $cmd $cmd_args
+    }
+
+    # apply the patch
     foreach ( $patch in $global:GitCheckoutInfos.Patches )
     {
         $resolved_path = ( Resolve-Path ( Join-Path $scriptPath $patch ) )
