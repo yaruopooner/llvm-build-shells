@@ -2,7 +2,8 @@
 
 $global:DOWNLOAD_LIST = @(
     @{ # CMAKE
-        uri = "https://cmake.org/files/v3.14/cmake-3.14.1-win64-x64.zip"
+        uri = "https://cmake.org/files/v3.17/cmake-3.17.0-win64-x64.zip"
+        # uri = "https://cmake.org/files/v3.14/cmake-3.14.1-win64-x64.zip"
         # uri = "https://cmake.org/files/v3.10/cmake-3.10.2-win64-x64.zip";
         # uri = "https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.zip";
         # uri = "https://cmake.org/files/v3.6/cmake-3.6.2-win64-x64.zip";
