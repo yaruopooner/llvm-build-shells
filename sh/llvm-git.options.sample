@@ -24,7 +24,7 @@ declare -rgA GitCheckoutInfos=(
     [RepositoryName]="llvm-project"
     [RepositoryURL]="https://github.com/llvm/llvm-project.git"
     [DefaultCheckoutTag]="llvmorg-10.0.0"
-    [Fetch]=false
+    [Fetch]=true
     [Patches]=LLVMPatches
     [AdditionalOptions]=GitAdditionalOptions
 )
