@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. 使用方法</a></li>
 <li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Visual Studio 2019/2017/2015/2013/2012/2010</a></li>
+<li><a href="#sec-2-1">2.1. Visual Studio 2019/2017</a></li>
 <li><a href="#sec-2-2">2.2. Git[必須]</a></li>
 <li><a href="#sec-2-3">2.3. CMake[必須]</a></li>
 <li><a href="#sec-2-4">2.4. Python 2.7.x[推奨]</a></li>
@@ -41,9 +41,10 @@ CYGWINやMSYSから実行すると実行時パス解釈がおかしくなるた�
 
 以下が必要になります。  
 
-## Visual Studio 2019/2017/2015/2013/2012/2010<a id="sec-2-1" name="sec-2-1"></a>
+## Visual Studio 2019/2017<a id="sec-2-1" name="sec-2-1"></a>
 
 どれでもOK  
+LLVMは2015/2013/2012/2010のサポートを終了しました。  
 
 ## Git[必須]<a id="sec-2-2" name="sec-2-2"></a>
 
@@ -57,6 +58,7 @@ sample.ps1でパスを設定する必要があります。
 <http://www.cmake.org/>  
 
 Windows ZIPをダウンロードして何処かへ展開。  
+なるべく最新版を使用してください。  
 Visual Studio ソリューション＆プロジェクトファイル生成と、カスタムビルドステップ時のスクリプト実行で使用される。  
 sample.ps1でパスを設定する必要があります。  
 
