@@ -2,8 +2,9 @@ $launchPath = Split-Path $myInvocation.MyCommand.path -Parent
 $builderShell = Join-Path $launchPath 'llvm-builder.ps1'
 
 $git = Join-Path $launchPath "tools-latest-version/PortableGit-2.23.0-x86_64/mingw64/bin"
-$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.17.0-win64-x64/bin"
-$python = Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;"
+# $cmake = Join-Path $launchPath "tools-latest-version/cmake-3.17.0-win64-x64/bin"
+$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.18.0-rc3-win64-x64/bin"
+$python = Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin"
 # $msys2 = Join-Path $launchPath "tools-latest-version/msys64/usr/bin"
 # $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + ( Join-Path $launchPath "tools-latest-version/msys64/usr/bin" )
 # $gnu32 = "c:/cygwin-x86_64/tmp/llvm-build-shells/ps1/tools-latest-version/GnuWin32/bin"
@@ -31,7 +32,10 @@ executeBuilder -tasks @("CHECKOUT", "PATCH", "PROJECT", "BUILD") -llvmCheckoutTa
 # executeBuilder -tasks @("CHECKOUT", "PATCH") -llvmCheckoutTag $llvmCheckoutTag -gitPath $git
 # executeBuilder -tasks @("PROJECT", "BUILD") -llvmCheckoutTag $llvmCheckoutTag -msvcProductName $msvcProductName -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python -target $target
 # executeBuilder -tasks @("PROJECT", "BUILD") -llvmCheckoutTag $llvmCheckoutTag -msvcProductName $msvcProductName -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python
+# executeBuilder -tasks @("PROJECT", "GENERATE_BUILD_BAT") -llvmCheckoutTag $llvmCheckoutTag -msvcProductName $msvcProductName -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python
+# executeBuilder -tasks @("BUILD") -llvmCheckoutTag $llvmCheckoutTag -msvcProductName $msvcProductName -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python
 # executeBuilder -tasks @("PROJECT", "BUILD") -llvmCheckoutTag $llvmCheckoutTag -msvcProductName $msvcProductName -platform 32 -configuration "Release" -cmakePath $cmake -pythonPath $python
+# executeBuilder -tasks @("GENERATE_BUILD_BAT") -llvmCheckoutTag $llvmCheckoutTag -msvcProductName $msvcProductName -platform 64 -configuration "Release" -cmakePath $cmake -pythonPath $python
 
 
 # LLVM Parts Build (single task)

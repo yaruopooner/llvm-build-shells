@@ -2,7 +2,9 @@
 
 $global:DOWNLOAD_LIST = @(
     @{ # CMAKE
-        uri = "https://cmake.org/files/v3.17/cmake-3.17.0-win64-x64.zip"
+        # uri = "https://cmake.org/files/v3.19/cmake-3.19.4-win64-x64.zip"
+        uri = "https://cmake.org/files/v3.18/cmake-3.18.0-rc3-win64-x64.zip"
+        # uri = "https://cmake.org/files/v3.17/cmake-3.17.0-win64-x64.zip"
         # uri = "https://cmake.org/files/v3.14/cmake-3.14.1-win64-x64.zip"
         # uri = "https://cmake.org/files/v3.10/cmake-3.10.2-win64-x64.zip";
         # uri = "https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.zip";
@@ -10,7 +12,9 @@ $global:DOWNLOAD_LIST = @(
         expand = $true;
     }
     ,@{ # Python2.x [msys2(x64)] http://repo.msys2.org/mingw/x86_64/
-        uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.16-1-any.pkg.tar.xz"
+        uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.18-1-any.pkg.tar.xz"
+        # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.17-2-any.pkg.tar.xz"
+        # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.16-1-any.pkg.tar.xz"
         # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.14-5-any.pkg.tar.xz";
         # uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-5-any.pkg.tar.xz";
         # uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-python2-2.7.14-1-any.pkg.tar.xz";
@@ -60,6 +64,7 @@ $global:DOWNLOAD_LIST = @(
     #     install = $true;
     # }
     ,@{ # PortableGit
+        # uri = "https://github.com/git-for-windows/git/releases/download/v2.27.0.windows.1/PortableGit-2.27.0-64-bit.7z.exe"
         uri = "https://github.com/git-for-windows/git/releases/download/v2.23.0.windows.1/PortableGit-2.23.0-64-bit.7z.exe"
         expand = $true;
         expandPath = "PortableGit-2.23.0-x86_64";
