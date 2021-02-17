@@ -920,7 +920,11 @@ function executeGenerateBuildBat( [ref]$result )
     $cmd = "msbuild"
     $target = $LLVMBuildEnv.BUILD.Target
     $properties = "/p:Platform=" + $LLVMBuildEnv.BUILD.Platform + ";Configuration=" + $LLVMBuildEnv.BUILD.Configuration + $LLVMBuildEnv.BUILD.AdditionalProperties
-    $cmd_args = @("LLVM.sln", $target, $properties, "/maxcpucount", "/fileLogger")
+    # quiet/minimal/normal/detailed/diagnostic
+    # safety option is quiet/minimal/normal. 
+    # if specify detailed/diagnostic, msbuild will crash.
+    # maybe cause is the huge size of msbuild-log file.
+    $cmd_args = @("LLVM.sln", $target, $properties, "/maxcpucount", "/flp:verbosity=normal")
 
     # & $cmd $cmd_args
     $build_bat_contents += "${cmd} ${cmd_args}" + $new_line
