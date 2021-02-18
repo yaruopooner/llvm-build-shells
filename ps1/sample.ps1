@@ -2,8 +2,7 @@ $launchPath = Split-Path $myInvocation.MyCommand.path -Parent
 $builderShell = Join-Path $launchPath 'llvm-builder.ps1'
 
 $git = Join-Path $launchPath "tools-latest-version/PortableGit-2.23.0-x86_64/mingw64/bin"
-# $cmake = Join-Path $launchPath "tools-latest-version/cmake-3.17.0-win64-x64/bin"
-$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.18.0-rc3-win64-x64/bin"
+$cmake = Join-Path $launchPath "tools-latest-version/cmake-3.19.5-win64-x64/bin"
 $python = Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin"
 # $msys2 = Join-Path $launchPath "tools-latest-version/msys64/usr/bin"
 # $msys2 = ( Join-Path $launchPath "tools-latest-version/msys64/mingw64/bin;" ) + ( Join-Path $launchPath "tools-latest-version/msys64/usr/bin" )
