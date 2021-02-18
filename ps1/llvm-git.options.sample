@@ -1,13 +1,13 @@
 # -*- mode: powershell ; coding: utf-8-dos -*-
 
 
-# llvm 9.00
+# llvm 10.0.0
 $global:GitCheckoutInfos = @{
     # LLVM
     RepositoryName = "llvm-project";
     RepositoryURL = "https://github.com/llvm/llvm-project.git";
-    DefaultCheckoutTag = "llvmorg-9.0.0";
-    Fetch = $false;
+    DefaultCheckoutTag = "llvmorg-10.0.0";
+    Fetch = $true;
     Patches = @(
         # llvm bug : fixed out of range access at container.
         "../patch/bugfix000.patch"

@@ -469,6 +469,15 @@ function executePatch( [ref]$result )
 
     $cmd = "git"
 
+    # branch reset execute before apply the patch
+    if ( $global:GitCheckoutInfos.Patches.Length -ne 0 )
+    {
+        $cmd_args = @("reset", "--hard")
+        Write-Host $cmd_args
+        & $cmd $cmd_args
+    }
+
+    # apply the patch
     foreach ( $patch in $global:GitCheckoutInfos.Patches )
     {
         $resolved_path = ( Resolve-Path ( Join-Path $scriptPath $patch ) )
@@ -864,9 +873,70 @@ function executeBuild( [ref]$result )
     $cmd = "msbuild"
     $target = $LLVMBuildEnv.BUILD.Target
     $properties = "/p:Platform=" + $LLVMBuildEnv.BUILD.Platform + ";Configuration=" + $LLVMBuildEnv.BUILD.Configuration + $LLVMBuildEnv.BUILD.AdditionalProperties
-    $cmd_args = @("LLVM.sln", $target, $properties, "/maxcpucount", "/fileLogger")
+    # quiet/minimal/normal/detailed/diagnostic
+    # safety option is quiet/minimal/normal. 
+    # if specify detailed/diagnostic, msbuild will crash.
+    # maybe cause is the huge size of msbuild-log file.
+    $cmd_args = @("LLVM.sln", $target, $properties, "/maxcpucount", "/flp:verbosity=normal")
 
     & $cmd $cmd_args
+
+    if ( -not $? )
+    {
+        Write-Host "failed msbuild"
+        $result.value = $false
+
+        popd
+
+        return
+    }
+
+    popd
+
+    $result.value = $true
+}
+
+function executeGenerateBuildBat( [ref]$result )
+{
+    if ( $LLVMBuildEnv.BUILD.Gnu32Path -ne "" )
+    {
+        prependToEnvPath -path $LLVMBuildEnv.BUILD.Gnu32Path
+    }
+
+    # $script = $LLVMBuildEnv.BUILD.VsCmdPrompt
+    # $scriptArg = $LLVMBuildEnv.BUILD.VsCmdPromptArg
+    importScriptEnvVariables -script $LLVMBuildEnv.BUILD.VsCmdPrompt -scriptArg $LLVMBuildEnv.BUILD.VsCmdPromptArg
+    $new_line = "`r`n"
+
+
+    $build_bat_contents = "call `"" + $LLVMBuildEnv.BUILD.VsCmdPrompt + "`" " + $LLVMBuildEnv.BUILD.VsCmdPromptArg + $new_line
+
+    # $build_bat_contents += "pushd " + $LLVMBuildEnv.WorkingDir + $new_line
+    # $build_bat_contents += "cd " + $LLVMBuildEnv.BuildDir + $new_line
+    # $build_bat_contents += "cd " + $LLVMBuildEnv.LLVMBuildVersion + $new_line
+    $build_bat_contents += "cd " + $LLVMBuildEnv.BUILD.PlatformDir + $new_line
+
+    # return
+    $cmd = "msbuild"
+    $target = $LLVMBuildEnv.BUILD.Target
+    $properties = "/p:Platform=" + $LLVMBuildEnv.BUILD.Platform + ";Configuration=" + $LLVMBuildEnv.BUILD.Configuration + $LLVMBuildEnv.BUILD.AdditionalProperties
+    # quiet/minimal/normal/detailed/diagnostic
+    # safety option is quiet/minimal/normal. 
+    # if specify detailed/diagnostic, msbuild will crash.
+    # maybe cause is the huge size of msbuild-log file.
+    $cmd_args = @("LLVM.sln", $target, $properties, "/maxcpucount", "/flp:verbosity=normal")
+
+    # & $cmd $cmd_args
+    $build_bat_contents += "${cmd} ${cmd_args}" + $new_line
+
+    $build_bat_contents += "PAUSE" + $new_line
+
+    # output
+    pushd $LLVMBuildEnv.WorkingDir
+    cd $LLVMBuildEnv.BuildDir
+    cd $LLVMBuildEnv.LLVMBuildVersion
+
+    $build_bat_contents | Set-Content -Encoding ASCII -path ($LLVMBuildEnv.BUILD.PlatformDir + ".bat")
 
     if ( -not $? )
     {
@@ -923,6 +993,16 @@ $phase_infos = @{
         execute = {
             param( [ref]$result )
             executeBuild -result $result
+        };
+    };
+    GENERATE_BUILD_BAT = @{
+        setup = {
+            param( [ref]$result )
+            setupBuildVariables -result $result
+        };
+        execute = {
+            param( [ref]$result )
+            executeGenerateBuildBat -result $result
         };
     };
     TEST = @{

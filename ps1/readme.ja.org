@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2019/11/07.14:05:42
+# last updated : 2020/03/31.18:32:07
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -17,8 +17,9 @@
 * セルフビルドに必要なソフトウェア
   以下が必要になります。
 
-** Visual Studio 2019/2017/2015/2013/2012/2010
+** Visual Studio 2019/2017
    どれでもOK
+   LLVMは2015/2013/2012/2010のサポートを終了しました。
 
 ** Git[必須]
    https://git-scm.com/download/win
@@ -30,6 +31,7 @@
    http://www.cmake.org/
 
    Windows ZIPをダウンロードして何処かへ展開。
+   なるべく最新版を使用してください。
    Visual Studio ソリューション＆プロジェクトファイル生成と、カスタムビルドステップ時のスクリプト実行で使用される。
    sample.ps1でパスを設定する必要があります。
 	

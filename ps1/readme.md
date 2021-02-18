@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. Usage</a></li>
 <li><a href="#sec-2">2. Requirements</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Visual Studio 2019/2017/2015/2013/2012/2010[required]</a></li>
+<li><a href="#sec-2-1">2.1. Visual Studio 2019/2017</a></li>
 <li><a href="#sec-2-2">2.2. Git[required]</a></li>
 <li><a href="#sec-2-3">2.3. CMake[required]</a></li>
 <li><a href="#sec-2-4">2.4. Python 2.7.x[recommend]</a></li>
@@ -43,9 +43,10 @@ There is a need to launch from the Windows CMD or EXPLORER.
 
 The following is required.  
 
-## Visual Studio 2019/2017/2015/2013/2012/2010[required]<a id="sec-2-1" name="sec-2-1"></a>
+## Visual Studio 2019/2017<a id="sec-2-1" name="sec-2-1"></a>
 
 any ok.  
+LLVM has ended support for the 2015/2013/2012/2010.  
 
 ## Git[required]<a id="sec-2-2" name="sec-2-2"></a>
 
@@ -59,6 +60,7 @@ You need to set the PATH in sample.ps1.
 <http://www.cmake.org/>  
 
 You download The Windows ZIP and decompress to somewhere.  
+Please use the latest version.  
 CMake generate a Visual Studio solution and project file.  
 And it is used in the execution on script of custom build step.  
 You need to set the PATH in sample.ps1.  

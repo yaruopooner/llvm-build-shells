@@ -172,6 +172,8 @@ function executePatchByGIT()
 
     pushd ${REPOSITORY_DIR}
 
+    git reset --hard
+
     git ${CMD_ARGS[@]}
 
     popd
