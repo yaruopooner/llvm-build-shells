@@ -1,7 +1,7 @@
 # -*- mode: powershell ; coding: utf-8-dos -*-
 
 
-function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask, [switch]$expandPathFromArchiveName, [string]$expandPath )
+function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [switch]$install, [scriptBlock]$afterTask, [switch]$expandPathFromArchiveName, [string]$expandPath, [switch]$expandBy7zip )
 {
     Write-Host "========== DownloadFromURI =========="
     Write-Host "#URI : ${uri}"
@@ -51,44 +51,77 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
             $expandPath = $archive_file_name
         }
 
-        if ( $archive_extension -eq ".zip" )
+        if ( $expandBy7zip )
         {
-            if ( !( Test-Path -Path $archive_file_name -PathType container ) )
+            # 7zip
+            if ( $archive_extension -eq ".zip" )
             {
-                Write-Host "#expanding : ${downloaded_file}"
-                Expand-Archive -Path $downloaded_file -DestinationPath $expandPath -Force
-            }
-        }
-        $cmd = "./7za.exe"
-        if ( ( $archive_extension -ne ".zip" ) -and ( Test-Path $cmd ) )
-        {
-            $archive_extension2 = [System.IO.Path]::GetExtension( $archive_file_name )
-            $is_tar = $archive_extension2 -eq ".tar"
-
-            $tmp_path = $expandPath
-
-            if ( $is_tar )
-            {
-                $tmp_path = "./"
-            }
-
-            $check_path = Join-Path $tmp_path $archive_file_name
-
-            if ( !( Test-Path -Path $check_path -PathType container ) )
-            {
-                Write-Host "#expanding : ${downloaded_file}"
-                & $cmd x $downloaded_file -aos -o"${tmp_path}"
-            }
-
-            if ( $is_tar )
-            {
-                $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $archive_file_name )
-                if ( !( Test-Path -Path $extract_name -PathType container ) )
+                if ( !( Test-Path -Path $archive_file_name -PathType container ) )
                 {
-                    & $cmd x $archive_file_name -aos -o"${expandPath}"
+                    Write-Host "#expanding : ${downloaded_file}"
+                    Expand-Archive -Path $downloaded_file -DestinationPath $expandPath -Force
+                    Write-Host "#expand ===> completed"
+                }
+            }
+
+            $cmd = "./7za.exe"
+            if ( ( $archive_extension -ne ".zip" ) -and ( Test-Path $cmd ) )
+            {
+                $archive_extension2 = [System.IO.Path]::GetExtension( $archive_file_name )
+                $is_tar = $archive_extension2 -eq ".tar"
+
+                $tmp_path = $expandPath
+
+                if ( $is_tar )
+                {
+                    $tmp_path = "./"
+                }
+
+                $check_path = Join-Path $tmp_path $archive_file_name
+
+                if ( !( Test-Path -Path $check_path -PathType container ) )
+                {
+                    Write-Host "#expanding : ${downloaded_file}"
+                    & $cmd x $downloaded_file -aos -o"${tmp_path}"
+                    Write-Host "#expand ===> completed"
+                }
+
+                if ( $is_tar )
+                {
+                    $extract_name = [System.IO.Path]::GetFileNameWithoutExtension( $archive_file_name )
+                    if ( !( Test-Path -Path $extract_name -PathType container ) )
+                    {
+                        & $cmd x $archive_file_name -aos -o"${expandPath}"
+                        Write-Host "#expand ===> completed"
+                    }
                 }
             }
         }
+        else
+        {
+            # tar
+            if ( Test-Path $TAR_CMD )
+            {
+                if ( !( Test-Path -Path $expandPath -PathType container ) )
+                {
+                    & mkdir $expandPath
+                }
+
+                # $cmd_args = @("-v", "-x", "-f", "${downloaded_file}", "-C", "${expandPath}")
+
+                # Write-Host "cmd_args ${cmd_args}"
+
+                # & $TAR_CMD $cmd_args
+                & $TAR_CMD -v -x -f "${downloaded_file}" -C "${expandPath}"
+
+                Write-Host "#expand ===> completed"
+            }
+            else
+            {
+                Write-Host "#error : ${TAR_CMD} is not found!"
+            }
+        }
+
     }
 
     # installer execute 
@@ -110,7 +143,8 @@ function DownloadFromURI( [string]$uri, [switch]$expand, [switch]$forceExpand, [
 
 function setupEnvironment()
 {
-    DownloadFromURI -Uri $URI_7ZIP -Expand
+    DownloadFromURI @global:URI_7ZIP
+    DownloadFromURI @global:URI_MSYS2
 
     foreach ( $download in $global:DOWNLOAD_LIST )
     {
@@ -121,8 +155,13 @@ function setupEnvironment()
 
 
 # preset vars
+$URI_7ZIP = @{}
+$URI_MSYS2 = @{}
 $DOWNLOAD_LIST = @()
-$URI_7ZIP = "http://www.7-zip.org/a/7za920.zip"
+
+$MSYS2_USR_BIN = "./msys64/usr/bin/"
+$TAR_CMD = Join-Path $MSYS2_USR_BIN "bsdtar.exe"
+
 
 $installer_option_file = "./tools-installer.options"
 $installer_option_src_file = "${installer_option_file}.sample"
