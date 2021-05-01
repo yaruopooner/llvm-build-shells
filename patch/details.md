@@ -1,27 +1,47 @@
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
-<ul>
-<li><a href="#sec-1">1. invalidate-mmap.patch</a></li>
-<li><a href="#sec-2">2. bugfix000.patch</a></li>
-<li><a href="#sec-3">3. msvc2017-build-error-fixed.patch</a></li>
-</ul>
-</div>
-</div>
+
+# Table of Contents
+
+1.  [invalidate-mmap.patch](#orgcece7f1)
+2.  [<del>bugfix000.patch</del>](#org7cca040)
+3.  [<del>msvc2017-build-error-fixed.patch</del>](#orgfec4f41)
 
 
 
-# invalidate-mmap.patch<a id="sec-1" name="sec-1"></a>
+<a id="orgcece7f1"></a>
 
-Bug 20880 - Header file mmap lock problem by CXTranslationUnit  
-<https://bugs.llvm.org/show_bug.cgi?id=20880>  
+# invalidate-mmap.patch
 
-# bugfix000.patch<a id="sec-2" name="sec-2"></a>
+-   Contents  
+    mmap use invalidation.
 
-Bug 31150 - Out of range access occurs and a crash occurs in llvm/tools/clang/lib/Lex/HeaderSearch.cpp  
-<https://bugs.llvm.org/show_bug.cgi?id=31150>  
+-   Detail  
+    Bug 20880 - Header file mmap lock problem by CXTranslationUnit  
+    <https://bugs.llvm.org/show_bug.cgi?id=20880>
 
-# msvc2017-build-error-fixed.patch<a id="sec-3" name="sec-3"></a>
 
-I didn't report this error.  
-llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
+<a id="org7cca040"></a>
+
+# <del>bugfix000.patch</del>
+
+-   Contents  
+    Fixed out of range access at container.  
+    
+    Apply this bugfix patch if the LLVM version is 11.0.x or lower.  
+    This bug is fixed on LLVM 12.0.0.
+
+-   Detail  
+    Bug 31150 - Out of range access occurs and a crash occurs in llvm/tools/clang/lib/Lex/HeaderSearch.cpp  
+    <https://bugs.llvm.org/show_bug.cgi?id=31150>
+
+
+<a id="orgfec4f41"></a>
+
+# <del>msvc2017-build-error-fixed.patch</del>
+
+-   Contents  
+    Fixed compile error.  
+    I didn't report this error.
+
+-   Detail  
+    LLVM 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & LLVM 4.00 only, this problem fixed at LLVM greater than 4.00.
+

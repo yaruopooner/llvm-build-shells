@@ -6,14 +6,19 @@ $global:GitCheckoutInfos = @{
     # LLVM
     RepositoryName = "llvm-project";
     RepositoryURL = "https://github.com/llvm/llvm-project.git";
-    DefaultCheckoutTag = "llvmorg-11.0.0";
+    DefaultCheckoutTag = "llvmorg-12.0.0";
     Fetch = $true;
     Patches = @(
-        # llvm bug : fixed out of range access at container.
-        "../patch/bugfix000.patch"
-        # llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
+        #-- LLVM bug : fixed out of range access at container.
+        #-- Apply this bugfix patch if the LLVM version is 11.0.x or lower.
+        #-- Fixed in LLVM 12.0.0
+        # "../patch/bugfix000.patch"
+
+        #-- LLVM 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & LLVM 4.00 only, this problem fixed at LLVM greater than 4.00.
         # ,"../patch/msvc2017-build-error-fixed.patch"
-        # This patch is for ac-clang of emacs package.
+
+        #-- This patch is for ac-clang of emacs package.
+        #-- mmap use invalidation.
         # ,"../patch/invalidate-mmap.patch"
     );
     AdditionalOptions = @(
