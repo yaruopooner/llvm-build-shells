@@ -1,42 +1,44 @@
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
-<ul>
-<li><a href="#sec-1">1. 使用方法</a></li>
-<li><a href="#sec-2">2. セルフビルドに必要なソフトウェア</a>
-<ul>
-<li><a href="#sec-2-1">2.1. Git</a></li>
-<li><a href="#sec-2-2">2.2. CMake</a></li>
-<li><a href="#sec-2-3">2.3. Python 2.7.x</a></li>
-</ul>
-</li>
-<li><a href="#sec-3">3. セルフビルド</a>
-<ul>
-<li><a href="#sec-3-1">3.1. パッチ</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
+
+# Table of Contents
+
+1.  [使用方法](#org46a39ed)
+2.  [セルフビルドに必要なソフトウェア](#org623912c)
+    1.  [Git](#org31c5949)
+    2.  [CMake](#org0ce101a)
+    3.  [Python 3.6.x](#orgbc641b6)
+    4.  [Python 2.7.x](#org631bb26)
+3.  [セルフビルド](#org04a3e55)
+    1.  [パッチ](#org198d65f)
 
 
 
-# 使用方法<a id="sec-1" name="sec-1"></a>
+<a id="org46a39ed"></a>
+
+# 使用方法
 
 このシェルではLinux or CYGWINのLLVMがビルド可能です。  
 llvm-builder.shが本体です。  
 sample.shが呼び出しサンプルです。  
 patchパスなど必要に応じて編集してください。  
 
-# セルフビルドに必要なソフトウェア<a id="sec-2" name="sec-2"></a>
+
+<a id="org623912c"></a>
+
+# セルフビルドに必要なソフトウェア
 
 以下が必要になります。  
 
-## Git<a id="sec-2-1" name="sec-2-1"></a>
+
+<a id="org31c5949"></a>
+
+## Git
 
     $ sudo apt-get install git
 
-## CMake<a id="sec-2-2" name="sec-2-2"></a>
+
+<a id="org0ce101a"></a>
+
+## CMake
 
     $ sudo apt-get install cmake
 
@@ -52,22 +54,40 @@ patchパスなど必要に応じて編集してください。
     $ ./configure && make
     $ make install
 
-## Python 2.7.x<a id="sec-2-3" name="sec-2-3"></a>
 
-入っているはず  
+<a id="orgbc641b6"></a>
 
-# セルフビルド<a id="sec-3" name="sec-3"></a>
+## Python 3.6.x
+
+LLVM 12.0.X から必要。  
+
+
+<a id="org631bb26"></a>
+
+## Python 2.7.x
+
+LLVM 11.0.X までは必要。  
+
+
+<a id="org04a3e55"></a>
+
+# セルフビルド
 
 Bash版を使用します。  
 
 llvm-build-shellsでは以下を一括で行います。  
+
 -   LLVMレポジトリのクローンとチェックアウト
 -   パッチ適用(optional)
 -   cmakeによるLLVM Makefile生成
 -   ビルド
 
-## パッチ<a id="sec-3-1" name="sec-3-1"></a>
+
+<a id="org198d65f"></a>
+
+## パッチ
 
 sample.shでパッチのパスを設定する必要があります。  
 
-[Patch Details](../patch/details.md)
+[Patch Details](../patch/details.md)  
+

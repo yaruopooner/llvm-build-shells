@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2019/11/06.14:20:03
+# last updated : 2021/05/02.17:56:26
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -40,8 +40,11 @@
      $ make install
    #+end_src
 
+** Python 3.6.x
+   LLVM 12.0.X から必要。
+
 ** Python 2.7.x
-   入っているはず
+   LLVM 11.0.X までは必要。
 
 * セルフビルド
   Bash版を使用します。
