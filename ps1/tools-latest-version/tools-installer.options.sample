@@ -30,6 +30,11 @@ $global:DOWNLOAD_LIST = @(
         expand = $true;
         expandPath = "msys64";
     }
+    ,@{ # libwinpthread-1 for Python3.x [msys2(x64)] http://repo.msys2.org/mingw/x86_64/
+        uri = "http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-libwinpthread-git-9.0.0.6166.0a00d0ea-1-any.pkg.tar.zst"
+        expand = $true;
+        expandPath = "msys64";
+    }
     # ,@{ # Python2.x [msys2(x86)] http://repo.msys2.org/mingw/i686/
     #     uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-5-any.pkg.tar.xz";
     #     # uri = "http://repo.msys2.org/mingw/i686/mingw-w64-i686-python2-2.7.14-1-any.pkg.tar.xz";
