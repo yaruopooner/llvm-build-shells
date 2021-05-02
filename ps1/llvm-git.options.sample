@@ -1,7 +1,7 @@
 # -*- mode: powershell ; coding: utf-8-dos -*-
 
 
-# llvm 10.0.0
+# llvm 12.0.0
 $global:GitCheckoutInfos = @{
     # LLVM
     RepositoryName = "llvm-project";

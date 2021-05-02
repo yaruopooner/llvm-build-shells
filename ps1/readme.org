@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2020/03/31.18:33:15
+# last updated : 2021/05/02.17:54:13
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -38,25 +38,36 @@
    And it is used in the execution on script of custom build step.
    You need to set the PATH in sample.ps1.
 	
-** Python 2.7.x[recommend]
+** Python 3.6.x[required]
    http://repo.msys2.org/mingw/x86_64/
    http://repo.msys2.org/mingw/i686/
 
+   Starting with LLVM 12.0.X, use Python 3.6.x (msys2) or higher.
+   Use Python 3.6.x (msys2).
+   Should not use 2.x
+   Required when CMake to generate the project files of LLVM.
+   You need to set the PATH in sample.ps1.
+
+** Python 2.7.x[required]
+   http://repo.msys2.org/mingw/x86_64/
+   http://repo.msys2.org/mingw/i686/
+
+   Up to LLVM 11.0.X uses Python 2.7.x (msys2).
    Use Python 2.7.x (msys2).
    Should not use 3.x
    Required when CMake to generate the project files of LLVM.
    You need to set the PATH in sample.ps1.
 
-** MSYS2[unrecommend]
-   _Behavior changed by updating msys2 and changed to deprecated._
 
-   http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/
+** MSYS2[recommend]
+   _Updating with pacman is not recommended as it changes the behavior of msys2._
 
-   Python and Perl support.
-   Perl is also required when Win32 build.
-   Easier than individually install Python and Perl.
-   Does not pollute the environment because it uses the portable version.
-   You need to set the PATH in sample.ps1.
+
+   https://repo.msys2.org/distrib/x86_64/
+   Use msys2-base-x86_64 to decompress various packages downloaded with tools-installer.ps1 .
+   Python2 and Python3 are also decompress for msys2.
+
+   You need to set the path in sample.ps1 after extracting with tools-installer.ps1.
 
 ** GnuWin32[unrecommend]
    http://sourceforge.net/projects/getgnuwin32/   
