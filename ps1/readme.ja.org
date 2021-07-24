@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2020/03/31.18:32:07
+# last updated : 2021/05/02.17:51:45
 
 
 #+TITLE:     LLVM Build Shell by Power Shell
@@ -34,25 +34,34 @@
    なるべく最新版を使用してください。
    Visual Studio ソリューション＆プロジェクトファイル生成と、カスタムビルドステップ時のスクリプト実行で使用される。
    sample.ps1でパスを設定する必要があります。
-	
-** Python 2.7.x[推奨]
+
+** Python 3.6.x[必須]
    http://repo.msys2.org/mingw/x86_64/
    http://repo.msys2.org/mingw/i686/
 
-   Python 2.7.x(msys2) を使用します。
+   LLVM 12.0.X からは Python 3.6.x(msys2) 以上を使用します。
+   2.x 系は使用しない。
+   cmake で LLVM のソリューションファイルを生成する際に必要。
+   sample.ps1でパスを設定する必要があります。
+	
+** Python 2.7.x[必須]
+   http://repo.msys2.org/mingw/x86_64/
+   http://repo.msys2.org/mingw/i686/
+
+   LLVM 11.0.X までは Python 2.7.x(msys2) を使用します。
    3.x 系は使用しない。
    cmake で LLVM のソリューションファイルを生成する際に必要。
    sample.ps1でパスを設定する必要があります。
 
-** MSYS2[非推奨]
-   _msys2のアップデートにより挙動が変わるので非推奨に変更。_
 
-   http://jaist.dl.sourceforge.net/project/msys2/Base/x86_64/
+** MSYS2[推奨]
+   _pacmanによるアップデートはmsys2の挙動が変わるので非推奨。_
 
-   Python, Perl をサポート。
-   PerlはWin32版ビルドでのみ必要。
-   個別にPythonとPerlをインストールするより楽。
-   ポータブル版を使用するので環境を汚さない。
+   https://repo.msys2.org/distrib/x86_64/
+   tools-installer.ps1 でダウンロードした各種パッケージ展開のためにmsys2-base-x86_64を使用する
+   Python2, Python3 もmsys2用が展開される
+
+   tools-installer.ps1 で展開後に
    sample.ps1でパスを設定する必要があります。
 
 ** GnuWin32[非推奨]

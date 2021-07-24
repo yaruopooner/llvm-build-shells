@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2018/03/12.12:37:22
+# last updated : 2021/05/01.19:05:22
 
 
 #+TITLE:     Patch Details for LLVM
@@ -9,13 +9,28 @@
 
 
 * invalidate-mmap.patch
-  Bug 20880 - Header file mmap lock problem by CXTranslationUnit 
-  https://bugs.llvm.org/show_bug.cgi?id=20880
+  - Contents
+    mmap use invalidation.
 
-* bugfix000.patch
-  Bug 31150 - Out of range access occurs and a crash occurs in llvm/tools/clang/lib/Lex/HeaderSearch.cpp
-  https://bugs.llvm.org/show_bug.cgi?id=31150
+  - Detail
+    Bug 20880 - Header file mmap lock problem by CXTranslationUnit 
+    https://bugs.llvm.org/show_bug.cgi?id=20880
 
-* msvc2017-build-error-fixed.patch
-  I didn't report this error.
-  llvm 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & llvm 4.00 only, this problem fixed at llvm greater than 4.00.
+* +bugfix000.patch+
+  - Contents
+    Fixed out of range access at container.
+
+    Apply this bugfix patch if the LLVM version is 11.0.x or lower.
+    This bug is fixed on LLVM 12.0.0.
+
+  - Detail
+    Bug 31150 - Out of range access occurs and a crash occurs in llvm/tools/clang/lib/Lex/HeaderSearch.cpp
+    https://bugs.llvm.org/show_bug.cgi?id=31150
+
+* +msvc2017-build-error-fixed.patch+
+  - Contents
+    Fixed compile error.
+    I didn't report this error.
+
+  - Detail
+    LLVM 4.00 under ? msvc ? : build error fixed patch for msvc2017(update0) & LLVM 4.00 only, this problem fixed at LLVM greater than 4.00.

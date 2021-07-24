@@ -120,7 +120,7 @@ function executeCheckoutByGIT()
             popd
         fi
     else
-        local -r CMD_ARGS=("clone" "${REPOSITORY_URL}" "${ADDITIONAL_OPTIONS}")
+        local CMD_ARGS=("clone" "${REPOSITORY_URL}" "${ADDITIONAL_OPTIONS}")
 
         echo "====clone detail===="
         echo "repository   : ${REPOSITORY_NAME}"
@@ -139,7 +139,7 @@ function executeCheckoutByGIT()
         # branch checkout
         local -r START_POINT="refs/tags/${CHECKOUT_TAG}"
         local -r BRANCH=${CHECKOUT_TAG}
-        local -r CMD_ARGS=("checkout" "--force" "-B" "${BRANCH}" "${START_POINT}")
+        local CMD_ARGS=("checkout" "--force" "-B" "${BRANCH}" "${START_POINT}")
 
         echo "====checkout branch===="
         echo "checkout tag : ${CHECKOUT_TAG}"
