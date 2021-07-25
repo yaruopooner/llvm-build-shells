@@ -20,7 +20,7 @@ function usage()
     echo '     generate makefile by cmake'
     echo '     The additional option is referenced from "llvm.cmake.options"'
     echo ' --build'
-    echo '     execute make'
+    echo '     execute compile'
     echo ' --llvmCheckoutTag "CHECKOUT_TAG_NAME"'
     echo '     The tag name to checkout from the LLVM repository'
     echo '     default is leatest version tag'
@@ -228,9 +228,9 @@ function executeConfigureByCMake()
     mkdir ${BUILD_TYPE}
     cd ${BUILD_TYPE}
 
-    local -r CMD_ARGS=("../../../${REPOSITORY_NAME}/llvm" "-DCMAKE_BUILD_TYPE=${BUILD_TYPE}" "${ADDITIONAL_OPTIONS[@]}")
+    local -r CMD_ARGS=("../../../${REPOSITORY_NAME}/llvm" "${ADDITIONAL_OPTIONS[@]}" "-DCMAKE_BUILD_TYPE=${BUILD_TYPE}")
 
-    # echo "cmd_args:${CMD_ARGS[@]}"
+    echo "cmd arguments                 : ${CMD_ARGS[@]}"
     cmake ${CMD_ARGS[@]}
 
     popd

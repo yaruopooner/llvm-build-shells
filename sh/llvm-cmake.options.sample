@@ -3,6 +3,8 @@
 
 
 declare -rga CMakeAdditionalOptions=(
+    "-G Unix Makefiles"
+    # "-G Ninja"
     # "-Thost=x64"
     # "-DCMAKE_BUILD_TYPE=Release"
     # "-DLLVM_ENABLE_PROJECTS=clang;clang-tools-extra;libcxx;libcxxabi;libunwind;lldb;compiler-rt;lld;polly"

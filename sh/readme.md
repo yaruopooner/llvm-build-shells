@@ -1,18 +1,19 @@
 
 # Table of Contents
 
-1.  [Usage](#org8b30d47)
-2.  [Requirements](#org4368ed2)
-    1.  [Git](#org0e3022f)
-    2.  [CMake](#org8f470a2)
-    3.  [Python 3.6.x](#org041c582)
-    4.  [Python 2.7.x](#orgf6be4ce)
-3.  [Self Build](#org73190a3)
-    1.  [Patch](#org4e98871)
+1.  [Usage](#org47522eb)
+2.  [Requirements](#orgc7773eb)
+    1.  [Git](#org14dd8dd)
+    2.  [CMake](#org2335b1b)
+    3.  [Ninja](#org6abf5e5)
+    4.  [Python 3.6.x](#orgec536be)
+    5.  [Python 2.7.x](#org74dec8d)
+3.  [Self Build](#org4668263)
+    1.  [Patch](#org27d1a51)
 
 
 
-<a id="org8b30d47"></a>
+<a id="org47522eb"></a>
 
 # Usage
 
@@ -22,21 +23,21 @@ sample.sh is a call sample.
 Please edit it if necessary, for example the patch path.  
 
 
-<a id="org4368ed2"></a>
+<a id="orgc7773eb"></a>
 
 # Requirements
 
 The following is required.  
 
 
-<a id="org0e3022f"></a>
+<a id="org14dd8dd"></a>
 
 ## Git
 
     $ sudo apt-get install git
 
 
-<a id="org8f470a2"></a>
+<a id="org2335b1b"></a>
 
 ## CMake
 
@@ -55,21 +56,28 @@ download latest cmake, decompress, build and install.
     $ make install
 
 
-<a id="org041c582"></a>
+<a id="org6abf5e5"></a>
+
+## Ninja
+
+    $ sudo apt-get install ninja-build
+
+
+<a id="orgec536be"></a>
 
 ## Python 3.6.x
 
 Required from LLVM 12.0.X.  
 
 
-<a id="orgf6be4ce"></a>
+<a id="org74dec8d"></a>
 
 ## Python 2.7.x
 
 Required up to LLVM 11.0.X.  
 
 
-<a id="org73190a3"></a>
+<a id="org4668263"></a>
 
 # Self Build
 
@@ -79,11 +87,11 @@ llvm-build-shells performs the following steps.
 
 -   LLVM repository clone and checkout
 -   Apply patch(optional)
--   Makefile generation by cmake
+-   Build files generation by cmake(makefile or build.ninja)
 -   Build
 
 
-<a id="org4e98871"></a>
+<a id="org27d1a51"></a>
 
 ## Patch
 

@@ -1,5 +1,5 @@
 # -*- mode: org ; coding: utf-8-unix -*-
-# last updated : 2021/05/02.17:57:06
+# last updated : 2021/07/25.02:09:39
 
 
 #+TITLE:     LLVM Build Shell by bash
@@ -40,11 +40,17 @@
      $ make install
    #+end_src
 
+** Ninja
+   #+begin_src shell-script
+     $ sudo apt-get install ninja-build
+   #+end_src
+
 ** Python 3.6.x
    Required from LLVM 12.0.X.
 
 ** Python 2.7.x
    Required up to LLVM 11.0.X.
+
 
 * Self Build
   Use Bash version.
@@ -52,7 +58,7 @@
   llvm-build-shells performs the following steps.
   - LLVM repository clone and checkout
   - Apply patch(optional)
-  - Makefile generation by cmake
+  - Build files generation by cmake(makefile or build.ninja)
   - Build
     
 ** Patch
